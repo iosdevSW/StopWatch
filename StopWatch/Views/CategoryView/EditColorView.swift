@@ -17,6 +17,7 @@ class EditColorView: UIView {
         label.textColor = .darkGray
         label.text = "색상 추가"
         label.font = UIFont(name: "GodoM", size: 18)
+        
         return label
     }()
     
@@ -68,9 +69,6 @@ class EditColorView: UIView {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
         button.tintColor = .red
-        
-//        button.layer.borderWidth = 1
-        //        button.layer.borderColor = UIColor.white.cgColor
         
         return button
     }()
@@ -147,7 +145,7 @@ class EditColorView: UIView {
             self.cancelButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 8),
             self.cancelButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
             self.cancelButton.widthAnchor.constraint(equalToConstant: 20),
-            self.cancelButton.heightAnchor.constraint(equalToConstant: 20)
+            self.cancelButton.heightAnchor.constraint(equalToConstant: 20),
             ])
         
         NSLayoutConstraint.activate([

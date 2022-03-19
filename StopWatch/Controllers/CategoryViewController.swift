@@ -126,7 +126,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource{
 
         
         cell.nameLabel.text = name
-        cell.colorView.backgroundColor = self.uiColorFromHexCode(colorCode)
+        cell.colorView.backgroundColor = self.view.uiColorFromHexCode(colorCode)
         cell.subValueLabel.text = subSecond
         cell.valueLabel.text = "\(hour) : \(minute) :  \(second)"
         

@@ -11,10 +11,9 @@ import RealmSwift
 class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
     
     var calendarInfo: CalendarViewInfo = CalendarViewInfo()
+    let calendarMethod = CalendarMethod()
     let dayArray = ["S","M","T","W","T","F","S"]
-    var year = 0
-    var month = 0
-    var day = 0
+    var saveDate = ""
     
     var delegate: StopWatchViewController?
     var calendarMode: CalendarMode = .week {
@@ -75,7 +74,8 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         self.collectionHeaderView.dataSource = self
         self.calendarView.delegate = self
         self.calendarView.dataSource = self
-        self.getToday()
+        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        
         self.backgroundColor = .white
         self.layer.cornerRadius = 10
         
@@ -94,63 +94,22 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         self.calendarInfo.heightNumberOfCell = 6
     }
     
-    func getToday(){
-        let today = Date()
-        var calendar = Calendar.current
-        calendar.timeZone = .current
-        self.year = calendar.component(.year, from: today)
-        self.month = calendar.component(.month, from: today)
-        self.day = calendar.component(.day, from: today)
-    }
-    
-    // CalendarMethod
-    
-    func isLeapYear(year: Int) -> Bool {
-        if (year%4 == 0 && year%100 != 0) || year%400 == 0{
-            return true //4로 떨어지고 100으로 안떨어지거나 400으로 떨어지면 윤년
-        } else { return false } //아니면 평년
-    }
-
-    func getFirstDay(year: Int,month: Int, day: Int) -> Int {
-        let first = (year-1) / 400 // 400으로 떨어진건 무조건 윤년.
-        let second = (year-1) / 100 - first //100으로 나눈 수는 평년 그러나 400으로 나눈건 윤년이니까 빼준다.
-        let leapYear =  (year-1) / 4 - second // 4로 떨어진 수에 100으로 떨어진 수를 빼면 윤년
-        var days = (year - 1) * 365 + leapYear + 1 // 1년 1월 1일 기준 월요일로 잡고 월요일값 1에 일 수 만큼 더한 후 7로 나누어 그 해 첫 요일 값을 구한다.
-        // 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6, 일: 0
-        var monthDay = 0
-        
-        for i in 1..<month {
-            monthDay += self.getMonthDay(year: year, month: i)
-        }
-        days += monthDay
-
-        return days % 7
-    }
-
-    // 월마다 일 수 구하기.
-    func getMonthDay(year: Int, month: Int) -> Int {
-        switch month {
-        case 4 : fallthrough
-        case 6 : fallthrough
-        case 9 : fallthrough
-        case 11 : return 30
-        case 2 :
-            if isLeapYear(year: year) {
-                return 29
-            }else { return 28 }
-            
-        default:
-            return 31
-        }
-    }
+//    func getToday(){
+//        let today = Date()
+//        var calendar = Calendar.current
+//        calendar.timeZone = .current
+//        self.year = calendar.component(.year, from: today)
+//        self.month = calendar.component(.month, from: today)
+//        self.day = calendar.component(.day, from: today)
+//    }
     
     // 전체 셀 개수 구하기.
     func getNumberOfCell() -> Int{
+        let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.saveDate)
+        let startDay = self.calendarMethod.getFirstDay(date: self.saveDate)
+        let dayCount = self.calendarMethod.getMonthDay(year: year, month: month)
         
-        let startDay = self.getFirstDay(year: self.year, month: self.month, day: self.day)
-        let day = self.getMonthDay(year: self.year, month: self.month)
-        
-        if startDay + day <= self.calendarInfo.numberOfItem{
+        if startDay + dayCount <= self.calendarInfo.numberOfItem{
             self.calendarInfo.heightNumberOfCell = 6
         }else {
             self.calendarInfo.heightNumberOfCell = 7
@@ -158,20 +117,6 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
 
         return self.calendarInfo.numberOfItem
         
-    }
-    // 일(day) -> 인덱스 변환함수
-    func returnIndexOfDay() -> Int{
-        let dayNumber = self.getFirstDay(year: self.year, month: self.month, day: self.day)
-        return self.day + dayNumber
-    }
-    
-    func returnDate(year: Int, month: Int, day: Int) -> String {
-        let year = String(year)
-        let month = self.returnString(month)
-        let day = self.returnString(day)
-        let date = year + "." + month + "." + day
-        
-        return date
     }
     
     //월마다 일 수 계산하여 날짜 표시하는 함수
@@ -181,12 +126,13 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         cell.frameView.backgroundColor = .white
         cell.dataCheckView.isHidden = true
         
-        let dayNumber = self.getFirstDay(year: self.year, month: self.month, day: self.day)
-        let day = dayNumber + self.day
+        let (year,month,day): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.saveDate)
+        let dayNumber = self.calendarMethod.getFirstDay(date: self.saveDate)
+        let index = dayNumber + day
         
         // 해당 달의 첫 날짜(1일)에 해당하는 요일에 맞춰 달력 나타내기.
         if row >= dayNumber{
-            if row >= self.getMonthDay(year: self.year, month: self.month) + dayNumber{
+            if row >= self.calendarMethod.getMonthDay(year: year, month: month) + dayNumber{
                 cell.isUserInteractionEnabled = false
                 cell.dateLabel.text = " " // 초과
                 cell.dataCheckView.isHidden = true
@@ -194,12 +140,13 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
                 cell.dateLabel.text = "\(row + 1 - dayNumber)"
                 // 데이터 있는 날짜 표시
                 let realm = try! Realm()
-                let date = self.returnDate(year: self.year, month: self.month, day: row + 1 - dayNumber)
+                
+                let date = String(year) + "." + self.returnString(month) + "." + self.returnString(row + 1  - dayNumber)
                 if let _ = realm.object(ofType: DailyData.self, forPrimaryKey: date) {
                     cell.dataCheckView.isHidden = false
                 }
                 //선택된 셀 배경 바꾸기
-                if day == (row + 1) {
+                if index == (row + 1) {
                     cell.frameView.backgroundColor = .standardColor
                 }
             }
@@ -282,14 +229,15 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         // 선택한 인덱스 날짜 계산
         if collectionView == self.calendarView {
             let row = indexPath.row
-            let dayNumber = self.getFirstDay(year: self.year, month: self.month, day: self.day)
+            let dayNumber = self.calendarMethod.getFirstDay(date: self.saveDate)
             
             let day = self.returnString(row + 1 - dayNumber)
-            let month = self.returnString(self.month)
-            let year = self.year
+            let year: String = CalendarMethod().splitDate(date: self.saveDate).0
+            let month: String = CalendarMethod().splitDate(date: self.saveDate).1
+            
             let string = "\(year).\(month).\(day)"
-    
-            self.day = Int(day)!
+            
+            self.saveDate = string
             self.calendarView.reloadData()
             self.delegate?.clickDay(saveDate: string)
         }

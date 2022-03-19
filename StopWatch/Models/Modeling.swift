@@ -89,7 +89,7 @@ struct CalendarViewInfo{
     var numberOfItem: Int {
         return widthNumberOfCell * (heightNumberOfCell! - 1) // - 1은 요일 표기하는 헤더 셀 크기 빼주기.
     }
-    var dayArray = ["일","월","화","수","목","금","토"]
+    var dayArray = ["S","M","T","W","T","F","S"]
 }
 
 class SingleTon {

@@ -98,9 +98,9 @@ extension StatisticsViewController: SaveDateDetectionDelegate {
     func detectSaveDate(date: String) {
         self.navigationItem.title = CalendarMethod().convertDate(date: date)
         let stringDate:(Int,Int,Int) = CalendarMethod().splitDate(date: date)
-        self.calendarView.year = stringDate.0
-        self.calendarView.month = stringDate.1
-        self.calendarView.day = stringDate.2
+//        self.calendarView.year = stringDate.0
+//        self.calendarView.month = stringDate.1
+//        self.calendarView.day = stringDate.2
         
         self.calendarView.calendarView.reloadData()
     }

@@ -21,15 +21,6 @@ extension UIViewController {
         self.view.endEditing(true)
     }
     
-    // 16진수 코드를 입력받아 UIColor를 반환하는 함수.
-    func uiColorFromHexCode(_ hex:Int)->UIColor{
-        let red = CGFloat((hex & 0xFF0000) >> 16) / 0xFF
-        let green = CGFloat((hex & 0x00FF00) >> 8) / 0xFF
-        let blue = CGFloat(hex & 0x0000FF) / 0xFF
-        
-        return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
-    }
-    
 }
 
 extension UIView {
@@ -76,6 +67,22 @@ extension UIColor {
     class var customPurpleColor:UIColor {
         return UIColor(red: 226/255, green: 219/255, blue: 255/255, alpha: 1.0)
     }
+    
+    // UICOLOR -> HEXCODE
+    func toHexStr() -> String {
+        var (r,g,b,a): (CGFloat,CGFloat,CGFloat,CGFloat) = (0,0,0,0)
+        
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+            
+        let rgb: Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
+            
+        print(r)
+        print(g)
+        print(b)
+
+        return NSString(format:"#%06x", rgb) as String
+        }
+
 }
 
 extension UITextField {

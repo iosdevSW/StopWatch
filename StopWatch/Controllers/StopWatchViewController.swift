@@ -19,10 +19,6 @@ class StopWatchViewController: UIViewController {
             self.setTimeLabel() // 현재시간 Label 재설정
             self.titleView.label.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
             self.toDoTableView.reloadData()
-            self.calendarView.day = Int(CalendarMethod().splitDate(date: self.saveDate).2) ?? 0
-            self.calendarView.month = Int(CalendarMethod().splitDate(date: self.saveDate).1) ?? 0
-            self.calendarView.year = Int(CalendarMethod().splitDate(date: self.saveDate).0) ?? 0
-            self.calendarView.calendarView.reloadData()
         }
     }
     
@@ -45,9 +41,8 @@ class StopWatchViewController: UIViewController {
         return view
     }()
     
-    lazy var calendarView: CalendarView = {
+    let calendarView: CalendarView = {
         let view = CalendarView()
-        view.delegate = self
         view.translatesAutoresizingMaskIntoConstraints = false
         
         return view
@@ -229,13 +224,14 @@ class StopWatchViewController: UIViewController {
         self.addSubView()   // 서브뷰 추가 메소드
         self.layOut()       // 레이이웃 메소드
         self.addTarget()
+        self.calendarView.delegate = self
         self.toDoTableView.delegate = self
         self.toDoTableView.dataSource = self
         self.hideKeyboardWhenTapped() //
         self.setNavigationItem()
         self.addObserverMtd() // 옵저버 추가
         self.reloadProgressBar()
-//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -250,9 +246,12 @@ class StopWatchViewController: UIViewController {
         self.setNavigationBar()  // 네비게이션바 설정
         self.setDday()
     }
+    
     override func viewDidAppear(_ animated: Bool) {
-        self.calendarView.calendarView.scrollToItem(at: NSIndexPath(item: 12, section: 0) as IndexPath, at: .left, animated: true)
+        let itemIndex = CalendarMethod().returnIndexOfDay(date: self.saveDate)
+        self.calendarView.calendarView.scrollToItem(at: IndexPath(item: itemIndex - 1, section: 0), at: .left, animated: true)
     }
+    
     
     func setNavigationBar() {
         // Set navigationbar Color ( ios15 기준 버전별로 분기 )
@@ -420,9 +419,7 @@ class StopWatchViewController: UIViewController {
         self.saveDate = String(year) + "." + self.view.returnString(month) + "." + self.view.returnString(day)
         
         // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
-        self.calendarView.day = day
-        self.calendarView.month = month
-        self.calendarView.year = year
+        self.calendarView.saveDate = self.saveDate
         self.calendarView.calendarView.reloadData()
         
         self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
@@ -833,7 +830,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         let view = TodoListHeaderView()
 
         let colorCode = segment[section].colorCode
-        let color = self.uiColorFromHexCode(colorCode)
+        let color = self.view.uiColorFromHexCode(colorCode)
         view.categoryNameLabel.text = segment[section].name
         view.frameView.backgroundColor = color
     
@@ -860,7 +857,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         cell.checkImageView.isHidden = true
 
         let colorCode = self.realm.objects(Segments.self)[indexPath.section].colorCode
-        let color = self.uiColorFromHexCode(colorCode)
+        let color = self.view.uiColorFromHexCode(colorCode)
         let text = segment[indexPath.section].toDoList[indexPath.row]
         let checkImageIndex = segment[indexPath.section].listCheckImageIndex[indexPath.row]
         

@@ -221,10 +221,10 @@ class ConcentrationTimeViewController: UIViewController{
         self.label.text = segment[row].name
 //        self.label.textColor = .white
 //        self.frameView.backgroundColor = self.uiColorFromHexCode(segment[row].colorCode)
-        self.topView.backgroundColor = self.uiColorFromHexCode(segment[row].colorCode)
-        self.bottomview.backgroundColor = self.uiColorFromHexCode(segment[row].colorCode)
+        self.topView.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
+        self.bottomview.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
 //        self.mainLabel.textColor = self.uiColorFromHexCode(segment[row].colorCode)
-        self.pickerCategory.backgroundColor = self.uiColorFromHexCode(segment[row].colorCode)
+        self.pickerCategory.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
     }
     
     func closeStopModalView(){

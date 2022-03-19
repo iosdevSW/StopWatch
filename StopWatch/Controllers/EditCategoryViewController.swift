@@ -198,7 +198,7 @@ class EditCategoryViewController: UIViewController {
         self.editColorView?.addButton.tag = colorCode
         let convertString = String(colorCode, radix: 16).uppercased()
         self.editColorView!.getColorCodeTextfield.text? = convertString
-        self.editColorView!.colorPreView.backgroundColor = self.uiColorFromHexCode(colorCode)
+        self.editColorView!.colorPreView.backgroundColor = self.view.uiColorFromHexCode(colorCode)
         
         //버튼 타이틀을 edit으로 수정하고 edit method,delete method 추가
         self.editColorView?.addButton.setTitle("edit", for: .normal)
@@ -328,7 +328,7 @@ extension EditCategoryViewController: UICollectionViewDelegate,UICollectionViewD
         }else { // 팔레트 구성
             //팔레트 색상 구성
             let colorCode = palettes[indexPath.row].colorCode
-            cell.paintView.backgroundColor = self.uiColorFromHexCode(colorCode)
+            cell.paintView.backgroundColor = self.view.uiColorFromHexCode(colorCode)
            
             //선택된 셀이면 체크마크!
             if let row = self.selectedColorRow {
