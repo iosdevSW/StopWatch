@@ -46,7 +46,8 @@ class DdayViewController: UIViewController{
         view.translatesAutoresizingMaskIntoConstraints = false
         view.preferredDatePickerStyle = .wheels
         view.datePickerMode = .date
-        view.timeZone = .current
+        view.locale = Locale(identifier: "ko-KR")
+        view.timeZone = .autoupdatingCurrent
         view.minimumDate = Date() // 최소 오늘 이상
         
         return view

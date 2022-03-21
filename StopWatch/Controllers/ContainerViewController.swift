@@ -30,6 +30,18 @@ class ContainerViewController: UIViewController {
         self.view.addSubview(self.homeVC.view) // stopWatch의 뷰를 container 뷰의 자식뷰로 추가
         self.addChild(self.homeVC) // 컨테이너VC의 자식 컨트롤러로 StopWatchVC를 추가
         self.homeVC.didMove(toParent: self) // 부모VC가 바뀜을 알림
+        
+        // add gestrue
+        let leftGesture = UISwipeGestureRecognizer()
+        leftGesture.direction = .left
+        let rightGesture = UISwipeGestureRecognizer()
+        rightGesture.direction = .right
+        
+        self.StopWatchVC.frameView.addGestureRecognizer(leftGesture)
+        self.StopWatchVC.frameView.addGestureRecognizer(rightGesture)
+        
+        leftGesture.addTarget(self, action: #selector(self.respondToswipe(gesture:)))
+        rightGesture.addTarget(self, action: #selector(self.respondToswipe(gesture:)))
     }
     
     // 메뉴VC 구성 함수
@@ -51,6 +63,7 @@ class ContainerViewController: UIViewController {
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
                 self.homeVC.view.frame.origin.x = 160 // 왼쪽으로
             }, completion: nil)
+            
         }else {
             //hide menu
             UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
@@ -63,6 +76,22 @@ class ContainerViewController: UIViewController {
         }
     }
     //MARK: - Selector
+    
+    @objc func respondToswipe(gesture: UISwipeGestureRecognizer) {
+        if !self.isExpanded {
+            self.ConfigureMenuViewController()
+        }
+        
+        switch gesture.direction {
+        case .left:
+            self.isExpanded = false
+        case .right:
+            self.isExpanded = true
+        default:
+            print("default")
+        }
+        self.animatePanel(isExpand: self.isExpanded, MenuOption: nil)
+    }
 }
 
 extension ContainerViewController: StopWatchVCDelegate {
@@ -74,5 +103,8 @@ extension ContainerViewController: StopWatchVCDelegate {
         self.animatePanel(isExpand: self.isExpanded, MenuOption: menuOption)
     }
     
-    
+    func closeMenu() {
+        self.isExpanded = false
+        self.animatePanel(isExpand: self.isExpanded, MenuOption: nil)
+    }
 }

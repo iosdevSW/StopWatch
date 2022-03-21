@@ -81,12 +81,29 @@ class CategoryViewController: UIViewController {
         return nil
     }
     
+    func deleteCategory(point: CGPoint){
+        if let indexPath = self.tableView.indexPathForRow(at: point) {
+            let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+            if let todaySegment = filter?.dailySegment[indexPath.row]{
+                try! self.realm.write{
+                    self.realm.delete(todaySegment)
+                }
+            }
+            let segment = self.realm.objects(Segments.self)[indexPath.row]
+            
+            try! self.realm.write{
+                self.realm.delete(segment)
+            }
+            self.tableView.reloadData()
+        }
+    }
+    
     //MARK: Configure
     func configure(){
         self.view.backgroundColor = .white
         self.navigationItem.rightBarButtonItem = addCategoryBarButtonItem
         self.navigationItem.title = "Category"
-        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
         self.navigationController?.navigationBar.titleTextAttributes = textAttributes
     }
     
@@ -105,6 +122,32 @@ class CategoryViewController: UIViewController {
         let editVC = EditCategoryViewController()
         self.navigationController?.pushViewController(editVC, animated: true)
     }
+    
+    @objc func longPressGesture(gesture: UILongPressGestureRecognizer){
+        let point = gesture.location(in: self.tableView)
+        if let indexPath = self.tableView.indexPathForRow(at: point) {
+            let segment = self.realm.objects(Segments.self)
+            let name = segment[indexPath.row].name
+            let alert = UIAlertController(title: nil, message: name + "를 삭제 하시겠습니까?", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "확인", style: .default) {(_) in
+                self.deleteCategory(point: point)
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+            alert.addAction(okAction)
+            alert.addAction(cancelAction)
+            
+            present(alert, animated: true)
+            
+        }
+    }
+    
+    //MARK: setGesture
+    func setLongPressGesture(cell: CategoryCell){
+        let gesture = UILongPressGestureRecognizer()
+        gesture.addTarget(self, action: #selector(self.longPressGesture(gesture:)))
+        cell.addGestureRecognizer(gesture)
+    }
+    
 }
 //MARK: TableViewDelegate
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource{
@@ -115,7 +158,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as! CategoryCell
-       
+        self.setLongPressGesture(cell: cell)
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let segment = filter!.dailySegment
         let value = segment[indexPath.row].value 
@@ -135,24 +178,23 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource{
         return cell
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete{
-            let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-            if let todaySegment = filter?.dailySegment[indexPath.row]{
-                try! self.realm.write{
-                    self.realm.delete(todaySegment)
-                }
-            }
-            let segment = self.realm.objects(Segments.self)[indexPath.row]
-            
-            try! self.realm.write{
-                self.realm.delete(segment)
-            }
-            tableView.reloadData()
-        }
-        
-    }
-    
+//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete{
+//            let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+//            if let todaySegment = filter?.dailySegment[indexPath.row]{
+//                try! self.realm.write{
+//                    self.realm.delete(todaySegment)
+//                }
+//            }
+//            let segment = self.realm.objects(Segments.self)[indexPath.row]
+//
+//            try! self.realm.write{
+//                self.realm.delete(segment)
+//            }
+//            tableView.reloadData()
+//        }
+//    }
+//
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let editVC = EditCategoryViewController()
         let segment = self.realm.objects(Segments.self)
@@ -164,7 +206,6 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource{
             editVC.selectedColorRow = colorRow
             print(colorRow)
         }
-        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

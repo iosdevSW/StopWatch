@@ -120,7 +120,7 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
     }
     
     //월마다 일 수 계산하여 날짜 표시하는 함수
-    func presentCalendar(row: Int, cell:UICollectionViewCell){
+    func presentCalendar(row: Int, cell: UICollectionViewCell){
         let cell = cell as! CalendarCell
         // 셀 배경 초기화
         cell.frameView.backgroundColor = .white
@@ -175,7 +175,7 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
             self.collectionHeaderView.topAnchor.constraint(equalTo: self.topAnchor),
             self.collectionHeaderView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.collectionHeaderView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.collectionHeaderView.heightAnchor.constraint(equalToConstant: 40)
+            self.collectionHeaderView.heightAnchor.constraint(equalToConstant: 32)
         ])
         
         NSLayoutConstraint.activate([
@@ -249,7 +249,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {    
             return CGSize(
                 width: self.calendarInfo.cellSize!,
-                height: 40
+                height: 32
                 )
     }
     

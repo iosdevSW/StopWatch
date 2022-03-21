@@ -38,16 +38,21 @@ class MenuViewController: UIViewController {
             self.menuTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
         ])
     }
+    
+    func resetSelectedCellIndex(){
+        self.menuTableView.deselectRow(at: IndexPath(indexes: 0...3), animated: true)
+    }
     //MARK: - Selector
 }
 
 extension MenuViewController: UITableViewDelegate,UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 3
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MenuOptionCell", for: indexPath) as! MenuOptionCell
+        cell.selectionStyle = .none
         let menuOption = MenuOption(rawValue: indexPath.row)
         cell.menuImageView.image = menuOption?.image
         cell.menuTitleLabel.text = menuOption?.description
@@ -78,7 +83,21 @@ extension MenuViewController: UITableViewDelegate,UITableViewDataSource {
         return view
     }
     
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        cell?.backgroundColor = .systemGray4
+    }
+    
+    func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        cell?.backgroundColor = .standardColor
+    }
+    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 200
+        return 180
     }
 }

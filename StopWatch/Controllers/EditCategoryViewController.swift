@@ -91,7 +91,8 @@ class EditCategoryViewController: UIViewController {
         self.paletteView.dataSource = self
         self.navigationItem.hidesBackButton = true
         self.hideKeyboardWhenTapped()
-        self.navigationItem.title = "category"
+        self.navigationItem.title = "Category"
+        
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
     }
     

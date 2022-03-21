@@ -34,7 +34,7 @@ class CustomTextField: UITextField{
             self.underLine.bottomAnchor.constraint(equalTo:self.bottomAnchor),
             self.underLine.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.underLine.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.underLine.heightAnchor.constraint(equalToConstant: underLineWidth)
+            self.underLine.heightAnchor.constraint(equalToConstant: self.underLineWidth)
             ])
     }
     

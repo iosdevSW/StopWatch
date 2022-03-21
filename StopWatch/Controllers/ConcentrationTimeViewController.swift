@@ -7,6 +7,7 @@
 //
 import UIKit
 import RealmSwift
+import CoreData
 
 private let reuseIdentifier = "Cell"
 
@@ -59,7 +60,6 @@ class ConcentrationTimeViewController: UIViewController{
         self.view.addSubview(pickerView)
         pickerView.layer.cornerRadius = 10
         pickerView.backgroundColor = .systemGray6
-        
         
         return pickerView
     }()
@@ -386,8 +386,7 @@ extension ConcentrationTimeViewController: UIPickerViewDelegate,UIPickerViewData
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         self.pickCategoryRow = row // 카테고리 선택했을때 호출
-        self.changeUI(row: row
-        )
+        self.changeUI(row: row)
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {

@@ -9,6 +9,11 @@ import UIKit
 
 protocol StopWatchVCDelegate {
     func handleMenuToggle(menuOption: MenuOption?)
+    func closeMenu()
+}
+// 구현 자유!
+extension StopWatchVCDelegate {
+    func closeMenu() { }
 }
 
 protocol SaveDateDetectionDelegate {
