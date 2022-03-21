@@ -330,7 +330,8 @@ extension ConcentrationTimeViewController {
         
         NSLayoutConstraint.activate([
             self.pickerCategory.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 160),
-            self.pickerCategory.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            self.pickerCategory.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
+            self.pickerCategory.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
             self.pickerCategory.heightAnchor.constraint(equalToConstant: 80)
         ])
         
