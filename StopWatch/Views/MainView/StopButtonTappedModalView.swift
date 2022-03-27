@@ -10,6 +10,7 @@ import UIKit
 protocol StopModalViewDelegate {
     func closeModalView()
     func cancelModalView()
+    func exitModalView()
 }
 // ConcentrationViewController에서 확인 버튼 누를 때 나타나는 ModalView
 class StopButtonTappedModalView: UIView {
@@ -42,6 +43,14 @@ class StopButtonTappedModalView: UIView {
         return label
     }()
     
+    lazy var buttonStackView: UIStackView = {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(view)
+        
+        return view
+    }()
+    
     lazy var aceptButton: UIButton = {
        let button = UIButton()
         button.setTitle("확인", for: .normal)
@@ -49,7 +58,7 @@ class StopButtonTappedModalView: UIView {
         button.backgroundColor = .darkGray
         button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(button)
+        self.buttonStackView.addSubview(button)
         
         return button
     }()
@@ -61,10 +70,24 @@ class StopButtonTappedModalView: UIView {
         button.backgroundColor = .darkGray
         button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(button)
+        self.buttonStackView.addSubview(button)
         
         return button
     }()
+    
+    lazy var exitButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("저장 안함", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.backgroundColor = .darkGray
+        button.layer.cornerRadius = 10
+        self.buttonStackView.addSubview(button)
+        
+        
+        return button
+    }()
+    
     //MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -84,8 +107,9 @@ class StopButtonTappedModalView: UIView {
     func configure(){
         self.backgroundColor = .white
         self.layer.cornerRadius = 20
-        self.aceptButton.addTarget(self, action: #selector(aceptButtonTapped(sender:)), for: .touchUpInside)
-        self.cancelButton.addTarget(self, action: #selector(cancelButtonTapped(sender:)), for: .touchUpInside)
+        self.aceptButton.addTarget(self, action: #selector(self.aceptButtonTapped(sender:)), for: .touchUpInside)
+        self.cancelButton.addTarget(self, action: #selector(self.cancelButtonTapped(sender:)), for: .touchUpInside)
+        self.exitButton.addTarget(self, action: #selector(self.exitButtonTapped(sender:)), for: .touchUpInside)
     }
     
     func layout(){
@@ -104,26 +128,49 @@ class StopButtonTappedModalView: UIView {
         ])
         
         NSLayoutConstraint.activate([
-            self.aceptButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
-            self.aceptButton.centerXAnchor.constraint(equalTo: self.centerXAnchor,constant: -36),
-            self.aceptButton.widthAnchor.constraint(equalToConstant: 60),
-            self.aceptButton.heightAnchor.constraint(equalToConstant: 36)
+            self.buttonStackView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            self.buttonStackView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10)
         ])
         
         NSLayoutConstraint.activate([
-            self.cancelButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
-            self.cancelButton.centerXAnchor.constraint(equalTo: self.centerXAnchor,constant: 36),
+//            self.aceptButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
+//            self.aceptButton.centerXAnchor.constraint(equalTo: self.centerXAnchor,constant: -36),
+            self.aceptButton.leadingAnchor.constraint(equalTo: self.buttonStackView.leadingAnchor),
+            self.aceptButton.widthAnchor.constraint(equalToConstant: 60),
+            self.aceptButton.heightAnchor.constraint(equalToConstant: 36),
+            self.aceptButton.topAnchor.constraint(equalTo: self.buttonStackView.topAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+//            self.cancelButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -10),
+//            self.cancelButton.centerXAnchor.constraint(equalTo: self.centerXAnchor,constant: 36),
+            self.cancelButton.leadingAnchor.constraint(equalTo: self.aceptButton.trailingAnchor, constant: 10),
+            self.cancelButton.trailingAnchor.constraint(equalTo: self.exitButton.leadingAnchor, constant: -10),
             self.cancelButton.widthAnchor.constraint(equalToConstant: 60),
-            self.cancelButton.heightAnchor.constraint(equalToConstant: 36)
+            self.cancelButton.heightAnchor.constraint(equalToConstant: 36),
+            self.cancelButton.topAnchor.constraint(equalTo: self.buttonStackView.topAnchor),
+            self.cancelButton.bottomAnchor.constraint(equalTo: self.buttonStackView.bottomAnchor),
+        ])
+        
+        NSLayoutConstraint.activate([
+            self.exitButton.trailingAnchor.constraint(equalTo: self.buttonStackView.trailingAnchor),
+            self.exitButton.widthAnchor.constraint(equalToConstant: 80),
+            self.exitButton.heightAnchor.constraint(equalToConstant: 36),
+            self.exitButton.topAnchor.constraint(equalTo: self.buttonStackView.topAnchor),
+            self.exitButton.bottomAnchor.constraint(equalTo: self.buttonStackView.bottomAnchor)
         ])
     }
     
     //MARK: Selector
     @objc func aceptButtonTapped(sender: UIButton){
-        delegate?.closeModalView()
+        self.delegate?.closeModalView()
     }
     
     @objc func cancelButtonTapped(sender: UIButton){
-        delegate?.cancelModalView()
+        self.delegate?.cancelModalView()
+    }
+    
+    @objc func exitButtonTapped(sender: UIButton){
+        self.delegate?.exitModalView()
     }
 }

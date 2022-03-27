@@ -247,17 +247,6 @@ class ConcentrationTimeViewController: UIViewController{
         navigationController?.popViewController(animated: true)
     }
     
-    func cancelModalView() {
-        UIView.animate(withDuration: 0.3, animations: {
-            self.blurView.alpha = 0
-            self.modalView.alpha = 0
-        }){(_) in
-            self.modalView.removeFromSuperview()
-            self.blurView.removeFromSuperview()
-            self.modalView.delegate = nil
-        }
-    }
-    
     func openBlackView(){
 //        self.navigationController?.setNavigationBarHidden(true, animated: true)
         if self.blackViewController == nil {
@@ -332,7 +321,7 @@ extension ConcentrationTimeViewController {
             self.pickerCategory.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 160),
             self.pickerCategory.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
             self.pickerCategory.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
-            self.pickerCategory.heightAnchor.constraint(equalToConstant: 80)
+            self.pickerCategory.heightAnchor.constraint(equalToConstant: 100)
         ])
         
         NSLayoutConstraint.activate([
@@ -371,8 +360,28 @@ extension ConcentrationTimeViewController {
     }
 }
 extension ConcentrationTimeViewController: StopModalViewDelegate{
+    func exitModalView() {
+        if let stopWatchVC = self.navigationController?.viewControllers[0] as? StopWatchViewController {
+            stopWatchVC.setTimeLabel()
+            stopWatchVC.concentraionTimerVC = nil
+        }
+        
+        self.navigationController?.popViewController(animated: true)
+    }
+    
     func closeModalView() {
         self.closeStopModalView()
+    }
+    
+    func cancelModalView() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.blurView.alpha = 0
+            self.modalView.alpha = 0
+        }){(_) in
+            self.modalView.removeFromSuperview()
+            self.blurView.removeFromSuperview()
+            self.modalView.delegate = nil
+        }
     }
 }
 

@@ -31,10 +31,12 @@ class StopWatchViewController: UIViewController {
     var editListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
     var chartView: ChartView?
+    var guideLabelView: GuideLabelView?
     var tapGesture: UITapGestureRecognizer?
     var tapView: UIView?
     var delegate: StopWatchVCDelegate?
     var saveDateDelegate: SaveDateDetectionDelegate?
+    var timer: Timer?
     
     let titleView: TitleView = {
         let view = TitleView()
@@ -249,9 +251,16 @@ class StopWatchViewController: UIViewController {
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
         self.setDday()
+        self.animateGuideLabel() // 가이드 레이블 표시
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        self.autoScrollCurrentDate()
+        UIView.transition(with: self.guideLabelView!, duration: 3, options: [.repeat, .transitionFlipFromTop], animations: nil, completion: nil)
+        
+    }
+    
+    func autoScrollCurrentDate(){
         let itemIndex = CalendarMethod().returnIndexOfDay(date: self.saveDate)
         self.calendarView.calendarView.scrollToItem(at: IndexPath(item: itemIndex - 1, section: 0), at: .left, animated: true)
     }
@@ -314,6 +323,50 @@ class StopWatchViewController: UIViewController {
             downSwipe.direction = .down
             view.addGestureRecognizer(downSwipe)
         }
+    }
+    
+    // 가이드레이블 애니메이트
+    func animateGuideLabel() {
+        if self.guideLabelView != nil{
+            self.guideLabelView?.removeFromSuperview()
+            self.guideLabelView = nil
+            self.timer?.invalidate()
+            self.timer = nil
+        }
+        
+        // 애니메이트 시작
+        self.guideLabelView = {
+            let view = GuideLabelView()
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(view)
+            
+            NSLayoutConstraint.activate([
+                view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
+                view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+                view.heightAnchor.constraint(equalToConstant: 30)
+            ])
+
+            return view
+        }()
+        
+        var count = 0
+        
+        self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true){ timer in
+            count += 1
+            // 4 번 실행되면 중지
+            print(count)
+            if count == 4 {
+                UIView.animate(withDuration: 1){
+                    self.guideLabelView?.removeFromSuperview()
+                    self.guideLabelView = nil
+                }
+                self.timer?.invalidate()
+                self.timer = nil
+            }
+        }
+
+    
     }
     
     // 서브뷰가 떠있을때 외부 뷰 탭
@@ -423,7 +476,7 @@ class StopWatchViewController: UIViewController {
         // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
         self.calendarView.saveDate = self.saveDate
         self.calendarView.calendarView.reloadData()
-        
+        self.autoScrollCurrentDate()
         self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
     }
 
@@ -709,10 +762,11 @@ extension StopWatchViewController {
         ])
 
         NSLayoutConstraint.activate([
-            self.frameView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 180),
+//            self.frameView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 180),
             self.frameView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             self.frameView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.frameView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+            self.frameView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
         ])
         
         NSLayoutConstraint.activate([
@@ -759,14 +813,14 @@ extension StopWatchViewController {
         ])
         
         NSLayoutConstraint.activate([
-            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor, constant: 16),
+            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor, constant: 0),
             self.calendarView.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
             self.calendarView.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -10),
             self.calendarView.heightAnchor.constraint(equalToConstant: 66)
         ])
         
         NSLayoutConstraint.activate([
-            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 20),
+            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 14),
             self.toDoTableView.bottomAnchor.constraint(equalTo: self.goalTimeView.topAnchor),
             self.toDoTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
             self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20)
