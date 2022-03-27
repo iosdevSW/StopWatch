@@ -67,6 +67,16 @@ extension UIColor {
     class var customPurpleColor:UIColor {
         return UIColor(red: 226/255, green: 219/255, blue: 255/255, alpha: 1.0)
     }
+    
+    // 배경색 어두운 정도의 따라 글자 컬러
+    var isDarkColor: Bool {
+        var r,g,b,a:CGFloat
+        (r,g,b,a) = (0,0,0,0)
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        
+        return lum > 0.96
+    }
 }
 
 extension UITextField {

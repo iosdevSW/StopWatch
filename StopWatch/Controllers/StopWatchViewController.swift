@@ -905,7 +905,10 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         let color = self.view.uiColorFromHexCode(colorCode)
         view.categoryNameLabel.text = segment[section].name
         view.frameView.backgroundColor = color
-    
+
+        view.categoryNameLabel.textColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
+        view.plusImageView.tintColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
+        
         view.touchViewButton.tag = section
         view.touchViewButton.addTarget(self, action: #selector(self.clickedSection(_:)), for: .touchUpInside)
         
