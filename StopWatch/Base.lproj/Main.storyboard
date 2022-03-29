@@ -25,6 +25,10 @@
                                 <color key="shadowColor" systemColor="systemGray6Color"/>
                                 <size key="shadowOffset" width="3" height="-1"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="rectangle.2.swap" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="kFI-oY-44U">
+                                <rect key="frame" x="126" y="401" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -36,6 +40,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="rectangle.2.swap" catalog="system" width="128" height="101"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

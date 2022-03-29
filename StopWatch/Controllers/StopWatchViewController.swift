@@ -963,6 +963,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
             
             view.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             view.deleteButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            view.changeCheckImageButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             
             let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
             let title = object?.dailySegment[indexPath.section].toDoList[indexPath.row] // list 불러오기
@@ -1036,8 +1037,9 @@ extension StopWatchViewController {
     @objc func editListMethod(_ sender: UIButton){
         if let editView = self.editListView {
             let indexPath = editView.indexPath
-            let segment = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.dailySegment
-            let toDoList = segment?[indexPath!.section].toDoList[editView.indexPath!.row] // 이전텍스트 불러오기
+            let (section,row) = (indexPath!.section,indexPath!.row)
+            guard let segment = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.dailySegment else { return }
+            let toDoList = segment[indexPath!.section].toDoList[editView.indexPath!.row] // 이전텍스트 불러오기
             
             if sender.tag == 0 { // 수정버튼이면
                 let alert = UIAlertController(title: "무엇으로 변경할까요?", message: nil, preferredStyle: .alert)
@@ -1048,7 +1050,7 @@ extension StopWatchViewController {
                 alert.addAction(UIAlertAction(title: "확인", style: .default){ (_) in
                     
                     try! self.realm.write{
-                        segment?[indexPath!.section].toDoList[editView.indexPath!.row] = (alert.textFields?[0].text)!
+                        segment[section].toDoList[row] = (alert.textFields?[0].text)!
                     }
                     self.toDoTableView.reloadData()
                     self.closeListEditView()
@@ -1062,8 +1064,8 @@ extension StopWatchViewController {
                 alert.addAction(UIAlertAction(title: "취소", style: .cancel))
                 alert.addAction(UIAlertAction(title: "확인", style: .default){ (_) in
                     try! self.realm.write{
-                        segment?[indexPath!.section].toDoList.remove(at: indexPath!.row) // 리스트 삭제
-                        segment?[indexPath!.section].listCheckImageIndex.remove(at: indexPath!.row)
+                        segment[section].toDoList.remove(at: row) // 리스트 삭제
+                        segment[section].listCheckImageIndex.remove(at: row)
                     }
                     StopWatchDAO().deleteSegment(date: self.saveDate) // 데이터베이스에서 삭제
                     self.toDoTableView.reloadData()
@@ -1072,6 +1074,16 @@ extension StopWatchViewController {
                 })
 
                 self.present(alert, animated: false)
+            }
+            
+            if sender.tag == 2 { //모양변경 버튼이면
+                var index = segment[section].listCheckImageIndex[row]
+                index += 1
+                try! self.realm.write{
+                    segment[section].listCheckImageIndex[row] = index % 4
+                }
+                
+                self.toDoTableView.reloadData()
             }
             
         }
