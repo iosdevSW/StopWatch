@@ -77,9 +77,30 @@ class StopWatchDAO {
                 }
             }
         }
+    }
+    
+    func checkSegmentData(date: String){
+        let segmentData = self.realm.objects(SegmentData.self).where {
+            $0.date == date
+        }
+        let segemnts = self.realm.objects(Segments.self)
+        guard let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: date) else { return }
         
-        
-        
+        for segment in segemnts {
+            let isSeg = segmentData.contains{ seg in seg.segment == segment }
+            if isSeg == false {
+                try! self.realm.write{
+                    let object = SegmentData() // 오늘 과목들 생성
+                    object.date = date
+                    object.goal = 0
+                    object.value = 0
+                    object.segment = segment
+                    realm.add(object)
+                    
+                    dailyData.dailySegment.append(object)
+                }
+            }
+        }
     }
 
     

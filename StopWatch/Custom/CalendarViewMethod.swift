@@ -31,7 +31,7 @@ class CalendarMethod {
     func changeMonth(tag: Int,date: String) -> (Int,Int,Int) {
         var year =  Int(self.splitDate(date: date).0)!
         var month = Int(self.splitDate(date: date).1)!
-        let day = Int(self.splitDate(date: date).2)!
+        var day = Int(self.splitDate(date: date).2)!
         
         switch tag {
         case 0: // previous button
@@ -52,6 +52,12 @@ class CalendarMethod {
             break
         default:
             return (year,month,day)
+        }
+        
+        // 날짜 오류 방지
+        let maxDay = self.getMonthDay(year: year, month: month)
+        if day > maxDay {
+            day = maxDay
         }
         
         return (year,month,day)

@@ -234,7 +234,7 @@ class StopWatchViewController: UIViewController {
         self.hideKeyboardWhenTapped() //
         self.addObserverMtd() // 옵저버 추가
         self.reloadProgressBar()
-//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
         
         let ud = UserDefaults.standard
         if ud.bool(forKey: "FirstPalette") == false { self.setFirstPalette() }
@@ -589,11 +589,14 @@ class StopWatchViewController: UIViewController {
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
         let segments = dailyData.dailySegment // 오늘 과목들
         let section = sender.tag //section번째 과목 인덱스
+        // 그 날의 과목 데이터가 있는지 체크
+        
         let toDoList = segments[section].toDoList // section번째 과목의 할 일들
 
         let row = toDoList.count // section번째 과목의 할 일 번호
         let indexPath = IndexPath(row: row, section: section )
 
+        
         try! self.realm.write{
             toDoList.append("")
             segments[section].listCheckImageIndex.append(0)
@@ -893,6 +896,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let segment = filter?.dailySegment
+        StopWatchDAO().checkSegmentData(date: self.saveDate)
         return segment?[section].toDoList.count ?? 0 // 오늘의 리스트가 없으면 0개
     }
     
@@ -918,7 +922,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TodoListCell
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        let segment = filter!.dailySegment
+        let segment = filter?.dailySegment
         
         cell.saveDate = self.saveDate
         cell.getListTextField.tag = indexPath.section // 섹션구분 태그 이용
@@ -933,9 +937,9 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
 
         let colorCode = self.realm.objects(Segments.self)[indexPath.section].colorCode
         let color = self.view.uiColorFromHexCode(colorCode)
-        let text = segment[indexPath.section].toDoList[indexPath.row]
-        let checkImageIndex = segment[indexPath.section].listCheckImageIndex[indexPath.row]
-        let checkImage = CheckImage.init(rawValue: checkImageIndex)
+        let text = segment?[indexPath.section].toDoList[indexPath.row]
+        let checkImageIndex = segment?[indexPath.section].listCheckImageIndex[indexPath.row]
+        let checkImage = CheckImage.init(rawValue: checkImageIndex ?? 0)
         if text == ""{
             cell.getListTextField.isHidden = false
             cell.getListTextField.underLine.backgroundColor = color
