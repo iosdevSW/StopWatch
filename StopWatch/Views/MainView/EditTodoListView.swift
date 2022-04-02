@@ -58,6 +58,16 @@ class EditTodoListView: UIView{
         return view
     }()
     
+    lazy var changeDateButton: CustomListEditView = { // todolist 날짜,과목 변경 버튼
+        let view = CustomListEditView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.button.setImage(UIImage(systemName: "calendar" ), for: .normal)
+        view.label.text = "날짜 변경"
+        view.button.tag = 3
+        
+        return view
+    }()
+    
     //MARK: - Init
     
     override init(frame: CGRect) {
@@ -74,6 +84,7 @@ class EditTodoListView: UIView{
         self.buttonContainerStackView.addSubview(self.editButton)
         self.buttonContainerStackView.addSubview(self.deleteButton)
         self.buttonContainerStackView.addSubview(self.changeCheckImageButton)
+        self.buttonContainerStackView.addSubview(self.changeDateButton)
         self.addTarget()
         self.layout()
         
@@ -93,7 +104,7 @@ class EditTodoListView: UIView{
     //MARK: - layout
     func layout() {
         NSLayoutConstraint.activate([
-            self.title.topAnchor.constraint(equalTo: self.topAnchor,constant: 4),
+            self.title.topAnchor.constraint(equalTo: self.topAnchor, constant: 4),
             self.title.centerXAnchor.constraint(equalTo: self.centerXAnchor)
         ])
         
@@ -101,24 +112,32 @@ class EditTodoListView: UIView{
             self.editButton.leadingAnchor.constraint(equalTo: self.buttonContainerStackView.leadingAnchor),
             self.editButton.widthAnchor.constraint(equalToConstant: self.buttonSize),
             self.editButton.heightAnchor.constraint(equalToConstant: self.buttonSize),
-            self.editButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 4),
+            self.editButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 8),
             self.editButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor)
         ])
         
         NSLayoutConstraint.activate([
             self.deleteButton.leadingAnchor.constraint(equalTo: self.editButton.trailingAnchor,constant: 10),
-            self.deleteButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 4),
+            self.deleteButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 8),
             self.deleteButton.heightAnchor.constraint(equalToConstant: self.buttonSize),
             self.deleteButton.widthAnchor.constraint(equalToConstant: self.buttonSize),
             self.deleteButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            self.changeCheckImageButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 4),
+            self.changeDateButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 8),
+            self.changeDateButton.heightAnchor.constraint(equalToConstant: self.buttonSize),
+            self.changeDateButton.widthAnchor.constraint(equalToConstant: self.buttonSize),
+            self.changeDateButton.leadingAnchor.constraint(equalTo: self.deleteButton.trailingAnchor, constant: 10),
+            self.changeDateButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            self.changeCheckImageButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 8),
             self.changeCheckImageButton.heightAnchor.constraint(equalToConstant: self.buttonSize),
             self.changeCheckImageButton.widthAnchor.constraint(equalToConstant: self.buttonSize),
             self.changeCheckImageButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor),
-            self.changeCheckImageButton.leadingAnchor.constraint(equalTo: self.deleteButton.trailingAnchor, constant: 10),
+            self.changeCheckImageButton.leadingAnchor.constraint(equalTo: self.changeDateButton.trailingAnchor, constant: 10),
             self.changeCheckImageButton.trailingAnchor.constraint(equalTo: self.buttonContainerStackView.trailingAnchor)
         ])
         

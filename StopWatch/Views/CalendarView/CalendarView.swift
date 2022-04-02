@@ -13,8 +13,13 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
     var calendarInfo: CalendarViewInfo = CalendarViewInfo()
     let calendarMethod = CalendarMethod()
     let dayArray = ["S","M","T","W","T","F","S"]
-    var saveDate = ""
-    
+    var saveDate = "" // 저장할 날짜를 위한 문자열
+    var presentDate = "" {
+        didSet{
+            self.calendarView.reloadData()
+        }
+    } // 달력을 표시하기 위한 날짜 문자열
+    var saveDateDelegate: SaveDateDetectionDelegate?
     var delegate: StopWatchViewController?
     var calendarMode: CalendarMode = .week {
         didSet{
@@ -74,11 +79,12 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         self.collectionHeaderView.dataSource = self
         self.calendarView.delegate = self
         self.calendarView.dataSource = self
-        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
         
         self.backgroundColor = .white
         self.layer.cornerRadius = 10
         
+        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        self.presentDate =  (UIApplication.shared.delegate as! AppDelegate).saveDate
     }
     
     required init?(coder: NSCoder) {
@@ -105,8 +111,8 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
     
     // 전체 셀 개수 구하기.
     func getNumberOfCell() -> Int{
-        let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.saveDate)
-        let startDay = self.calendarMethod.getFirstDay(date: self.saveDate)
+        let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.presentDate)
+        let startDay = self.calendarMethod.getFirstDay(date: self.presentDate)
         let dayCount = self.calendarMethod.getMonthDay(year: year, month: month)
         
         if startDay + dayCount <= self.calendarInfo.numberOfItem{
@@ -126,9 +132,10 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         cell.frameView.backgroundColor = .white
         cell.dataCheckView.isHidden = true
         
-        let (year,month,day): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.saveDate)
-        let dayNumber = self.calendarMethod.getFirstDay(date: self.saveDate)
-        let index = dayNumber + day
+        let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.presentDate)
+        let (saveYear,saveMonth,saveDay): (Int,Int,Int) = calendarMethod.splitDate(date: self.saveDate)
+        let dayNumber = self.calendarMethod.getFirstDay(date: self.presentDate)
+        let index = dayNumber + saveDay
         
         // 해당 달의 첫 날짜(1일)에 해당하는 요일에 맞춰 달력 나타내기.
         if row >= dayNumber{
@@ -146,9 +153,12 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
                     cell.dataCheckView.isHidden = false
                 }
                 //선택된 셀 배경 바꾸기
-                if index == (row + 1) {
-                    cell.frameView.backgroundColor = .standardColor
+                if (saveYear == year) && (saveMonth == month) {
+                    if index == (row + 1) {
+                        cell.frameView.backgroundColor = .standardColor
+                    }
                 }
+                
             }
         }else {
             cell.dateLabel.text = " "  // 미만
@@ -229,17 +239,21 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         // 선택한 인덱스 날짜 계산
         if collectionView == self.calendarView {
             let row = indexPath.row
-            let dayNumber = self.calendarMethod.getFirstDay(date: self.saveDate)
+            let dayNumber = self.calendarMethod.getFirstDay(date: self.presentDate)
             
             let day = self.returnString(row + 1 - dayNumber)
-            let year: String = CalendarMethod().splitDate(date: self.saveDate).0
-            let month: String = CalendarMethod().splitDate(date: self.saveDate).1
+            let year: String = CalendarMethod().splitDate(date: self.presentDate).0
+            let month: String = CalendarMethod().splitDate(date: self.presentDate).1
             
             let string = "\(year).\(month).\(day)"
             
             self.saveDate = string
+            self.presentDate = string
             self.calendarView.reloadData()
             self.delegate?.clickDay(saveDate: string)
+            self.saveDateDelegate?.detectSaveDate(date: string)
+            print(self.presentDate)
+            print(self.saveDate)
         }
     }
 }

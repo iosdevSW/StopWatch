@@ -23,6 +23,8 @@
 		DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A7276CB61C00CF737C /* CalendarView.swift */; };
 		DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */; };
 		DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */; };
+		DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB74504627F6B8730088C26C /* CalendarModalView.swift */; };
+		DB74504927F6F5510088C26C /* DateChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB74504827F6F5510088C26C /* DateChangeView.swift */; };
 		DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */; };
 		DB8DB18D2611E67900A5814A /* StopWatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */; };
 		DB8F532526F05C1A0071F911 /* EditCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8F532426F05C1A0071F911 /* EditCategoryViewController.swift */; };
@@ -71,6 +73,8 @@
 		DB5AE4A7276CB61C00CF737C /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTimeView.swift; sourceTree = "<group>"; };
+		DB74504627F6B8730088C26C /* CalendarModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarModalView.swift; sourceTree = "<group>"; };
+		DB74504827F6F5510088C26C /* DateChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateChangeView.swift; sourceTree = "<group>"; };
 		DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcentrationTimeViewController.swift; sourceTree = "<group>"; };
 		DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatchViewController.swift; sourceTree = "<group>"; };
 		DB8F532426F05C1A0071F911 /* EditCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryViewController.swift; sourceTree = "<group>"; };
@@ -113,15 +117,17 @@
 		DB076D5826A696110063D3C6 /* MainView */ = {
 			isa = PBXGroup;
 			children = (
-				DBEC226B276B27740083ECDA /* TitleView.swift */,
 				DB0E89B8262842BE00533009 /* StopButtonTappedModalView.swift */,
 				DB2890742623074900FCC4BC /* ChartView.swift */,
 				DB8F533026F22FBD0071F911 /* TodoListHeaderView.swift */,
 				DB8F533226F316AE0071F911 /* TodoListCell.swift */,
+				DBEC226B276B27740083ECDA /* TitleView.swift */,
 				DBEC2267276864380083ECDA /* EditTodoListView.swift */,
 				DBBDF75726527986003F55FE /* drawBarView.swift */,
 				DBA7ED5B27DDB790004B0D0E /* MenuOptionCell.swift */,
 				DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */,
+				DB74504627F6B8730088C26C /* CalendarModalView.swift */,
+				DB74504827F6F5510088C26C /* DateChangeView.swift */,
 			);
 			path = MainView;
 			sourceTree = "<group>";
@@ -412,6 +418,7 @@
 				DBA7ED6027E0614A004B0D0E /* DdayViewController.swift in Sources */,
 				DB8F533126F22FBD0071F911 /* TodoListHeaderView.swift in Sources */,
 				DB8F533326F316AE0071F911 /* TodoListCell.swift in Sources */,
+				DB74504927F6F5510088C26C /* DateChangeView.swift in Sources */,
 				DBB33AA52789B93D00537881 /* EditColorView.swift in Sources */,
 				DBEC226C276B27740083ECDA /* TitleView.swift in Sources */,
 				DB8F532826F07A3A0071F911 /* PaletteCell.swift in Sources */,
@@ -431,6 +438,7 @@
 				DB4FE82426BF80F100B1DF3E /* Modeling.swift in Sources */,
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,
 				DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */,
+				DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */,
 				DBA7ED5727DDAF89004B0D0E /* Protocols.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

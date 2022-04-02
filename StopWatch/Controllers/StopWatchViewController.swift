@@ -48,6 +48,8 @@ class StopWatchViewController: UIViewController {
     let calendarView: CalendarView = {
         let view = CalendarView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        view.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
         
         return view
     }()
@@ -469,14 +471,15 @@ class StopWatchViewController: UIViewController {
     }
     
     @objc func respondToButton(_ button:UIButton){
-        let (year,month,day) = CalendarMethod().changeMonth(tag: button.tag, date: self.saveDate)
+        let (year,month,day) = CalendarMethod().changeMonth(tag: button.tag, date: self.calendarView.presentDate)
         
-        self.saveDate = String(year) + "." + self.view.returnString(month) + "." + self.view.returnString(day)
+        self.calendarView.presentDate = String(year) + "." + self.view.returnString(month) + "." + self.view.returnString(day)
         
         // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
         self.calendarView.saveDate = self.saveDate
         self.calendarView.calendarView.reloadData()
         self.autoScrollCurrentDate()
+        self.titleView.label.text = CalendarMethod().convertDate(date: self.calendarView.presentDate) // 타이틀 날짜 다시표시
         self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
     }
 
@@ -497,6 +500,7 @@ class StopWatchViewController: UIViewController {
                 StopWatchDAO().deleteSegment(date: self.saveDate)
                 _editGoalTimeView.removeFromSuperview()
                 self.editGoalTimeView = nil
+                self.removeTapView()
             }
         }
     }
@@ -635,19 +639,24 @@ class StopWatchViewController: UIViewController {
     
     //탭 제스쳐를 감지하여 뷰를 닫는 액션함수
     @objc func respondToTapGesture(_ sender: Any){
-        guard let _tapGesture = self.tapGesture else { return } // nil이면 그냥 종료
         //편집 뷰가 열려 있으면 편집 뷰 닫기
         self.closeListEditView()
         
         //골타임설정 뷰가 열려 있으면 닫기
         self.closeGoalTimeEditView()
+
+    }
+    
+    func removeTapView(){
+        if self.tapView != nil {
+            // 탭 제스쳐 제거
+            self.view.removeGestureRecognizer(self.tapGesture!)
+            self.tapGesture = nil
+            // 탭뷰 제거
+            self.tapView?.removeFromSuperview()
+            self.tapView = nil
+        }
         
-        // 탭 제스쳐 제거
-        self.tapGesture = nil
-        self.view.removeGestureRecognizer(_tapGesture)
-        // 탭뷰 제거
-        self.tapView?.removeFromSuperview()
-        self.tapView = nil
     }
     
     //MARK: CalendarView method
@@ -968,12 +977,13 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
             view.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             view.deleteButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             view.changeCheckImageButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            view.changeDateButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             
             let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
             let title = object?.dailySegment[indexPath.section].toDoList[indexPath.row] // list 불러오기
             view.title.text = "' \(title!) '"
             
-            view.frame.size = CGSize(width: self.view.frame.width - 40, height: 90)
+            view.frame.size = CGSize(width: self.view.frame.width - 40, height: 100)
             view.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height + 45)
             UIView.animate(withDuration: 0.5){
                 view.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height - 80)
@@ -1090,6 +1100,37 @@ extension StopWatchViewController {
                 self.toDoTableView.reloadData()
             }
             
+            if sender.tag == 3 { // 날짜 변경 버튼
+                let calendar: CalendarModalView = {
+                    let calendar = CalendarModalView()
+                    calendar.translatesAutoresizingMaskIntoConstraints = false
+                    
+                    calendar.calendarView.saveDate = self.saveDate
+                    calendar.calendarView.presentDate = self.saveDate
+                    calendar.changeDate = self.saveDate
+                    calendar.saveDate = self.saveDate
+                    
+                    print(calendar.saveDate)
+                    self.view.addSubview(calendar)
+                    NSLayoutConstraint.activate([
+                        calendar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+                        calendar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+                        calendar.topAnchor.constraint(equalTo: self.view.topAnchor),
+                        calendar.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+                    ])
+                    
+                    
+                    calendar.indexpath = indexPath!
+                    
+                    calendar.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
+                    calendar.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
+                    
+                    return calendar
+                }()
+                
+                self.closeListEditView()
+            }
+            
         }
     }
     
@@ -1100,7 +1141,102 @@ extension StopWatchViewController {
             }){ (_) in
                 editView.removeFromSuperview() // 슈퍼뷰에서 제거!
                 self.editListView = nil
+                self.removeTapView()
             }
         }
+    }
+}
+
+extension StopWatchViewController {
+    //MARK: - ModalCalendarView Selector
+    
+    @objc func clickOkButton(_ sender: UIButton){
+        let modalView = sender.superview?.superview as! CalendarModalView
+        let _ = StopWatchDAO().create(date: modalView.saveDate)
+        let section = modalView.indexpath.section
+        let row = modalView.indexpath.row
+        
+        self.changeDate(modalView: modalView, section: section, row: row)
+        
+    }
+    
+    @objc func postponeList(sender: UIButton){
+        let today = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        let modalView = sender.superview?.superview as! CalendarModalView
+        let section = modalView.indexpath.section
+        let row = modalView.indexpath.row
+        var date = ""
+        
+        var (intYear,intMonth,intDay): (Int,Int,Int) = CalendarMethod().splitDate(date: today)
+        let maxDay = CalendarMethod().getMonthDay(year: intYear, month: intMonth)
+        
+        if modalView.compareDate {
+            if intDay == maxDay {
+                let (year,month,_) = CalendarMethod().changeMonth(tag: 1, date: today)
+                intYear = year
+                intMonth = month
+                intDay = 1
+            }else {
+                intDay += 1
+            }
+            date = String(intYear) + "." + self.view.returnString(intMonth) + "." + self.view.returnString(intDay)
+        }else {
+            date = today
+        }
+        
+        modalView.saveDate = date
+        modalView.calendarView.saveDate = date
+        modalView.calendarView.presentDate = date
+        modalView.calendarView.calendarView.reloadData()
+        modalView.titleView.label.text = CalendarMethod().convertDate(date: date)
+        
+        let _ = StopWatchDAO().create(date: modalView.saveDate)
+        
+        self.changeDate(modalView: modalView, section: section, row: row)
+    }
+    
+    func changeDate(modalView: CalendarModalView, section: Int, row: Int){
+        let segment = realm.objects(SegmentData.self).where{ seg in
+            seg.date == modalView.changeDate
+        }[section]
+        
+        let text = segment.toDoList[row]
+        let destination = realm.objects(SegmentData.self).where{ seg in
+            seg.date == modalView.saveDate
+        }[section]
+        
+        let alert = UIAlertController(title: nil, message: "선 택", preferredStyle: .alert)
+        let move = UIAlertAction(title: "이동하기", style: .default){ _ in
+            try! self.realm.write{
+                segment.toDoList.remove(at: row)
+                segment.listCheckImageIndex.remove(at: row)
+                
+                destination.toDoList.append(text)
+                destination.listCheckImageIndex.append(0)
+            }
+            StopWatchDAO().deleteSegment(date: modalView.changeDate)
+            modalView.removeFromSuperview()
+            self.toDoTableView.reloadData()
+            self.calendarView.calendarView.reloadData()
+        }
+        
+        let copy = UIAlertAction(title: "복사하기", style: .default){ _ in
+            try! self.realm.write{
+                //복사
+                destination.toDoList.append(text)
+                destination.listCheckImageIndex.append(0)
+            }
+            StopWatchDAO().deleteSegment(date: modalView.changeDate)
+            modalView.removeFromSuperview()
+            self.toDoTableView.reloadData()
+            self.calendarView.calendarView.reloadData()
+        }
+        
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        alert.addAction(move)
+        alert.addAction(copy)
+        alert.addAction(cancel)
+        
+        present(alert, animated: true)
     }
 }
