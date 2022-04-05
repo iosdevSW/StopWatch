@@ -295,9 +295,11 @@ class StopWatchViewController: UIViewController {
     func reloadProgressBar(){
         let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         self.totalGoalTime = object?.totalGoalTime ?? 0
+        self.totalTime = object?.totalTime ?? 0
         self.barView.per =
             self.totalGoalTime != 0 ? Float(self.totalTime / self.totalGoalTime): 0
         self.barView.progressView.setProgress(self.barView.per, animated: true)
+        
         self.barView.showPersent()
         
     }

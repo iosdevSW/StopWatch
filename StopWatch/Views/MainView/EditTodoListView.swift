@@ -113,7 +113,7 @@ class EditTodoListView: UIView{
             self.editButton.widthAnchor.constraint(equalToConstant: self.buttonSize),
             self.editButton.heightAnchor.constraint(equalToConstant: self.buttonSize),
             self.editButton.topAnchor.constraint(equalTo: self.buttonContainerStackView.topAnchor, constant: 8),
-            self.editButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor)
+            self.editButton.bottomAnchor.constraint(equalTo: self.buttonContainerStackView.bottomAnchor, constant: -4)
         ])
         
         NSLayoutConstraint.activate([
