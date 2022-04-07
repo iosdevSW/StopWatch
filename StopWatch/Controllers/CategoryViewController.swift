@@ -51,8 +51,8 @@ class CategoryViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        StopWatchDAO().create(date: (UIApplication.shared.delegate as! AppDelegate).saveDate)
+        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
+        StopWatchDAO().create(date: (UIApplication.shared.delegate as! AppDelegate).resetDate)
         self.tableView.reloadData()
         
         self.navigationController?.navigationBar.isHidden = false
@@ -83,19 +83,22 @@ class CategoryViewController: UIViewController {
     
     func deleteCategory(point: CGPoint){
         if let indexPath = self.tableView.indexPathForRow(at: point) {
-            let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-            if let todaySegment = filter?.dailySegment[indexPath.row]{
-                try! self.realm.write{
-                    self.realm.delete(todaySegment)
-                }
-            }
             let segment = self.realm.objects(Segments.self)[indexPath.row]
             
+            let filter = self.realm.objects(SegmentData.self).where{
+                $0.segment == segment
+            }
+            
             try! self.realm.write{
+                for data in filter {
+                    self.realm.delete(data)
+                }
                 self.realm.delete(segment)
             }
+            StopWatchDAO().create(date: self.saveDate)
             self.tableView.reloadData()
         }
+        
     }
     
     //MARK: Configure
@@ -128,6 +131,7 @@ class CategoryViewController: UIViewController {
         if let indexPath = self.tableView.indexPathForRow(at: point) {
             let segment = self.realm.objects(Segments.self)
             let name = segment[indexPath.row].name
+            
             let alert = UIAlertController(title: nil, message: name + "를 삭제 하시겠습니까?", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "확인", style: .default) {(_) in
                 self.deleteCategory(point: point)

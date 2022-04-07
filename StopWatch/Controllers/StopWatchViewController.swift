@@ -245,7 +245,7 @@ class StopWatchViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // 프로퍼티 값 갱신
-        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate //오늘 날짜!
+        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate //오늘 날짜!
         self.totalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
         self.totalGoalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalGoalTime ?? 0
         
@@ -586,6 +586,7 @@ class StopWatchViewController: UIViewController {
     
     @objc func pushCategoryVC(_ button: UIBarButtonItem){
         self.delegate?.handleMenuToggle(menuOption: nil)
+        
     }
     
     //세션(과목명)을 눌렀을때 호출되는 메소드
@@ -1163,7 +1164,7 @@ extension StopWatchViewController {
     }
     
     @objc func postponeList(sender: UIButton){
-        let today = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
         let modalView = sender.superview?.superview as! CalendarModalView
         let section = modalView.indexpath.section
         let row = modalView.indexpath.row

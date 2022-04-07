@@ -21,7 +21,7 @@ class CalendarModalView: UIView {
         didSet{
             self.titleView.label.text = CalendarMethod().convertDate(date: self.calendarView.saveDate) // 타이틀 날짜 다시표시
             
-            let today = (UIApplication.shared.delegate as! AppDelegate).saveDate
+            let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
             let formatter = DateFormatter()
             formatter.timeZone = .autoupdatingCurrent
             formatter.dateFormat = "YYYY.MM.dd"

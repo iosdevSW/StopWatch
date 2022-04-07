@@ -18,6 +18,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return self.date()
     }
     
+    var resetDate: String {
+        return self.returnResetDate()
+    }
+    
     var totalTime: TimeInterval {
             //DB에서 전체시간 리턴
         return self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
@@ -46,7 +50,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         formatter.timeZone = TimeZone(identifier: TimeZone.current.identifier)
         formatter.dateFormat = "yyyy.MM.dd"
         formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.string(from: Date())
+        
+        return formatter.string(from: Date() )
+    }
+    
+    func returnResetDate() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: Locale.current.identifier)
+        formatter.timeZone = TimeZone(identifier: TimeZone.current.identifier)
+        formatter.dateFormat = "yyyy.MM.dd"
+        formatter.locale = Locale(identifier: "ko_KR")
+        let interval = TimeInterval(-3600 * 4) // 4시에 리셋
+        let date = Date().addingTimeInterval(interval)
+        
+        return formatter.string(from: date )
     }
     
     //DB 아무것도 없을 때 기본 과목 설정.

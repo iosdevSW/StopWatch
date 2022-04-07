@@ -19,6 +19,7 @@ class ConcentrationTimeViewController: UIViewController{
     var pickCategoryRow = 0
     var blackViewController: BlackViewController?
     var saveDate = ""
+    var resetDate = "" // 초기화 기준 날짜
     let realm = try! Realm()
     
     let frameView:UIView = {
@@ -180,7 +181,8 @@ class ConcentrationTimeViewController: UIViewController{
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
         self.totalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
         self.navigationController?.navigationBar.isHidden = true
-        StopWatchDAO().create(date: self.saveDate) // 오늘 데이터 없으면 생성
+        self.resetDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
+        StopWatchDAO().create(date: self.resetDate) // 오늘 데이터 없으면 생성
         //vibrate iphone when the timer starts
         self.changeUI(row: 0)
      
@@ -232,7 +234,9 @@ class ConcentrationTimeViewController: UIViewController{
             stopWatchVC.setTimeLabel()
             stopWatchVC.concentraionTimerVC = nil
         }
-        let segments = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate) // 오늘 과목
+        
+        let segments = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.resetDate) // 오늘 과목
+        
         try! self.realm.write{
             segments?.dailySegment[pickCategoryRow].value += self.timeInterval //선택한 과목에 시간 추가
             var totalTime: TimeInterval = 0
