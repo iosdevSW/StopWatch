@@ -117,9 +117,9 @@
 			children = (
 				DB0E89B8262842BE00533009 /* StopButtonTappedModalView.swift */,
 				DB2890742623074900FCC4BC /* ChartView.swift */,
+				DBEC226B276B27740083ECDA /* TitleView.swift */,
 				DB8F533026F22FBD0071F911 /* TodoListHeaderView.swift */,
 				DB8F533226F316AE0071F911 /* TodoListCell.swift */,
-				DBEC226B276B27740083ECDA /* TitleView.swift */,
 				DBEC2267276864380083ECDA /* EditTodoListView.swift */,
 				DBBDF75726527986003F55FE /* drawBarView.swift */,
 				DBA7ED5B27DDB790004B0D0E /* MenuOptionCell.swift */,

@@ -566,13 +566,7 @@ class StopWatchViewController: UIViewController {
         }
         //취소버튼
         if sender.tag == 2 {
-            UIView.animate(withDuration: 0.5, animations: {
-                self.editGoalTimeView!.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
-            }){_ in
-                StopWatchDAO().deleteSegment(date: self.saveDate)
-                self.editGoalTimeView!.removeFromSuperview()
-                self.editGoalTimeView = nil
-            }
+            self.closeGoalTimeEditView()
         }
     }
     
