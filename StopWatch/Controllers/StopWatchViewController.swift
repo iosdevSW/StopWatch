@@ -999,6 +999,17 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         return 40
     }
     
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        let categoryCount = self.realm.objects(Segments.self).count
+        if section == (categoryCount - 1) {
+            let str = NSAttributedString(string: "카테고리 명을 눌러 할 일을 추가해주세요.", attributes: [.font : UIFont.systemFont(ofSize: 30, weight: .light), .foregroundColor : UIColor.systemGray4])
+            
+            return str.string
+        }
+        
+        return nil
+    }
+    
 }
 
 extension StopWatchViewController: UITextFieldDelegate {
