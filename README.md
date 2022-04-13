@@ -6,3 +6,7 @@
  3. D-day 설정 기능
  4. 차트 뷰를 통한 과목별 시간 확인
  5. 목표 시간 설정과 ProgressBar를 통한 수행량 체크
+
+
+ ### 피드백 관리
+ https://working-melody-26f.notion.site/StopWatch-Feedback-Management-0131fbe9f9d14c5b939c519c167e07d4
