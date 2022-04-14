@@ -38,7 +38,6 @@ class ConcentrationTimeViewController: UIViewController{
         label.textAlignment = .center
         label.textColor = .darkGray
         
-        
         return label
     }()
     
@@ -162,6 +161,21 @@ class ConcentrationTimeViewController: UIViewController{
         return view
     }()
     
+    let addCategoryButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let title = "원하는 카테고리가 없으신가요?"
+        let attributedTitle = NSMutableAttributedString(string: title)
+        let range = NSRange(location: 0, length: title.count)
+        attributedTitle.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+        attributedTitle.addAttribute(.foregroundColor, value: UIColor.systemGray2, range: range)
+        attributedTitle.addAttribute(.font, value: UIFont.systemFont(ofSize: 14, weight: .semibold), range: range)
+        
+        button.setAttributedTitle(attributedTitle, for: .normal)
+        
+        return button
+    }()
+    
     //MARK: Method
     
     deinit {
@@ -189,6 +203,7 @@ class ConcentrationTimeViewController: UIViewController{
     }
     override func viewWillAppear(_ animated: Bool) {
 //        print("viewWillappear")
+        self.pickerCategory.reloadAllComponents()
     }
     override func viewWillDisappear(_ animated: Bool) {
         //timer start
@@ -277,6 +292,11 @@ class ConcentrationTimeViewController: UIViewController{
         self.openStopModalView()
     }
     
+    @objc func addCategoryButtonMtd(){
+        let editVC = EditCategoryViewController()
+        self.navigationController?.pushViewController(editVC, animated: true)
+    }
+    
 }
 extension ConcentrationTimeViewController {
     //MARK: Configured
@@ -287,12 +307,14 @@ extension ConcentrationTimeViewController {
     
     //MARK: AddTarget
     func addTarget(){
-        self.aceptButton.addTarget(self, action: #selector(aceptButtonMtd), for: .touchUpInside)
+        self.aceptButton.addTarget(self, action: #selector(self.aceptButtonMtd), for: .touchUpInside)
+        self.addCategoryButton.addTarget(self, action: #selector(self.addCategoryButtonMtd), for: .touchUpInside)
     }
     //MARK: AddSubView
     func addSubView(){
         self.view.addSubview(self.frameView)
         self.view.addSubview(self.guideLabel)
+        self.view.addSubview(self.addCategoryButton)
         
         self.frameView.addSubview(self.label)
     }
@@ -333,6 +355,11 @@ extension ConcentrationTimeViewController {
             self.guideLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             self.guideLabel.widthAnchor.constraint(equalToConstant: self.view.frame.width - 120),
             self.guideLabel.heightAnchor.constraint(equalToConstant: 60)
+        ])
+        
+        NSLayoutConstraint.activate([
+            self.addCategoryButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -50),
+            self.addCategoryButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ])
         
         //Level 2
