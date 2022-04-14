@@ -1001,15 +1001,27 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let categoryCount = self.realm.objects(Segments.self).count
+        
+        let guideText = "카테고리를 눌러 할일을 추가해주세요."
+        
+        // 마지막 섹션에 문구 출력
         if section == (categoryCount - 1) {
-            let str = NSAttributedString(string: "카테고리 명을 눌러 할 일을 추가해주세요.", attributes: [.font : UIFont.systemFont(ofSize: 30, weight: .light), .foregroundColor : UIColor.systemGray4])
+           // 오늘의 데이터가 nil일때
+            guard let category = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate) else { return guideText }
             
-            return str.string
+            var sum = 0 // todolist 합
+            
+            for seg in category.dailySegment{
+                sum += seg.toDoList.count
+            }
+            // 합이 0 이면 안내문구
+            if sum == 0 {
+                return guideText
+            }
         }
         
         return nil
     }
-    
 }
 
 extension StopWatchViewController: UITextFieldDelegate {
