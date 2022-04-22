@@ -661,6 +661,8 @@ class StopWatchViewController: UIViewController {
     
     func clickDay(saveDate: String) {
         self.saveDate = saveDate
+        self.chartView?.saveDate = saveDate
+        self.chartView?.setNeedsDisplay() // 다시 차트ㅡ 그리기
     }
     
     //MARK: - SideBarMenu Method

@@ -14,6 +14,19 @@ class ChartView: UIView {
     var total: TimeInterval = 0.0
     lazy var radius = min(self.frame.width, self.frame.height) * 0.40
     let realm = try! Realm()
+    let guideLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = """
+                    측정된 시간이 없습니다.
+                    """
+        label.font = .systemFont(ofSize: 18)
+        label.textColor = .systemGray3
+        label.textAlignment = .center
+        label.numberOfLines = 2
+        
+        return label
+    }()
     
     private lazy var textAttributes : [NSAttributedString.Key : Any] = {
         return [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 14)]
@@ -22,6 +35,14 @@ class ChartView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
+        self.addSubview(self.guideLabel)
+        
+        NSLayoutConstraint.activate([
+            self.guideLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            self.guideLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            self.guideLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor)
+        ])
+        
     }
     
     required init?(coder: NSCoder) {
@@ -40,10 +61,19 @@ class ChartView: UIView {
     //MARK: Draw
     override func draw(_ rect: CGRect) {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        let segment = filter!.dailySegment
+        self.guideLabel.isHidden = true
+        guard let segment = filter?.dailySegment else {
+            self.guideLabel.isHidden = false
+            return
+        }
         self.total = segment.reduce(0){
             (result,segment) in
             return segment.value + result
+        }
+        
+        if total == 0 {
+            self.guideLabel.isHidden = false
+            return
         }
             
             let center = CGPoint(x: rect.midX, y: rect.midY)
@@ -108,6 +138,5 @@ class ChartView: UIView {
                 }
                 startAngle = endAngle
             }
-            
     }
 }
