@@ -360,7 +360,6 @@ class StopWatchViewController: UIViewController {
         self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true){ timer in
             count += 1
             // 4 번 실행되면 중지
-            print(count)
             if count == 4 {
                 UIView.animate(withDuration: 1){
                     self.guideLabelView?.removeFromSuperview()
@@ -399,24 +398,24 @@ class StopWatchViewController: UIViewController {
     // subview open method
     func openChartView(){
         // DB불러오기 및 데이터 유무 확인
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        guard let segment = filter?.dailySegment else {
-            self.zeroTimeAlert()
-            return
-        }
-        
-        // 총 시간 구하기
-        let total = segment.reduce(0){
-            (result,segment) in
-            return segment.value + result
-        }
-        
-        // 총 시간이 0 이면 경고 알림창띄우기.
-        if total == 0 {
-            self.zeroTimeAlert()
-            return
-        }
-        
+//        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+//        guard let segment = filter?.dailySegment else {
+//            self.zeroTimeAlert()
+//            return
+//        }
+//
+//        // 총 시간 구하기
+//        let total = segment.reduce(0){
+//            (result,segment) in
+//            return segment.value + result
+//        }
+//
+//        // 총 시간이 0 이면 경고 알림창띄우기.
+//        if total == 0 {
+//            self.zeroTimeAlert()
+//            return
+//        }
+//
         // 차트뷰 중복생성 방지
         if self.chartView != nil { return }
 
@@ -438,7 +437,7 @@ class StopWatchViewController: UIViewController {
         
         self.setSwipeGesture()
         self.chartView!.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
-        UIView.animate(withDuration: 0.3){
+        UIView.animate(withDuration: 0.5){
             self.chartView!.transform = .identity
         }
     }
@@ -446,7 +445,7 @@ class StopWatchViewController: UIViewController {
     // 차트 뷰 닫는 함수
     func closeChartView(){
         if let modal = self.chartView {
-            UIView.animate(withDuration: 0.3 ,animations: {
+            UIView.animate(withDuration: 0.5 ,animations: {
                 modal.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
             }) {_ in
                 modal.removeFromSuperview()
@@ -460,7 +459,15 @@ class StopWatchViewController: UIViewController {
         let day = ud.value(forKey: "dday") as? Date ?? Date()
         let dayCount = Double(day.timeIntervalSinceNow / 86400) // 하루86400초
         let dday =  Int(ceil(dayCount)) // 소수점 올림
-        self.dDayLabel.text = "\(dday) days left"
+        if dday > 0 {
+            self.dDayLabel.text = "\(dday) days left"
+        }else if dday == 0 {
+            self.dDayLabel.text = "D-Day"
+        }else {
+            self.dDayLabel.text = "It's been \(abs(dday)) days."
+        }
+        
+        
     }
     
     //MARK: Selector
@@ -1133,7 +1140,7 @@ extension StopWatchViewController {
                     calendar.changeDate = self.saveDate
                     calendar.saveDate = self.saveDate
                     
-                    print(calendar.saveDate)
+                    
                     self.view.addSubview(calendar)
                     NSLayoutConstraint.activate([
                         calendar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),

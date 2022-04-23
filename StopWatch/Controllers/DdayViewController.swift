@@ -91,7 +91,12 @@ class DdayViewController: UIViewController{
     func returnDday(date: Date){
         let dayCount = Double(date.timeIntervalSinceNow / 86400) // 하루86400초
         let dday =  Int(ceil(dayCount)) // 소수점 올림
-        self.ddayLabel.text = "D-" + "\(dday)"
+        if dday >= 0 {
+            self.ddayLabel.text = "D-" + "\(dday)"
+        }else {
+            self.ddayLabel.text = "D+" + "\(abs(dday))"
+        }
+        
     }
     
     func returnToday(date: Date) -> String{

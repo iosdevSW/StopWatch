@@ -14,6 +14,28 @@ class ChartView: UIView {
     var total: TimeInterval = 0.0
     lazy var radius = min(self.frame.width, self.frame.height) * 0.40
     let realm = try! Realm()
+    let chevronImageView: UIImageView = {
+        let view = UIImageView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.image = UIImage(systemName: "chevron.compact.down")
+//        view.layer.cornerRadius = 4
+//        view.backgroundColor = .systemGray6
+        view.tintColor = .darkGray
+        
+        return view
+    }()
+    
+    let label: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "닫기"
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .systemGray4
+        label.textAlignment = .center
+        
+        return label
+    }()
+    
     let guideLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -36,6 +58,20 @@ class ChartView: UIView {
         super.init(frame: frame)
         self.backgroundColor = .white
         self.addSubview(self.guideLabel)
+        self.addSubview(self.label)
+        self.addSubview(self.chevronImageView)
+        
+        NSLayoutConstraint.activate([
+            self.label.topAnchor.constraint(equalTo: self.topAnchor, constant: 30),
+            self.label.centerXAnchor.constraint(equalTo: self.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            self.chevronImageView.widthAnchor.constraint(equalToConstant: 36),
+            self.chevronImageView.heightAnchor.constraint(equalToConstant: 26),
+            self.chevronImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            self.chevronImageView.topAnchor.constraint(equalTo: self.label.bottomAnchor, constant: 0)
+        ])
         
         NSLayoutConstraint.activate([
             self.guideLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor),
