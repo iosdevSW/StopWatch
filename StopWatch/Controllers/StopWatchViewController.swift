@@ -37,6 +37,10 @@ class StopWatchViewController: UIViewController {
     var delegate: StopWatchVCDelegate?
     var saveDateDelegate: SaveDateDetectionDelegate?
     var timer: Timer?
+    var calendarMode = true // true : week, false : month
+    
+    var calendarViewHeight: NSLayoutConstraint!
+    var frameViewHeight: NSLayoutConstraint!
     
     let titleView: TitleView = {
         let view = TitleView()
@@ -50,17 +54,16 @@ class StopWatchViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
         view.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        
+        view.backgroundColor = .blue
         return view
     }()
     
     let previousMonthButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("<", for: .normal)
         button.tag = 0
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        button.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        button.tintColor = .darkGray
         button.backgroundColor = .systemGray6
         button.layer.cornerRadius = 8
         
@@ -70,12 +73,22 @@ class StopWatchViewController: UIViewController {
     let nextMonthButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(">", for: .normal)
+        button.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        button.tintColor = .darkGray
         button.tag = 1
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         button.backgroundColor = .systemGray6
         button.layer.cornerRadius = 8
+        
+        return button
+    }()
+    
+    let changeCalendarMode: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("주▾", for: .normal)
+        button.backgroundColor = .systemGray6
+        button.layer.cornerRadius = 8
+        button.setTitleColor(UIColor.darkGray, for: .normal)
         
         return button
     }()
@@ -397,26 +410,6 @@ class StopWatchViewController: UIViewController {
     
     // subview open method
     func openChartView(){
-        // DB불러오기 및 데이터 유무 확인
-//        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-//        guard let segment = filter?.dailySegment else {
-//            self.zeroTimeAlert()
-//            return
-//        }
-//
-//        // 총 시간 구하기
-//        let total = segment.reduce(0){
-//            (result,segment) in
-//            return segment.value + result
-//        }
-//
-//        // 총 시간이 0 이면 경고 알림창띄우기.
-//        if total == 0 {
-//            self.zeroTimeAlert()
-//            return
-//        }
-//
-        // 차트뷰 중복생성 방지
         if self.chartView != nil { return }
 
         self.chartView = {
@@ -493,6 +486,46 @@ class StopWatchViewController: UIViewController {
         self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
     }
 
+    @objc func changeCalendarMode(_ sender: UIButton){
+        UIView.animate(withDuration: 0.5){
+            if self.calendarMode {
+                self.calendarView.calendarMode = .month
+                self.calendarViewHeight.isActive = false
+                self.frameViewHeight.isActive = false
+                
+                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 220)
+                self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.86)
+                self.mainTimeLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+                self.dDayLabel.alpha = 0
+                self.changeCalendarMode.setTitle("월▾", for: .normal)
+                
+                self.calendarViewHeight.isActive = true
+                self.frameViewHeight.isActive = true
+                self.frameView.layoutIfNeeded()
+                self.mainTimeLabel.layoutIfNeeded()
+            }else {
+                self.calendarView.calendarMode = .week
+                self.calendarViewHeight.isActive = false
+                self.frameViewHeight.isActive = false
+                
+                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
+                
+                self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
+                self.mainTimeLabel.font = .systemFont(ofSize: 50, weight: .regular)
+                self.mainTimeLabel.transform = CGAffineTransform(scaleX: 1, y: 1)
+                self.dDayLabel.alpha = 1
+                self.changeCalendarMode.setTitle("주▾", for: .normal)
+                
+                self.calendarViewHeight.isActive = true
+                self.frameViewHeight.isActive = true
+                self.frameView.layoutIfNeeded()
+                self.mainTimeLabel.layoutIfNeeded()
+            }
+            
+            self.calendarMode = !self.calendarMode
+        }
+        
+    }
     
     @objc func proximityChangedMtd(sender: Notification){
         let isTrue = UIDevice.current.isProximityMonitoringEnabled
@@ -756,6 +789,7 @@ extension StopWatchViewController {
         self.view.addSubview(self.dDayLabel)
         
         self.frameView.addSubview(self.titleView)
+        self.frameView.addSubview(self.changeCalendarMode)
         self.frameView.addSubview(self.calendarView)
         self.frameView.addSubview(self.previousMonthButton)
         self.frameView.addSubview(self.nextMonthButton)
@@ -785,7 +819,15 @@ extension StopWatchViewController {
             self.frameView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             self.frameView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             self.frameView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
+        ])
+        self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
+        self.frameViewHeight.isActive = true
+        
+        NSLayoutConstraint.activate([
+            self.changeCalendarMode.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -30),
+            self.changeCalendarMode.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor),
+            self.changeCalendarMode.heightAnchor.constraint(equalToConstant: 28),
+            self.changeCalendarMode.widthAnchor.constraint(equalToConstant: 34)
         ])
         
         NSLayoutConstraint.activate([
@@ -819,30 +861,31 @@ extension StopWatchViewController {
         
         NSLayoutConstraint.activate([
             self.previousMonthButton.leadingAnchor.constraint(equalTo: self.titleView.trailingAnchor),
-            self.previousMonthButton.heightAnchor.constraint(equalToConstant: 24),
-            self.previousMonthButton.widthAnchor.constraint(equalToConstant: 24),
+            self.previousMonthButton.heightAnchor.constraint(equalToConstant: 28),
+            self.previousMonthButton.widthAnchor.constraint(equalToConstant: 28),
             self.previousMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
         ])
         
         NSLayoutConstraint.activate([
             self.nextMonthButton.leadingAnchor.constraint(equalTo: self.previousMonthButton.trailingAnchor, constant: 4),
-            self.nextMonthButton.widthAnchor.constraint(equalToConstant: 24),
-            self.nextMonthButton.heightAnchor.constraint(equalToConstant: 24),
+            self.nextMonthButton.widthAnchor.constraint(equalToConstant: 28),
+            self.nextMonthButton.heightAnchor.constraint(equalToConstant: 28),
             self.nextMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
         ])
         
         NSLayoutConstraint.activate([
-            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor, constant: 0),
+            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor, constant: 12),
             self.calendarView.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
             self.calendarView.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -10),
-            self.calendarView.heightAnchor.constraint(equalToConstant: 66)
         ])
+        self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
+        self.calendarViewHeight.isActive = true
         
         NSLayoutConstraint.activate([
-            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 14),
+            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 0),
             self.toDoTableView.bottomAnchor.constraint(equalTo: self.goalTimeView.topAnchor),
             self.toDoTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
-            self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20)
+            self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20),
         ])
         
         NSLayoutConstraint.activate([
@@ -887,6 +930,7 @@ extension StopWatchViewController {
         self.previousMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
         self.nextMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
         self.categoryEditButton.addTarget(self, action: #selector(self.pushCategoryVC(_:)), for: .touchUpInside)
+        self.changeCalendarMode.addTarget(self, action: #selector(self.changeCalendarMode(_:)), for: .touchUpInside)
     }
     
     //MARK: AddObserver
