@@ -12,6 +12,7 @@ class ChartView: UIView {
     //MARK: properties
     var saveDate = ""
     var total: TimeInterval = 0.0
+    var labelConstraint: NSLayoutConstraint!
     lazy var radius = min(self.frame.width, self.frame.height) * 0.40
     let realm = try! Realm()
     let chevronImageView: UIImageView = {
@@ -61,10 +62,11 @@ class ChartView: UIView {
         self.addSubview(self.label)
         self.addSubview(self.chevronImageView)
         
-        NSLayoutConstraint.activate([
-            self.label.topAnchor.constraint(equalTo: self.topAnchor, constant: 30),
-            self.label.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-        ])
+        
+        self.labelConstraint = self.label.topAnchor.constraint(equalTo: self.topAnchor, constant: 30)
+        self.labelConstraint.isActive = true
+        self.label.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        
         
         NSLayoutConstraint.activate([
             self.chevronImageView.widthAnchor.constraint(equalToConstant: 36),

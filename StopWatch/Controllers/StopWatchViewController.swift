@@ -267,12 +267,15 @@ class StopWatchViewController: UIViewController {
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
         self.setDday()
-        self.animateGuideLabel() // 가이드 레이블 표시
+        if self.calendarMode { self.animateGuideLabel() } // 가이드 레이블 표시
     }
     
     override func viewDidAppear(_ animated: Bool) {
         self.autoScrollCurrentDate()
-        UIView.transition(with: self.guideLabelView!, duration: 3, options: [.repeat, .transitionFlipFromTop], animations: nil, completion: nil)
+        
+        if self.guideLabelView != nil{
+            UIView.transition(with: self.guideLabelView!, duration: 3, options: [.repeat, .transitionFlipFromTop], animations: nil, completion: nil)
+        }
         
     }
     
@@ -503,6 +506,11 @@ class StopWatchViewController: UIViewController {
                 self.frameViewHeight.isActive = true
                 self.frameView.layoutIfNeeded()
                 self.mainTimeLabel.layoutIfNeeded()
+                
+                self.chartView?.labelConstraint.isActive = false
+                self.chartView?.labelConstraint.constant = 0
+                self.chartView?.labelConstraint.isActive = true
+                self.chartView?.layoutIfNeeded()
             }else {
                 self.calendarView.calendarMode = .week
                 self.calendarViewHeight.isActive = false
@@ -520,8 +528,14 @@ class StopWatchViewController: UIViewController {
                 self.frameViewHeight.isActive = true
                 self.frameView.layoutIfNeeded()
                 self.mainTimeLabel.layoutIfNeeded()
+                
+                self.chartView?.labelConstraint.isActive = false
+                self.chartView?.labelConstraint.constant = 30
+                self.chartView?.labelConstraint.isActive = true
+                self.chartView?.layoutIfNeeded()
+                
             }
-            
+            self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
             self.calendarMode = !self.calendarMode
         }
         
@@ -897,7 +911,7 @@ extension StopWatchViewController {
         
         NSLayoutConstraint.activate([
             self.categoryEditButton.leadingAnchor.constraint(equalTo: self.itemBoxView.leadingAnchor),
-            self.categoryEditButton.widthAnchor.constraint(equalToConstant: 30),
+            self.categoryEditButton.widthAnchor.constraint(equalToConstant: 34),
             self.categoryEditButton.topAnchor.constraint(equalTo: self.itemBoxView.topAnchor),
             self.categoryEditButton.bottomAnchor.constraint(equalTo: self.itemBoxView.bottomAnchor)
         ])
@@ -906,12 +920,12 @@ extension StopWatchViewController {
             self.chartViewButton.topAnchor.constraint(equalTo: self.itemBoxView.topAnchor),
             self.chartViewButton.bottomAnchor.constraint(equalTo: self.itemBoxView.bottomAnchor),
             self.chartViewButton.leadingAnchor.constraint(equalTo:  self.categoryEditButton.trailingAnchor, constant: 10),
-            self.chartViewButton.widthAnchor.constraint(equalToConstant: 30),
+            self.chartViewButton.widthAnchor.constraint(equalToConstant: 34),
         ])
         
         NSLayoutConstraint.activate([
             self.itemBoxView.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 20),
-            self.itemBoxView.heightAnchor.constraint(equalToConstant: 30),
+            self.itemBoxView.heightAnchor.constraint(equalToConstant: 34),
             self.itemBoxView.trailingAnchor.constraint(equalTo: self.barView.leadingAnchor, constant: -10),
             self.itemBoxView.centerYAnchor.constraint(equalTo: self.barView.centerYAnchor, constant: -4)
         ])
