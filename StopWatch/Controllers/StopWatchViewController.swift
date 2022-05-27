@@ -37,7 +37,16 @@ class StopWatchViewController: UIViewController {
     var delegate: StopWatchVCDelegate?
     var saveDateDelegate: SaveDateDetectionDelegate?
     var timer: Timer?
-    var calendarMode = true // true : week, false : month
+    // true : week, false : month
+    var calendarMode = true {
+        didSet {
+            if self.calendarMode {
+                self.guideLabelView?.isHidden = false
+            }else {
+                self.guideLabelView?.isHidden = true
+            }
+        }
+    }
     
     var calendarViewHeight: NSLayoutConstraint!
     var frameViewHeight: NSLayoutConstraint!
