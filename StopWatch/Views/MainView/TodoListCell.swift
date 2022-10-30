@@ -134,7 +134,6 @@ class TodoListCell: UITableViewCell {
     }
     
     //MARK: Selector
-    
     @objc func changeImage(_ sender: UIButton){
         let row = sender.tag
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)

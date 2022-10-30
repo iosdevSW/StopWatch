@@ -9,34 +9,32 @@ import UIKit
 import CoreMotion
 import RealmSwift
 
+
 class StopWatchViewController: UIViewController {
     //MARK: - Properties
-    let realm = try! Realm()
-    var saveDate: String = "" {
-        didSet{ // 날짜가 바뀔 때마다
-            self.setGoalTime() // 목표시간 Label 재설정
-            self.reloadProgressBar() // 진행바 재로딩
-            self.setTimeLabel() // 현재시간 Label 재설정
-            self.titleView.label.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
-            self.toDoTableView.reloadData()
-            self.calendarView.saveDate = self.saveDate
-            self.calendarView.calendarView.reloadData()
-        }
-    }
-    
+    //전체 시간, 전체 목표시간 저장 프로퍼티
     var totalTime: TimeInterval = 0
     var totalGoalTime: TimeInterval = 0
+
+    let realm = try! Realm()
     var motionManager: CMMotionManager?
+    
     var concentraionTimerVC: ConcentrationTimeViewController?
-    var editListView: EditTodoListView?
+    var editTodoListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
     var chartView: ChartView?
     var guideLabelView: GuideLabelView?
-    var tapGesture: UITapGestureRecognizer?
     var tapView: UIView?
+    
+    var tapGesture: UITapGestureRecognizer?
+    var timer: Timer?
+    
     var delegate: StopWatchVCDelegate?
     var saveDateDelegate: SaveDateDetectionDelegate?
-    var timer: Timer?
+    
+    var calendarViewHeight: NSLayoutConstraint!
+    var frameViewHeight: NSLayoutConstraint!
+    
     // true : week, false : month
     var calendarMode = true {
         didSet {
@@ -48,8 +46,17 @@ class StopWatchViewController: UIViewController {
         }
     }
     
-    var calendarViewHeight: NSLayoutConstraint!
-    var frameViewHeight: NSLayoutConstraint!
+    var saveDate: String = "" {
+        didSet{ // 날짜가 바뀔 때마다
+            self.setGoalTime() // 목표시간 Label 재설정
+            self.reloadProgressBar() // 진행바 재로딩
+            self.setTimeLabel() // 현재시간 Label 재설정
+            self.titleView.label.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
+            self.toDoTableView.reloadData()
+            self.calendarView.saveDate = self.saveDate
+            self.calendarView.calendarView.reloadData()
+        }
+    }
     
     let titleView: TitleView = {
         let view = TitleView()
@@ -285,7 +292,6 @@ class StopWatchViewController: UIViewController {
         if self.guideLabelView != nil{
             UIView.transition(with: self.guideLabelView!, duration: 3, options: [.repeat, .transitionFlipFromTop], animations: nil, completion: nil)
         }
-        
     }
     
     func autoScrollCurrentDate(){
@@ -472,7 +478,7 @@ class StopWatchViewController: UIViewController {
             self.dDayLabel.text = "It's been \(abs(dday)) days."
         }
         
-        
+       
     }
     
     //MARK: Selector
@@ -498,24 +504,24 @@ class StopWatchViewController: UIViewController {
         self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
     }
 
+    //주 <-> 월 달력 변경 버튼 클릭
     @objc func changeCalendarMode(_ sender: UIButton){
         UIView.animate(withDuration: 0.5){
             if self.calendarMode {
                 self.calendarView.calendarMode = .month
                 self.calendarViewHeight.isActive = false
                 self.frameViewHeight.isActive = false
-                
-                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 220)
                 self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.86)
+                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 220)
+
                 self.mainTimeLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                 self.dDayLabel.alpha = 0
                 self.changeCalendarMode.setTitle("월▾", for: .normal)
-                
+
                 self.calendarViewHeight.isActive = true
                 self.frameViewHeight.isActive = true
-                self.frameView.layoutIfNeeded()
                 self.mainTimeLabel.layoutIfNeeded()
-                
+
                 self.chartView?.labelConstraint.isActive = false
                 self.chartView?.labelConstraint.constant = 0
                 self.chartView?.labelConstraint.isActive = true
@@ -524,25 +530,24 @@ class StopWatchViewController: UIViewController {
                 self.calendarView.calendarMode = .week
                 self.calendarViewHeight.isActive = false
                 self.frameViewHeight.isActive = false
-                
+
                 self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
-                
+
                 self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
                 self.mainTimeLabel.font = .systemFont(ofSize: 50, weight: .regular)
                 self.mainTimeLabel.transform = CGAffineTransform(scaleX: 1, y: 1)
                 self.dDayLabel.alpha = 1
                 self.changeCalendarMode.setTitle("주▾", for: .normal)
-                
+
                 self.calendarViewHeight.isActive = true
                 self.frameViewHeight.isActive = true
-                self.frameView.layoutIfNeeded()
                 self.mainTimeLabel.layoutIfNeeded()
-                
+
                 self.chartView?.labelConstraint.isActive = false
                 self.chartView?.labelConstraint.constant = 30
                 self.chartView?.labelConstraint.isActive = true
                 self.chartView?.layoutIfNeeded()
-                
+
             }
             self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
             self.calendarMode = !self.calendarMode
@@ -905,7 +910,7 @@ extension StopWatchViewController {
         self.calendarViewHeight.isActive = true
         
         NSLayoutConstraint.activate([
-            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 0),
+            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 10),
             self.toDoTableView.bottomAnchor.constraint(equalTo: self.goalTimeView.topAnchor),
             self.toDoTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
             self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20),
@@ -1041,9 +1046,9 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard self.editListView == nil else { return }
+        guard self.editTodoListView == nil else { return }
         
-        self.editListView = {
+        self.editTodoListView = {
             let view = EditTodoListView()
             self.setTapGesture() // 외부 탭 하면 닫히는 제스쳐 추가
             self.view.addSubview(view)
@@ -1146,7 +1151,7 @@ extension StopWatchViewController: UITextFieldDelegate {
 extension StopWatchViewController {
     
     @objc func editListMethod(_ sender: UIButton){
-        if let editView = self.editListView {
+        if let editView = self.editTodoListView {
             let indexPath = editView.indexPath
             let (section,row) = (indexPath!.section,indexPath!.row)
             guard let segment = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.dailySegment else { return }
@@ -1232,12 +1237,12 @@ extension StopWatchViewController {
     }
     
     func closeListEditView(){
-        if let editView = self.editListView {
+        if let editView = self.editTodoListView {
             UIView.animate(withDuration: 0.3,animations: {
                 editView.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height + 40)
             }){ (_) in
                 editView.removeFromSuperview() // 슈퍼뷰에서 제거!
-                self.editListView = nil
+                self.editTodoListView = nil
                 self.removeTapView()
             }
         }

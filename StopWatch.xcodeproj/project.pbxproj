@@ -214,15 +214,15 @@
 			isa = PBXGroup;
 			children = (
 				DB10DB8A27E4A040000560A3 /* Font */,
-				DBA7ED5A27DDAFFF004B0D0E /* Models */,
 				DB8F532D26F085D50071F911 /* Custom */,
-				DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */,
-				DB289048261C4FF500FCC4BC /* Views */,
 				DB0F172A261430F7007C8448 /* Utils */,
+				DBA7ED5A27DDAFFF004B0D0E /* Models */,
+				DB289048261C4FF500FCC4BC /* Views */,
 				DB289046261C4F6600FCC4BC /* Controllers */,
 				DB289047261C4F8000FCC4BC /* images */,
 				DB40D1FE2609B32C00A4E9FC /* Main.storyboard */,
 				DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */,
+				DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */,
 				DB40D2062609B32E00A4E9FC /* Info.plist */,
 			);
 			path = StopWatch;

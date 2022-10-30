@@ -7,5 +7,6 @@ target 'StopWatch' do
 
   # Pods for StopWatch
 pod 'RealmSwift', '~>10'
+pod 'Realm', '~>10'
 
 end

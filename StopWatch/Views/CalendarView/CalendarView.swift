@@ -9,18 +9,21 @@ import UIKit
 import RealmSwift
 
 class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
-    
-    var calendarInfo: CalendarViewInfo = CalendarViewInfo()
-    let calendarMethod = CalendarMethod()
+    //MARK: - Properties
     let dayArray = ["S","M","T","W","T","F","S"]
     var saveDate = "" // 저장할 날짜를 위한 문자열
-    var presentDate = "" {
+    var presentDate = "" {// 달력을 표시하기 위한 날짜 문자열
         didSet{
             self.calendarView.reloadData()
         }
-    } // 달력을 표시하기 위한 날짜 문자열
+    }
+    
+    var calendarInfo: CalendarViewInfo = CalendarViewInfo()
+    let calendarMethod = CalendarMethod()
+    
     var saveDateDelegate: SaveDateDetectionDelegate?
     var delegate: StopWatchViewController?
+    
     var calendarMode: CalendarMode = .week {
         didSet{
             switch calendarMode {
@@ -50,23 +53,16 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
     let calendarView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.register(CalendarCell.self, forCellWithReuseIdentifier: "cell")
-//        view.register(CalendarMonthCell.self, forCellWithReuseIdentifier: "monthCell")
         view.backgroundColor = .white
         view.showsHorizontalScrollIndicator = false
         view.isPagingEnabled = true // 페이징 스크롤 처리
+        
         // calendar week of month 참고!!
         
-        return view
-    }()
-    
-    let underLineView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .darkGray
-        view.alpha = 0
         return view
     }()
     
@@ -100,22 +96,13 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         self.calendarInfo.heightNumberOfCell = 6
     }
     
-//    func getToday(){
-//        let today = Date()
-//        var calendar = Calendar.current
-//        calendar.timeZone = .current
-//        self.year = calendar.component(.year, from: today)
-//        self.month = calendar.component(.month, from: today)
-//        self.day = calendar.component(.day, from: today)
-//    }
-    
     // 전체 셀 개수 구하기.
     func getNumberOfCell() -> Int{
         let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.presentDate)
         let startDay = self.calendarMethod.getFirstDay(date: self.presentDate)
         let dayCount = self.calendarMethod.getMonthDay(year: year, month: month)
         
-        if startDay + dayCount <= self.calendarInfo.numberOfItem{
+        if startDay + dayCount < 35 { // 7개 요일 * 5 넘는 인덱스면 높이 7로 늘려서 반환
             self.calendarInfo.heightNumberOfCell = 6
         }else {
             self.calendarInfo.heightNumberOfCell = 7
@@ -131,9 +118,10 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         // 셀 배경 초기화
         cell.frameView.backgroundColor = .white
         cell.dataCheckView.isHidden = true
+        cell.dateLabel.textColor = .darkGray
         
         let (year,month,_): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.presentDate)
-        let (saveYear,saveMonth,saveDay): (Int,Int,Int) = calendarMethod.splitDate(date: self.saveDate)
+        let (saveYear,saveMonth,saveDay): (Int,Int,Int) = self.calendarMethod.splitDate(date: self.saveDate)
         let dayNumber = self.calendarMethod.getFirstDay(date: self.presentDate)
         let index = dayNumber + saveDay
         
@@ -141,8 +129,10 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         if row >= dayNumber{
             if row >= self.calendarMethod.getMonthDay(year: year, month: month) + dayNumber{
                 cell.isUserInteractionEnabled = false
-                cell.dateLabel.text = " " // 초과
+                cell.dateLabel.text = "\(row - dayNumber - self.calendarMethod.getMonthDay(year: year, month: month)+1)" // 초과
+                cell.dateLabel.textColor = .lightGray
                 cell.dataCheckView.isHidden = true
+                
             }else{
                 cell.dateLabel.text = "\(row + 1 - dayNumber)"
                 // 데이터 있는 날짜 표시
@@ -158,7 +148,6 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
                         cell.frameView.backgroundColor = .standardColor
                     }
                 }
-                
             }
         }else {
             cell.dateLabel.text = " "  // 미만
@@ -167,17 +156,11 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
         }
     }
     
-    //MARK: - setGesture
-    
-    //MARK: Selector
-    
     //MARK: addsubview
     func addSubView(){
         self.addSubview(self.collectionHeaderView)
         self.addSubview(self.calendarView)
-        self.addSubview(self.underLineView)
     }
-    //MARK: addtarget
     
     //MARK: layout
     func layout(){
@@ -193,13 +176,6 @@ class CalendarView: UIView,UICollectionViewDelegate,UICollectionViewDataSource {
             self.calendarView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             self.calendarView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             self.calendarView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.underLineView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 4),
-            self.underLineView.leadingAnchor.constraint(equalTo: self.calendarView.leadingAnchor, constant: 14),
-            self.underLineView.trailingAnchor.constraint(equalTo: self.calendarView.trailingAnchor, constant: -14),
-            self.underLineView.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
 
