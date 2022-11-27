@@ -8,9 +8,10 @@
 import UIKit
 import CoreMotion
 import RealmSwift
+import Then
+import SnapKit
 
-
-class StopWatchViewController: UIViewController {
+final class StopWatchViewController: UIViewController {
     //MARK: - Properties
     //전체 시간, 전체 목표시간 저장 프로퍼티
     var totalTime: TimeInterval = 0
@@ -58,104 +59,45 @@ class StopWatchViewController: UIViewController {
         }
     }
     
-    let titleView: TitleView = {
-        let view = TitleView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        return view
-    }()
+    private let titleView = TitleView()
+    private let goalTimeView = GoalTimeView()
+    private let barView = DrawBarView()
     
-    let calendarView: CalendarView = {
-        let view = CalendarView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        view.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        view.backgroundColor = .blue
-        return view
-    }()
+    private let calendarView = CalendarView().then {
+        $0.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        $0.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
+        $0.backgroundColor = .blue
+    }
     
-    let previousMonthButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.tag = 0
-        button.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
-        button.tintColor = .darkGray
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 8
-        
-        return button
-    }()
+    private let previousMonthButton = UIButton(type: .system).then {
+        $0.tag = 0
+        $0.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
+        $0.tintColor = .darkGray
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 8
+    }
     
-    let nextMonthButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
-        button.tintColor = .darkGray
-        button.tag = 1
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 8
-        
-        return button
-    }()
+    private let nextMonthButton = UIButton(type: .system).then {
+        $0.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+        $0.tintColor = .darkGray
+        $0.tag = 1
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 8
+    }
     
-    let changeCalendarMode: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("주▾", for: .normal)
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 8
-        button.setTitleColor(UIColor.darkGray, for: .normal)
+    private let changeCalendarMode = UIButton(type: .system).then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.setTitle("주▾", for: .normal)
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 8
+        $0.setTitleColor(UIColor.darkGray, for: .normal)
+    }
         
-        return button
-    }()
-
-    let goalTimeView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-
-        return view
-    }()
-
-    lazy var goalTimeTitle: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.image = UIImage(systemName: "flag.fill")
-        view.tintColor = .darkGray
-        self.goalTimeView.addSubview(view)
-
-        return view
-    }()
-
-    lazy var goalTimeLabel: UILabel = {
-        let label = UILabel()
-        label.text = " 00 : 00"
-        label.textColor = .darkGray
-        label.backgroundColor = .white
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 14, weight: .light)
-        self.goalTimeView.addSubview(label)
-
-        return label
-    }()
-    
-    let frameView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 50
-        view.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
-        
-        return view
-    }()
-    
-    let barView: DrawBarView = {
-        let view = DrawBarView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        return view
-    }()
+    let frameView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 50
+        $0.layer.maskedCorners = CACornerMask(arrayLiteral: .layerMinXMinYCorner, .layerMaxXMinYCorner)
+    }
     
     let itemBoxView: UIView = {
         let view = UIView()
@@ -164,40 +106,10 @@ class StopWatchViewController: UIViewController {
         return view
     }()
     
-    let mainTimeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "00 : 00 : 00"
-        label.textAlignment = .center
-        label.layer.masksToBounds = true
-        label.textColor = .darkGray
-        label.font = .systemFont(ofSize: 50, weight: .regular)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = ""
-        label.backgroundColor = .standardColor
-        label.textAlignment = .left
-        label.textColor = .lightGray
-        label.font = .systemFont(ofSize: 20, weight: .light)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    let subTimeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "00"
-        label.textAlignment = .center
-        label.textColor = .black
-        label.font = .systemFont(ofSize: 20, weight: .regular)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
+    private let mainTimeLabel = TimeLabel(.hms).then {
+        $0.textColor = .darkGray
+        $0.font = .systemFont(ofSize: 50, weight: .regular)
+    }
     
     let chartViewButton: UIButton = {
         let button = UIButton()
@@ -235,25 +147,15 @@ class StopWatchViewController: UIViewController {
         return view
     }()
     
-    let categoryEditButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "list.bullet"), for: .normal)
-        button.tintColor = .darkGray
-        button.tag = 2
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 10
-        
-        return button
-    }()
+    private let categoryEditButton = UIButton(type: .system).then {
+        $0.setImage(UIImage(systemName: "list.bullet"), for: .normal)
+        $0.tintColor = .darkGray
+        $0.tag = 2
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 10
+    }
     
-    let pickerView: UIDatePicker = {
-        let view = UIDatePicker()
-        
-        return view
-    }()
-    
-    //MARK: Method
+    //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.configured()   // 뷰 초기 설정 메소드
@@ -267,9 +169,6 @@ class StopWatchViewController: UIViewController {
         self.addObserverMtd() // 옵저버 추가
         self.reloadProgressBar()
         print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
-        
-        let ud = UserDefaults.standard
-        if ud.bool(forKey: "FirstPalette") == false { self.setFirstPalette() }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -294,24 +193,10 @@ class StopWatchViewController: UIViewController {
         }
     }
     
+    //MARK: - Method
     func autoScrollCurrentDate(){
         let itemIndex = CalendarMethod().returnIndexOfDay(date: self.saveDate)
         self.calendarView.calendarView.scrollToItem(at: IndexPath(item: itemIndex - 1, section: 0), at: .left, animated: true)
-    }
-    
-    // 처음 앱 시작시 팔레트에 색 채우기.
-    func setFirstPalette(){
-        let paints = Palette().paints
-        for color in paints {
-            let palettes = Palettes()
-            palettes.colorCode = color
-            try! realm.write{
-                realm.add(palettes)
-            }
-        }
-        let ud = UserDefaults.standard
-        ud.set(true, forKey: "FirstPalette")
-        ud.synchronize()
     }
     
     func setNavigationBar() {
@@ -339,19 +224,16 @@ class StopWatchViewController: UIViewController {
     func setTimeLabel(){
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let time = dailyData?.totalTime ?? 0 // 오늘의 데이터가 없으면 0
-        let (_,second,minute,hour) = self.view.divideSecond(timeInterval: time)
-//        self.subTimeLabel.text = subSecond
-        self.mainTimeLabel.text = "\(hour) : \(minute) :  \(second)"
+        self.mainTimeLabel.updateTime(self.view.divideSecond(timeInterval: time))
     }
     
     func setGoalTime(){
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let goal = dailyData?.totalGoalTime ?? 0 // 오늘의 데이터가 없으면 0
-        let (_,_,minute,hour) = self.view.divideSecond(timeInterval: goal)
-        self.goalTimeLabel.text = " \(hour) : \(minute)"
+        self.goalTimeView.timeLabel.updateTime(self.view.divideSecond(timeInterval: goal))
     }
     
-    // gestrue method
+    //MARK: - gestrue method
     func setSwipeGesture(){
         //차트뷰 아래로 내려서 닫기 제스쳐 추가
         if let view = self.chartView {
@@ -481,7 +363,7 @@ class StopWatchViewController: UIViewController {
        
     }
     
-    //MARK: Selector
+    //MARK: - Selector
     @objc func respondToSwipeGesture(_ gesture: UISwipeGestureRecognizer){
         switch gesture.direction {
         case .down:
@@ -813,8 +695,8 @@ extension StopWatchViewController {
     //MARK: AddSubView
     func addSubView(){
         self.view.addSubview(self.frameView)
-        self.view.addSubview(self.mainTimeLabel)
         self.view.addSubview(self.dDayLabel)
+        self.view.addSubview(self.mainTimeLabel)
         
         self.frameView.addSubview(self.titleView)
         self.frameView.addSubview(self.changeCalendarMode)
@@ -828,26 +710,21 @@ extension StopWatchViewController {
         
         self.itemBoxView.addSubview(self.chartViewButton)
         self.itemBoxView.addSubview(self.categoryEditButton)
-        
-//        self.mainTimeLabel.addSubview(self.subTimeLabel)
     }
     
     //MARK: SetLayOut
     func layOut(){
         //Level 1
-        NSLayoutConstraint.activate([
-            self.mainTimeLabel.bottomAnchor.constraint(equalTo: self.frameView.topAnchor),
-            self.mainTimeLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.mainTimeLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.mainTimeLabel.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor)
-        ])
-
-        NSLayoutConstraint.activate([
-//            self.frameView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 180),
-            self.frameView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.frameView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.frameView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-        ])
+        self.mainTimeLabel.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            make.bottom.equalTo(self.frameView.snp.top)
+        }
+        
+        self.frameView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+        
         self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
         self.frameViewHeight.isActive = true
         
@@ -863,49 +740,45 @@ extension StopWatchViewController {
             self.dDayLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ])
         
-        NSLayoutConstraint.activate([
-            self.goalTimeView.widthAnchor.constraint(equalToConstant: 80),
-            self.goalTimeView.heightAnchor.constraint(equalToConstant: 30),
-            self.goalTimeView.bottomAnchor.constraint(equalTo: self.barView.topAnchor, constant: 0),
-            self.goalTimeView.trailingAnchor.constraint(equalTo: self.barView.trailingAnchor, constant: -4),
-
-            self.goalTimeLabel.topAnchor.constraint(equalTo: self.goalTimeView.topAnchor),
-            self.goalTimeLabel.bottomAnchor.constraint(equalTo: self.goalTimeView.bottomAnchor),
-            self.goalTimeLabel.trailingAnchor.constraint(equalTo: self.goalTimeView.trailingAnchor, constant: 6),
-            self.goalTimeLabel.leadingAnchor.constraint(equalTo: self.goalTimeTitle.trailingAnchor),
-
-            self.goalTimeTitle.centerYAnchor.constraint(equalTo: self.goalTimeView.centerYAnchor),
-            self.goalTimeTitle.leadingAnchor.constraint(equalTo: self.goalTimeView.leadingAnchor),
-            self.goalTimeTitle.widthAnchor.constraint(equalToConstant: 16),
-            self.goalTimeTitle.heightAnchor.constraint(equalToConstant: 16),
-        ])
+        self.goalTimeView.snp.makeConstraints{ make in
+            make.height.equalTo(30)
+            make.width.equalTo(80)
+            make.bottom.equalTo(self.barView.snp.top).offset(-6)
+            make.trailing.equalTo(self.barView.snp.trailing)
+        }
         
         //Level 2
-        NSLayoutConstraint.activate([
-            self.titleView.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 20),
-            self.titleView.topAnchor.constraint(equalTo: self.frameView.topAnchor, constant: 30),
-            self.titleView.heightAnchor.constraint(equalToConstant: 30)
-        ])
+        self.barView.snp.makeConstraints { make in
+            make.width.equalTo(240)
+            make.height.equalTo(40)
+            make.bottom.equalToSuperview().offset(-30)
+            make.trailing.equalTo(self.frameView.snp.trailing).offset(-30)
+        }
         
-        NSLayoutConstraint.activate([
-            self.previousMonthButton.leadingAnchor.constraint(equalTo: self.titleView.trailingAnchor),
-            self.previousMonthButton.heightAnchor.constraint(equalToConstant: 28),
-            self.previousMonthButton.widthAnchor.constraint(equalToConstant: 28),
-            self.previousMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
-        ])
+        self.titleView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(20)
+            make.top.equalToSuperview().offset(30)
+            make.height.equalTo(30)
+        }
         
-        NSLayoutConstraint.activate([
-            self.nextMonthButton.leadingAnchor.constraint(equalTo: self.previousMonthButton.trailingAnchor, constant: 4),
-            self.nextMonthButton.widthAnchor.constraint(equalToConstant: 28),
-            self.nextMonthButton.heightAnchor.constraint(equalToConstant: 28),
-            self.nextMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
-        ])
+        self.previousMonthButton.snp.makeConstraints { make in
+            make.leading.equalTo(self.titleView.snp.trailing)
+            make.height.width.equalTo(28)
+            make.centerY.equalTo(titleView.snp.centerY)
+        }
         
-        NSLayoutConstraint.activate([
-            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor, constant: 12),
-            self.calendarView.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
-            self.calendarView.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -10),
-        ])
+        self.nextMonthButton.snp.makeConstraints { make in
+            make.leading.equalTo(self.previousMonthButton.snp.trailing).offset(4)
+            make.height.width.equalTo(28)
+            make.centerY.equalTo(titleView.snp.centerY)
+        }
+        
+        self.calendarView.snp.makeConstraints { make in
+            make.top.equalTo(self.titleView.snp.bottom).offset(12)
+            make.leading.equalTo(self.frameView.snp.leading).offset(10)
+            make.trailing.equalTo(self.frameView.snp.trailing).offset(-10)
+        }
+        
         self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
         self.calendarViewHeight.isActive = true
         
@@ -916,12 +789,10 @@ extension StopWatchViewController {
             self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20),
         ])
         
-        NSLayoutConstraint.activate([
-            self.barView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30),
-            self.barView.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -30),
-            self.barView.heightAnchor.constraint(equalToConstant: 40),
-            self.barView.widthAnchor.constraint(equalToConstant: 240),
-        ])
+        self.categoryEditButton.snp.makeConstraints{ make in
+            make.top.bottom.leading.equalToSuperview()
+            make.width.equalTo(34)
+        }
         
         NSLayoutConstraint.activate([
             self.categoryEditButton.leadingAnchor.constraint(equalTo: self.itemBoxView.leadingAnchor),
@@ -943,14 +814,6 @@ extension StopWatchViewController {
             self.itemBoxView.trailingAnchor.constraint(equalTo: self.barView.leadingAnchor, constant: -10),
             self.itemBoxView.centerYAnchor.constraint(equalTo: self.barView.centerYAnchor, constant: -4)
         ])
-        
-//        NSLayoutConstraint.activate([
-//            self.subTimeLabel.centerYAnchor.constraint(equalTo: self.mainTimeLabel.centerYAnchor, constant: 3),
-//            self.subTimeLabel.leadingAnchor.constraint(equalTo: self.mainTimeLabel.centerXAnchor, constant: 135)
-//        ])
-        
-        //Level 3
-       
     }
     //MARK: AddTarget
     func addTarget(){

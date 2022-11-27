@@ -45,6 +45,7 @@
 		DBBD53052636BB78002F5157 /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBD53042636BB78002F5157 /* CategoryCell.swift */; };
 		DBBDF7562643DC59003F55FE /* PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF7552643DC59003F55FE /* PreView.swift */; };
 		DBBDF75826527986003F55FE /* drawBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF75726527986003F55FE /* drawBarView.swift */; };
+		DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
 		DBEC226A276864380083ECDA /* CustomListEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2269276864380083ECDA /* CustomListEditView.swift */; };
 		DBEC226C276B27740083ECDA /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC226B276B27740083ECDA /* TitleView.swift */; };
@@ -94,6 +95,7 @@
 		DBBD53042636BB78002F5157 /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		DBBDF7552643DC59003F55FE /* PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreView.swift; sourceTree = "<group>"; };
 		DBBDF75726527986003F55FE /* drawBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drawBarView.swift; sourceTree = "<group>"; };
+		DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLabel.swift; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
 		DBEC2269276864380083ECDA /* CustomListEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomListEditView.swift; sourceTree = "<group>"; };
 		DBEC226B276B27740083ECDA /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
@@ -213,13 +215,12 @@
 		DB40D1F72609B32C00A4E9FC /* StopWatch */ = {
 			isa = PBXGroup;
 			children = (
-				DB10DB8A27E4A040000560A3 /* Font */,
+				DBBFFBF0293358E800CA3FBC /* Resource */,
 				DB8F532D26F085D50071F911 /* Custom */,
 				DB0F172A261430F7007C8448 /* Utils */,
 				DBA7ED5A27DDAFFF004B0D0E /* Models */,
 				DB289048261C4FF500FCC4BC /* Views */,
 				DB289046261C4F6600FCC4BC /* Controllers */,
-				DB289047261C4F8000FCC4BC /* images */,
 				DB40D1FE2609B32C00A4E9FC /* Main.storyboard */,
 				DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */,
 				DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */,
@@ -258,6 +259,7 @@
 		DB8F532D26F085D50071F911 /* Custom */ = {
 			isa = PBXGroup;
 			children = (
+				DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */,
 				DB8F532E26F085E60071F911 /* CustomTextField.swift */,
 				DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */,
 				DBEC2269276864380083ECDA /* CustomListEditView.swift */,
@@ -273,6 +275,15 @@
 				DB4FE82326BF80F100B1DF3E /* Modeling.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		DBBFFBF0293358E800CA3FBC /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				DB289047261C4F8000FCC4BC /* images */,
+				DB10DB8A27E4A040000560A3 /* Font */,
+			);
+			path = Resource;
 			sourceTree = "<group>";
 		};
 		F95DBA0BF70FC8275FA2BE45 /* Pods */ = {
@@ -431,6 +442,7 @@
 				DBA7ED6427E301C5004B0D0E /* CalendarViewMethod.swift in Sources */,
 				DB10DB8927E363BD000560A3 /* CalendarMonthCell.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
+				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
 				DB4FE82426BF80F100B1DF3E /* Modeling.swift in Sources */,
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,
 				DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */,

@@ -40,6 +40,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         self.setFirstDB() // 아무 과목도 없을시  기타 과목 추가
         
+        let ud = UserDefaults.standard
+        if ud.bool(forKey: "FirstPalette") == false { self.setFirstPalette() }
+        
         return true
     }
     
@@ -77,6 +80,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 realm.add(data)
             }
         }
+    }
+    
+    // 처음 앱 시작시 팔레트에 색 채우기.
+    private func setFirstPalette(){
+        let paints = Palette().paints
+        for color in paints {
+            let palettes = Palettes()
+            palettes.colorCode = color
+            try! realm.write{
+                realm.add(palettes)
+            }
+        }
+        let ud = UserDefaults.standard
+        ud.set(true, forKey: "FirstPalette")
+        ud.synchronize()
     }
     
 }
