@@ -7,27 +7,20 @@
 
 import UIKit
 
-class GuideLabelView: UIView {
+final class GuideLabelView: UIView {
     //MARK: - Properties
-    let rotateImage: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.image = UIImage(systemName: "arrow.triangle.2.circlepath")
-        view.tintColor = .systemGray2
-        
-        return view
-    }()
+    private let rotateImage = UIImageView().then {
+        $0.image = UIImage(systemName: "arrow.triangle.2.circlepath")
+        $0.tintColor = .systemGray2
+    }
     
-    let rotateLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "타이머를 시작하려면 핸드폰을 뒤집어주세요."
-        label.font = .systemFont(ofSize: 16)
-        label.textColor = .systemGray2
-        
-        
-        return label
-    }()
+    private var timer: Timer?
+    
+    private let rotateLabel = UILabel().then {
+        $0.text = "타이머를 시작하려면 핸드폰을 뒤집어주세요."
+        $0.font = .systemFont(ofSize: 16)
+        $0.textColor = .systemGray2
+    }
     
     //MARK: - Init
     override init(frame: CGRect) {
@@ -40,24 +33,49 @@ class GuideLabelView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Method
+    /// 애니메이션 시작
+    func startAnimate() {
+        self.isHidden = false
+        var count = 0
+        self.timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) {
+            count += 1
+            UIView.transition(with: self,
+                              duration: 3.0,
+                              options: [.transitionFlipFromTop],
+                              animations: nil)
+            if count == 4 {
+                $0.invalidate()
+                self.stopAnimate()
+            }
+        }
+        
+    }
+    
+    /// 애니메이션 중단
+    func stopAnimate() {
+        self.layer.removeAllAnimations()
+        self.timer?.invalidate()
+        self.isHidden = true
+    }
+    
     //MARK: - addsubView
-    func addsubView(){
+    private func addsubView(){
         self.addSubview(self.rotateImage)
         self.addSubview(self.rotateLabel)
     }
     
     //MARK: - layout
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.rotateImage.trailingAnchor.constraint(equalTo: self.rotateLabel.leadingAnchor, constant: -10),
-            self.rotateImage.widthAnchor.constraint(equalToConstant: 20),
-            self.rotateImage.heightAnchor.constraint(equalToConstant: 18),
-            self.rotateImage.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-        ])
+    private func layout(){
+        self.rotateLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.centerX.equalToSuperview().offset(10)
+        }
         
-        NSLayoutConstraint.activate([
-            self.rotateLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor, constant: 10),
-            self.rotateLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor)
-        ])
+        self.rotateImage.snp.makeConstraints { make in
+            make.trailing.equalTo(self.rotateLabel.snp.leading).offset(-10)
+            make.width.height.equalTo(18)
+            make.centerY.equalToSuperview()
+        }
     }
 }
