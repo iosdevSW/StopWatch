@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol StopWatchVCDelegate {
+protocol StopWatchVCDelegate: AnyObject {
     func handleMenuToggle(menuOption: MenuOption?)
     func closeMenu()
 }
@@ -16,6 +16,6 @@ extension StopWatchVCDelegate {
     func closeMenu() { }
 }
 
-protocol SaveDateDetectionDelegate {
+protocol SaveDateDetectionDelegate: AnyObject {
     func detectSaveDate(date: String)
 }

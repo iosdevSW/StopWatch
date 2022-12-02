@@ -28,22 +28,8 @@ final class StopWatchViewController: UIViewController {
     
     var tapGesture: UITapGestureRecognizer?
     
-    var delegate: StopWatchVCDelegate?
-    var saveDateDelegate: SaveDateDetectionDelegate?
-    
-    var calendarViewHeight: NSLayoutConstraint!
-    var frameViewHeight: NSLayoutConstraint!
-    
-    // true : week, false : month
-    var calendarMode = true {
-        didSet {
-            if self.calendarMode {
-                
-            } else {
-                self.guideLabelView.stopAnimate()
-            }
-        }
-    }
+    weak var delegate: StopWatchVCDelegate?
+    private weak var saveDateDelegate: SaveDateDetectionDelegate?
     
     var saveDate: String = "" {
         didSet{ // 날짜가 바뀔 때마다
@@ -103,16 +89,12 @@ final class StopWatchViewController: UIViewController {
         $0.font = .systemFont(ofSize: 50, weight: .regular)
     }
     
-    let chartViewButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemGray6
-        button.setImage(UIImage(systemName: "chart.pie.fill"), for: .normal)
-        button.tintColor = .darkGray
-        button.layer.cornerRadius = 10
-    
-        return button
-    }()
+    private let chartViewButton = UIButton(type: .system).then {
+        $0.backgroundColor = .systemGray6
+        $0.setImage(UIImage(systemName: "chart.pie.fill"), for: .normal)
+        $0.tintColor = .darkGray
+        $0.layer.cornerRadius = 10
+    }
     
     private let dDayLabel = UILabel().then {
         $0.font = UIFont(name: "Times New Roman", size: 16)
@@ -120,20 +102,16 @@ final class StopWatchViewController: UIViewController {
         $0.text = "-days left"
     }
     
-    let toDoTableView: UITableView = {
-        let view = UITableView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.register(TodoListCell.self, forCellReuseIdentifier: "cell")
-        view.separatorStyle = .none
-        view.bounces = false
-        view.showsVerticalScrollIndicator = false
+    private let toDoTableView = UITableView().then {
+        $0.backgroundColor = .white
+        $0.register(TodoListCell.self, forCellReuseIdentifier: "cell")
+        $0.separatorStyle = .none
+        $0.bounces = false
+        $0.showsVerticalScrollIndicator = false
         if #available(iOS 15, *) {
-            view.sectionHeaderTopPadding = 0
+            $0.sectionHeaderTopPadding = 0
         }
-        
-        return view
-    }()
+    }
     
     private let categoryEditButton = UIButton(type: .system).then {
         $0.setImage(UIImage(systemName: "list.bullet"), for: .normal)
@@ -175,7 +153,9 @@ final class StopWatchViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         self.autoScrollCurrentDate()
-        if self.calendarMode { self.guideLabelView.startAnimate() } // 가이드 레이블 표시
+        if self.calendarView.calendarMode == .week {
+            self.guideLabelView.startAnimate()
+        } // 가이드 레이블 표시
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -232,16 +212,13 @@ final class StopWatchViewController: UIViewController {
     // 서브뷰가 떠있을때 외부 뷰 탭
     func setTapGesture(){
         guard tapView == nil else { return }
-        self.tapView = {
-            let tapView = UIView()
-            self.view.addSubview(tapView)
-            tapView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+        self.tapView = UIView().then {
+            self.view.addSubview($0)
+            $0.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
             
             self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.respondToTapGesture(_:)))
-            tapView.addGestureRecognizer(self.tapGesture!)
-            
-            return tapView
-        }()
+            $0.addGestureRecognizer(self.tapGesture!)
+        }
     }
     
     private func zeroTimeAlert(){
@@ -284,9 +261,8 @@ final class StopWatchViewController: UIViewController {
         }
     }
     
-    func setDday(){
-        let ud = UserDefaults.standard
-        let day = ud.value(forKey: "dday") as? Date ?? Date()
+    private func setDday(){
+        let day = UserDefaults.standard.value(forKey: "dday") as? Date ?? Date()
         let dayCount = Double(day.timeIntervalSinceNow / 86400) // 하루86400초
         let dday =  Int(ceil(dayCount)) // 소수점 올림
         if dday > 0 {
@@ -296,8 +272,6 @@ final class StopWatchViewController: UIViewController {
         }else {
             self.dDayLabel.text = "It's been \(abs(dday)) days."
         }
-        
-       
     }
     
     //MARK: - Selector
@@ -325,59 +299,58 @@ final class StopWatchViewController: UIViewController {
 
     //주 <-> 월 달력 변경 버튼 클릭
     @objc func changeCalendarMode(_ sender: UIButton){
-        UIView.animate(withDuration: 0.5){
-            if self.calendarMode {
+        UIView.animate(withDuration: 0.5) {
+            switch self.calendarView.calendarMode {
+            case .week:
                 self.calendarView.calendarMode = .month
-                self.calendarViewHeight.isActive = false
-                self.frameViewHeight.isActive = false
-                self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.86)
-                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 220)
-
+                
+                self.calendarView.snp.updateConstraints{ make in
+                    make.height.equalTo(220)
+                }
+                self.calendarView.superview?.layoutIfNeeded()
+                
+                self.frameView.snp.remakeConstraints { make in
+                    make.leading.trailing.bottom.equalToSuperview()
+                    make.height.equalToSuperview().multipliedBy(0.86)
+                }
+                self.frameView.superview?.layoutIfNeeded()
                 self.mainTimeLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                 self.dDayLabel.alpha = 0
                 self.changeCalendarMode.setTitle("월▾", for: .normal)
-
-                self.calendarViewHeight.isActive = true
-                self.frameViewHeight.isActive = true
                 self.mainTimeLabel.layoutIfNeeded()
-
-                self.chartView?.labelConstraint.isActive = false
-                self.chartView?.labelConstraint.constant = 0
-                self.chartView?.labelConstraint.isActive = true
-                self.chartView?.layoutIfNeeded()
-            }else {
+                self.chartView?.updateConstant(0)
+            case .month:
                 self.calendarView.calendarMode = .week
-                self.calendarViewHeight.isActive = false
-                self.frameViewHeight.isActive = false
-
-                self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
-
-                self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
+                
+                self.calendarView.snp.updateConstraints { make in
+                    make.height.equalTo(66)
+                }
+                self.calendarView.superview?.layoutIfNeeded()
+                
+                self.frameView.snp.remakeConstraints { make in
+                    make.leading.trailing.bottom.equalToSuperview()
+                    make.height.equalToSuperview().multipliedBy(0.76)
+                }
+                self.frameView.superview?.layoutIfNeeded()
+                
                 self.mainTimeLabel.font = .systemFont(ofSize: 50, weight: .regular)
-                self.mainTimeLabel.transform = CGAffineTransform(scaleX: 1, y: 1)
+                self.mainTimeLabel.transform = .identity
                 self.dDayLabel.alpha = 1
                 self.changeCalendarMode.setTitle("주▾", for: .normal)
-
-                self.calendarViewHeight.isActive = true
-                self.frameViewHeight.isActive = true
                 self.mainTimeLabel.layoutIfNeeded()
-
-                self.chartView?.labelConstraint.isActive = false
-                self.chartView?.labelConstraint.constant = 30
-                self.chartView?.labelConstraint.isActive = true
-                self.chartView?.layoutIfNeeded()
-
+        
+                self.chartView?.updateConstant(30)
+                self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
             }
             self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
-            self.calendarMode = !self.calendarMode
+            
         }
-        
     }
     
     @objc func proximityChangedMtd(sender: Notification){
         let isTrue = UIDevice.current.isProximityMonitoringEnabled
         if UIDevice.current.proximityState && isTrue {
-        }else{
+        } else {
             self.setDeviceMotion()
         }
     }
@@ -661,10 +634,8 @@ extension StopWatchViewController {
         
         self.frameView.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalToSuperview().multipliedBy(0.76)
         }
-        
-        self.frameViewHeight = self.frameView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.76)
-        self.frameViewHeight.isActive = true
         
         self.changeCalendarMode.snp.makeConstraints{ make in
             make.trailing.equalTo(self.frameView.snp.trailing).offset(-30)
@@ -721,10 +692,8 @@ extension StopWatchViewController {
             make.top.equalTo(self.titleView.snp.bottom).offset(12)
             make.leading.equalTo(self.frameView.snp.leading).offset(10)
             make.trailing.equalTo(self.frameView.snp.trailing).offset(-10)
+            make.height.equalTo(66)
         }
-        
-        self.calendarViewHeight = self.calendarView.heightAnchor.constraint(equalToConstant: 66)
-        self.calendarViewHeight.isActive = true
         
         self.itemBoxView.snp.makeConstraints{ make in
             make.leading.equalTo(self.frameView.snp.leading).offset(20)
@@ -733,31 +702,23 @@ extension StopWatchViewController {
             make.centerY.equalTo(self.barView.snp.centerY)
         }
         
-        NSLayoutConstraint.activate([
-            self.toDoTableView.topAnchor.constraint(equalTo: self.calendarView.bottomAnchor, constant: 10),
-            self.toDoTableView.bottomAnchor.constraint(equalTo: self.goalTimeView.topAnchor),
-            self.toDoTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 20),
-            self.toDoTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20),
-        ])
-        
+        self.toDoTableView.snp.makeConstraints { make in
+            make.top.equalTo(self.calendarView.snp.bottom).offset(10)
+            make.bottom.equalTo(self.goalTimeView.snp.top)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+        }
+    
         self.categoryEditButton.snp.makeConstraints{ make in
             make.top.bottom.leading.equalToSuperview()
             make.width.equalTo(34)
         }
         
-        NSLayoutConstraint.activate([
-            self.categoryEditButton.leadingAnchor.constraint(equalTo: self.itemBoxView.leadingAnchor),
-            self.categoryEditButton.widthAnchor.constraint(equalToConstant: 34),
-            self.categoryEditButton.topAnchor.constraint(equalTo: self.itemBoxView.topAnchor),
-            self.categoryEditButton.bottomAnchor.constraint(equalTo: self.itemBoxView.bottomAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.chartViewButton.topAnchor.constraint(equalTo: self.itemBoxView.topAnchor),
-            self.chartViewButton.bottomAnchor.constraint(equalTo: self.itemBoxView.bottomAnchor),
-            self.chartViewButton.leadingAnchor.constraint(equalTo:  self.categoryEditButton.trailingAnchor, constant: 10),
-            self.chartViewButton.widthAnchor.constraint(equalToConstant: 34),
-        ])
+        self.chartViewButton.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalTo(self.categoryEditButton.snp.trailing).offset(10)
+            make.width.equalTo(34)
+        }
     }
     
     //MARK: AddTarget
@@ -781,7 +742,6 @@ extension StopWatchViewController {
         notificationCenter.addObserver(self, selector: #selector(proximityChangedMtd(sender:)), name: UIDevice.proximityStateDidChangeNotification, object: nil)
     }
 }
-
 
 //MARK:- TabelView delegate datasource
 extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
@@ -1011,32 +971,22 @@ extension StopWatchViewController {
             }
             
             if sender.tag == 3 { // 날짜 변경 버튼
-                let calendar: CalendarModalView = {
-                    let calendar = CalendarModalView()
-                    calendar.translatesAutoresizingMaskIntoConstraints = false
+                let calendar = CalendarModalView().then {
+                    $0.calendarView.saveDate = self.saveDate
+                    $0.calendarView.presentDate = self.saveDate
+                    $0.changeDate = self.saveDate
+                    $0.saveDate = self.saveDate
                     
-                    calendar.calendarView.saveDate = self.saveDate
-                    calendar.calendarView.presentDate = self.saveDate
-                    calendar.changeDate = self.saveDate
-                    calendar.saveDate = self.saveDate
+                    self.view.addSubview($0)
+                    $0.snp.makeConstraints { make in
+                        make.leading.top.bottom.trailing.equalToSuperview()
+                    }
                     
+                    $0.indexpath = indexPath!
                     
-                    self.view.addSubview(calendar)
-                    NSLayoutConstraint.activate([
-                        calendar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-                        calendar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-                        calendar.topAnchor.constraint(equalTo: self.view.topAnchor),
-                        calendar.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-                    ])
-                    
-                    
-                    calendar.indexpath = indexPath!
-                    
-                    calendar.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
-                    calendar.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
-                    
-                    return calendar
-                }()
+                    $0.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
+                    $0.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
+                }
                 
                 self.closeListEditView()
             }
@@ -1067,7 +1017,6 @@ extension StopWatchViewController {
         let row = modalView.indexpath.row
         
         self.changeDate(modalView: modalView, section: section, row: row)
-        
     }
     
     @objc func postponeList(sender: UIButton){
