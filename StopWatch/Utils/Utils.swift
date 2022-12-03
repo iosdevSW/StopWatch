@@ -21,6 +21,24 @@ extension UIViewController {
         self.view.endEditing(true)
     }
     
+    ///기본적인 확인/취소 버튼이 존재하는 알림창
+    func defaultAlert(title: String?, message: String?, complete: @escaping (()->()) ){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+        let okAction = UIAlertAction(title: "확인", style: .default) { _ in complete() }
+        [okAction,cancelAction].forEach { alert.addAction($0) }
+        
+        self.present(alert, animated: true)
+    }
+    
+    ///단순 안내용 안내창 (확인 버튼만 존재)
+    func notiAlert(title: String?, message: String?) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "확인", style: .default)
+        alert.addAction(ok)
+        
+        present(alert, animated: true)
+    }
 }
 
 extension UIView {

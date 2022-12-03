@@ -84,6 +84,9 @@ class EditGoalTimeView: UIView {
         self.layer.cornerRadius = 10
         self.timePicker.delegate = self
         self.timePicker.dataSource = self
+        self.layer.shadowOpacity = 0.7
+        self.layer.shadowOffset = .zero
+        self.layer.shadowColor = UIColor.darkGray.cgColor
     }
     
     //MARK: - Method

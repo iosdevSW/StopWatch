@@ -24,9 +24,6 @@ final class StopWatchViewController: UIViewController {
     var editTodoListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
     var chartView: ChartView?
-    var tapView: UIView?
-    
-    var tapGesture: UITapGestureRecognizer?
     
     weak var delegate: StopWatchVCDelegate?
     private weak var saveDateDelegate: SaveDateDetectionDelegate?
@@ -124,17 +121,21 @@ final class StopWatchViewController: UIViewController {
     //MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.configured()   // 뷰 초기 설정 메소드
-        self.addSubView()   // 서브뷰 추가 메소드
-        self.layOut()       // 레이이웃 메소드
+        self.configured()
+        self.addSubView()
+        self.layOut()
         self.addTarget()
+        self.addObserver()
+        
         self.calendarView.delegate = self
         self.toDoTableView.delegate = self
         self.toDoTableView.dataSource = self
-        self.hideKeyboardWhenTapped() //
-        self.addObserverMtd() // 옵저버 추가
-        self.reloadProgressBar()
-        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        
+        // gesture
+        self.hideKeyboardWhenTapped()
+        self.hideSubviewWhenTapped()
+        
+//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -155,7 +156,7 @@ final class StopWatchViewController: UIViewController {
         self.autoScrollCurrentDate()
         if self.calendarView.calendarMode == .week {
             self.guideLabelView.startAnimate()
-        } // 가이드 레이블 표시
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -199,6 +200,54 @@ final class StopWatchViewController: UIViewController {
         self.goalTimeView.timeLabel.updateTime(self.view.divideSecond(timeInterval: goal))
     }
     
+    //목표 시간 설정 뷰 열기
+    func openGoalTimeEditView() {
+        guard self.editGoalTimeView == nil else { return } // 이미 객체가 생성되었으면 더 못생성되게 막기
+        
+        self.editGoalTimeView = EditGoalTimeView().then {
+            self.view.addSubview($0)
+            
+            $0.cancelButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
+            $0.okButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
+            
+            $0.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(30)
+                make.trailing.equalToSuperview().offset(-30)
+                make.bottom.equalToSuperview().offset(-20)
+                make.height.equalTo(200)
+            }
+        }
+        
+        self.editGoalTimeView!.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+        UIView.animate(withDuration: 0.3){
+            self.editGoalTimeView!.transform = .identity
+        }
+        StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
+        
+        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
+        let goal = dailyData.totalGoalTime
+        let hourIndex = Int(goal / 3600) % 24 // 3600초 (1시간)으로 나눈 몫을 24로 나누면 시간 인덱스와 같다.
+        let miniuteIndex = ((Int(goal) % 3600 ) / 60) / 5 // 남은 분을 5로 나누면 5분간격의 분 인덱스와 같다.
+        
+        self.editGoalTimeView!.timePicker.selectRow(hourIndex, inComponent: 0, animated: false) //시간초기값
+        self.editGoalTimeView!.timePicker.selectRow(miniuteIndex, inComponent: 1, animated: false)//분초기값
+        self.editGoalTimeView!.selectedMinute = TimeInterval(Int(goal) % 3600)
+        self.editGoalTimeView!.selectedHour = goal - self.editGoalTimeView!.selectedMinute
+    }
+    
+    //목표 시간 설정 뷰 닫기
+    func closeGoalTimeEditView() {
+        if let _editGoalTimeView = self.editGoalTimeView {
+            UIView.animate(withDuration: 0.5,animations: {
+                _editGoalTimeView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+            }){_ in
+                StopWatchDAO().deleteSegment(date: self.saveDate)
+                _editGoalTimeView.removeFromSuperview()
+                self.editGoalTimeView = nil
+            }
+        }
+    }
+    
     //MARK: - gestrue method
     private func setSwipeGesture(){
         //차트뷰 아래로 내려서 닫기 제스쳐 추가
@@ -210,25 +259,12 @@ final class StopWatchViewController: UIViewController {
     }
     
     // 서브뷰가 떠있을때 외부 뷰 탭
-    func setTapGesture(){
-        guard tapView == nil else { return }
-        self.tapView = UIView().then {
-            self.view.addSubview($0)
-            $0.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
-            
-            self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.respondToTapGesture(_:)))
-            $0.addGestureRecognizer(self.tapGesture!)
-        }
+    private func hideSubviewWhenTapped() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.respondToTapGesture(_:)))
+        self.view.addGestureRecognizer(tapGesture)
     }
     
-    private func zeroTimeAlert(){
-        let alert = UIAlertController(title: "알 림", message: "측정된 시간이 없습니다.", preferredStyle: .alert)
-        let ok = UIAlertAction(title: "확인", style: .default)
-        alert.addAction(ok)
-        present(alert, animated: true)
-    }
-    
-    // subview open method
+    // 차트뷰 열기
     func openChartView(){
         if self.chartView != nil { return }
         
@@ -282,6 +318,12 @@ final class StopWatchViewController: UIViewController {
         default:
             break
         }
+    }
+    
+    //탭 제스쳐를 감지하여 뷰를 닫는 액션함수
+    @objc func respondToTapGesture(_ sender: Any){
+        self.closeListEditView()        //편집 뷰가 열려 있으면 편집 뷰 닫기
+        self.closeGoalTimeEditView()    //골타임설정 뷰가 열려 있으면 닫기
     }
     
     @objc func respondToButton(_ button:UIButton){
@@ -353,62 +395,6 @@ final class StopWatchViewController: UIViewController {
         } else {
             self.setDeviceMotion()
         }
-    }
-    
-    func closeGoalTimeEditView() {
-        if let _editGoalTimeView = self.editGoalTimeView {
-            UIView.animate(withDuration: 0.5,animations: {
-                _editGoalTimeView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
-            }){_ in
-                StopWatchDAO().deleteSegment(date: self.saveDate)
-                _editGoalTimeView.removeFromSuperview()
-                self.editGoalTimeView = nil
-                self.removeTapView()
-            }
-        }
-    }
-    
-    //목표 시간 설정 뷰 열기
-    func openGoalTimeEditView() {
-        guard self.editGoalTimeView == nil else { return } // 이미 객체가 생성되었으면 더 못생성되게 막기
-        
-        self.editGoalTimeView = {
-            let view = EditGoalTimeView()
-            self.setTapGesture()
-            view.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addSubview(view)
-            view.layer.shadowOpacity = 0.7
-            view.layer.shadowOffset = .zero
-            view.layer.shadowColor = UIColor.darkGray.cgColor
-            
-            view.cancelButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
-            view.okButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
-            
-            NSLayoutConstraint.activate([
-                view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
-                view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -20),
-                view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
-                view.heightAnchor.constraint(equalToConstant: 200)
-            ])
-            
-            return view
-        }()
-        
-        self.editGoalTimeView!.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
-        UIView.animate(withDuration: 0.3){
-            self.editGoalTimeView!.transform = .identity
-        }
-        StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
-        
-        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
-        let goal = dailyData.totalGoalTime
-        let hourIndex = Int(goal / 3600) % 24 // 3600초 (1시간)으로 나눈 몫을 24로 나누면 시간 인덱스와 같다.
-        let miniuteIndex = ((Int(goal) % 3600 ) / 60) / 5 // 남은 분을 5로 나누면 5분간격의 분 인덱스와 같다.
-        
-        self.editGoalTimeView!.timePicker.selectRow(hourIndex, inComponent: 0, animated: false) //시간초기값
-        self.editGoalTimeView!.timePicker.selectRow(miniuteIndex, inComponent: 1, animated: false)//분초기값
-        self.editGoalTimeView!.selectedMinute = TimeInterval(Int(goal) % 3600)
-        self.editGoalTimeView!.selectedHour = goal - self.editGoalTimeView!.selectedMinute
     }
     
     // 목표 시간 설정 뷰 닫기
@@ -495,30 +481,7 @@ final class StopWatchViewController: UIViewController {
         self.navigationController?.pushViewController(categoryVC, animated: true)
     }
     
-    //탭 제스쳐를 감지하여 뷰를 닫는 액션함수
-    @objc func respondToTapGesture(_ sender: Any){
-        //편집 뷰가 열려 있으면 편집 뷰 닫기
-        self.closeListEditView()
-        
-        //골타임설정 뷰가 열려 있으면 닫기
-        self.closeGoalTimeEditView()
-
-    }
-    
-    func removeTapView(){
-        if self.tapView != nil {
-            // 탭 제스쳐 제거
-            self.view.removeGestureRecognizer(self.tapGesture!)
-            self.tapGesture = nil
-            // 탭뷰 제거
-            self.tapView?.removeFromSuperview()
-            self.tapView = nil
-        }
-        
-    }
-    
     //MARK: CalendarView method
-    
     func clickDay(saveDate: String) {
         self.saveDate = saveDate
         self.chartView?.saveDate = saveDate
@@ -587,10 +550,8 @@ extension StopWatchViewController {
                             self.navigationController?.pushViewController(self.concentraionTimerVC!, animated: false)
                         }
                         self.motionManager?.stopDeviceMotionUpdates()
-                        
                     }
                 }
-                
             } else if radian < 100 { //timer stop
                 if proximityState == false {
                     UIDevice.current.isProximityMonitoringEnabled = false
@@ -722,7 +683,7 @@ extension StopWatchViewController {
     }
     
     //MARK: AddTarget
-    func addTarget(){
+    private func addTarget(){
         self.chartViewButton.addTarget(self, action: #selector(self.clickToChartButton), for: .touchUpInside)
         self.previousMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
         self.nextMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
@@ -731,7 +692,7 @@ extension StopWatchViewController {
     }
     
     //MARK: AddObserver
-    func addObserverMtd(){
+    private func addObserver() {
         let notificationCenter = NotificationCenter.default
         // 키보드 나오고 들어갈때 호출되는 메소드 추가!
         notificationCenter.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -743,7 +704,7 @@ extension StopWatchViewController {
     }
 }
 
-//MARK:- TabelView delegate datasource
+//MARK: - TabelView delegate datasource
 extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func numberOfSections(in tableView: UITableView) -> Int {
         return self.realm.objects(Segments.self).count // 섹션 수 = 과목 수
@@ -818,7 +779,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         
         self.editTodoListView = {
             let view = EditTodoListView()
-            self.setTapGesture() // 외부 탭 하면 닫히는 제스쳐 추가
+            
             self.view.addSubview(view)
             
             view.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
@@ -915,7 +876,7 @@ extension StopWatchViewController: UITextFieldDelegate {
     }
 }
 
-//MARK:- editListMethod
+//MARK: - editListMethod
 extension StopWatchViewController {
     
     @objc func editListMethod(_ sender: UIButton){
@@ -944,9 +905,7 @@ extension StopWatchViewController {
             }
 
             if sender.tag == 1 { // 삭제 버튼이면
-                let alert = UIAlertController(title: nil, message: "정말 삭제 하시겠습니까?", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "취소", style: .cancel))
-                alert.addAction(UIAlertAction(title: "확인", style: .default){ (_) in
+                self.defaultAlert(title: nil, message: "정말 삭제 하시겠습니까?") {
                     try! self.realm.write{
                         segment[section].toDoList.remove(at: row) // 리스트 삭제
                         segment[section].listCheckImageIndex.remove(at: row)
@@ -955,9 +914,7 @@ extension StopWatchViewController {
                     self.toDoTableView.reloadData()
                     self.calendarView.calendarView.reloadData()
                     self.closeListEditView()
-                })
-
-                self.present(alert, animated: false)
+                }
             }
             
             if sender.tag == 2 { //모양변경 버튼이면
@@ -971,7 +928,7 @@ extension StopWatchViewController {
             }
             
             if sender.tag == 3 { // 날짜 변경 버튼
-                let calendar = CalendarModalView().then {
+                _ = CalendarModalView().then {
                     $0.calendarView.saveDate = self.saveDate
                     $0.calendarView.presentDate = self.saveDate
                     $0.changeDate = self.saveDate
@@ -1001,7 +958,6 @@ extension StopWatchViewController {
             }){ (_) in
                 editView.removeFromSuperview() // 슈퍼뷰에서 제거!
                 self.editTodoListView = nil
-                self.removeTapView()
             }
         }
     }
