@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 enum TimeLabelType {
     /// 시 분 초 밀리초
     case hmss
@@ -17,14 +18,12 @@ enum TimeLabelType {
 
 final class TimeLabel: UILabel {
     //MARK: - Properties
-    var labelType: TimeLabelType = .hms
+    private var labelType: TimeLabelType = .hms
     
     //MARK: - Init
     init(_ type: TimeLabelType) {
         super.init(frame: .zero)
         self.labelType = type
-        self.text = "00 : 00 : 00"
-        self.textAlignment = .center
         configure()
     }
     
@@ -34,7 +33,8 @@ final class TimeLabel: UILabel {
     
     //MARK: - Configure
     func configure() {
-        
+        self.text = "00 : 00 : 00"
+        self.textAlignment = .center
     }
     
     //MARK: - updateTime

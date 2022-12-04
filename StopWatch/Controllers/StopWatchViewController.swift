@@ -24,6 +24,7 @@ final class StopWatchViewController: UIViewController {
     var editTodoListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
     var chartView: ChartView?
+    var tapGesture: UITapGestureRecognizer?
     
     weak var delegate: StopWatchVCDelegate?
     private weak var saveDateDelegate: SaveDateDetectionDelegate?
@@ -133,7 +134,6 @@ final class StopWatchViewController: UIViewController {
         
         // gesture
         self.hideKeyboardWhenTapped()
-        self.hideSubviewWhenTapped()
         
 //        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
@@ -207,6 +207,7 @@ final class StopWatchViewController: UIViewController {
         self.editGoalTimeView = EditGoalTimeView().then {
             self.view.addSubview($0)
             
+            self.hideSubviewWhenTapped()
             $0.cancelButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
             $0.okButton.addTarget(self, action: #selector(self.didFinishEditingGoalTime(_:)), for: .touchUpInside)
             
@@ -244,6 +245,7 @@ final class StopWatchViewController: UIViewController {
                 StopWatchDAO().deleteSegment(date: self.saveDate)
                 _editGoalTimeView.removeFromSuperview()
                 self.editGoalTimeView = nil
+                self.removeTapGesture()
             }
         }
     }
@@ -260,8 +262,14 @@ final class StopWatchViewController: UIViewController {
     
     // 서브뷰가 떠있을때 외부 뷰 탭
     private func hideSubviewWhenTapped() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.respondToTapGesture(_:)))
-        self.view.addGestureRecognizer(tapGesture)
+        self.tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.respondToTapGesture(_:)))
+        self.view.addGestureRecognizer(tapGesture!)
+    }
+    
+    private func removeTapGesture() {
+        guard let tapGesture else { return }
+        self.view.removeGestureRecognizer(tapGesture)
+        self.tapGesture = nil
     }
     
     // 차트뷰 열기
@@ -777,29 +785,26 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard self.editTodoListView == nil else { return }
         
-        self.editTodoListView = {
-            let view = EditTodoListView()
+        self.editTodoListView = EditTodoListView().then {
+            self.view.addSubview($0)
+            self.hideSubviewWhenTapped()
             
-            self.view.addSubview(view)
-            
-            view.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            view.deleteButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            view.changeCheckImageButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            view.changeDateButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            $0.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            $0.deleteButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            $0.changeCheckImageButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            $0.changeDateButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
             
             let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
             let title = object?.dailySegment[indexPath.section].toDoList[indexPath.row] // list 불러오기
-            view.title.text = "' \(title!) '"
+            $0.title.text = "' \(title!) '"
             
-            view.frame.size = CGSize(width: self.view.frame.width - 40, height: 100)
-            view.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height + 45)
-            UIView.animate(withDuration: 0.5){
-                view.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height - 80)
-            }
-            view.indexPath = indexPath
-            
-            return view
-        }()
+            $0.frame.size = CGSize(width: self.view.frame.width - 40, height: 100)
+            $0.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height + 45)
+            $0.indexPath = indexPath
+        }
+        UIView.animate(withDuration: 0.5) {
+            self.editTodoListView?.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height - 80)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -958,6 +963,7 @@ extension StopWatchViewController {
             }){ (_) in
                 editView.removeFromSuperview() // 슈퍼뷰에서 제거!
                 self.editTodoListView = nil
+                self.removeTapGesture()
             }
         }
     }
