@@ -7,6 +7,8 @@
 
 import UIKit
 import RealmSwift
+import Then
+import SnapKit
 
 class CalendarModalView: UIView {
     //MARK: - Properties
@@ -19,7 +21,7 @@ class CalendarModalView: UIView {
     var indexpath: IndexPath!
     var changeDate = "" {
         didSet{
-            self.titleView.label.text = CalendarMethod().convertDate(date: self.calendarView.saveDate) // 타이틀 날짜 다시표시
+            self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.calendarView.saveDate) // 타이틀 날짜 다시표시
             
             let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
             let formatter = DateFormatter()
@@ -31,168 +33,90 @@ class CalendarModalView: UIView {
             let result = date_today!.compare(date_changeDate!)
             switch result {
             case.orderedSame:
-                self.compareDate = true
+                self.isTodayDate = true
                 break
             case.orderedAscending: fallthrough
             case.orderedDescending:
-                self.compareDate = false
+                self.isTodayDate = false
             }
         }
     }
-    var compareDate: Bool = true {
+    var isTodayDate: Bool = true {
         didSet{
-            if compareDate == true{ // 오늘 날짜의 리스트 일때
-                self.postponeButton.setTitle("내일 하기", for: .normal)
-            }else { // 오늘 미만 또는 이상 날짜의 리스트 일때
-                self.postponeButton.setTitle("오늘 하기", for: .normal)
-            }
-            
+            let title = self.isTodayDate ? "내일 하기" : "오늘 하기"
+            self.postponeButton.setTitle(title, for: .normal)
         }
     }
     
-    let blurView: UIVisualEffectView = {
-        let blurView = UIBlurEffect(style: .dark)
-        let effectView = UIVisualEffectView(effect: blurView)
-        effectView.alpha = 0.1
-        effectView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return effectView
-    }()
+    private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark)).then {
+        $0.alpha = 0.1
+    }
     
-    let selectedDateGuideLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "선택한 날짜"
-        label.textColor = .lightGray
-        label.font = UIFont(name: "GodoM", size: 12)
-        
-        return label
-    }()
+    private let selectedDateGuideLabel = UILabel().then {
+        $0.text = "선택한 날짜"
+        $0.textColor = .lightGray
+        $0.font = UIFont(name: "GodoM", size: 12)
+    }
     
-    let selectedDateLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .darkGray
-        label.font = UIFont(name: "GodoM", size: 24)
-       
-        return label
-    }()
+    private let selectedDateLabel = UILabel().then {
+        $0.textColor = .darkGray
+        $0.font = UIFont(name: "GodoM", size: 24)
+    }
     
-    let frameView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 10
-        view.layer.shadowOpacity = 0.7
-        view.layer.shadowOffset = .zero
-        view.layer.shadowColor = UIColor.darkGray.cgColor
-        
-        return view
-    }()
-    
-    let titleView: TitleView = {
-        let view = TitleView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.label.font = UIFont(name: "GodoM", size: 16)
-        
-        return view
-    }()
+    private let frameView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 10
+        $0.layer.shadowOpacity = 0.7
+        $0.layer.shadowOffset = .zero
+        $0.layer.shadowColor = UIColor.darkGray.cgColor
+    }
 
-    let calendarView: CalendarView = {
-        let view = CalendarView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.calendarMode = .month
-        view.calendarView.layer.cornerRadius = 20
-        view.collectionHeaderView.layer.cornerRadius = 20
-        view.calendarInfo.cellSize = (UIScreen.main.bounds.width - 60) / 7
-        
-        return view
-    }()
+    let calendarView = CalendarView().then {
+        $0.calendarMode = .month
+        $0.calendarView.layer.cornerRadius = 20
+        $0.collectionHeaderView.layer.cornerRadius = 20
+        $0.calendarInfo.cellSize = (UIScreen.main.bounds.width - 60) / 7
+        $0.yearMonthLabel.font = UIFont(name: "GodoM", size: 16)
+    }
     
-    let previousMonthButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("<", for: .normal)
-        button.tag = 0
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 8
-        
-        return button
-    }()
+    let okButton = UIButton(type: .roundedRect).then {
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 6
+        $0.setTitleColor(UIColor.darkGray, for: .normal)
+        $0.setTitle("확 인", for: .normal)
+        $0.titleLabel?.font = UIFont(name: "GodoM", size: 14)
+    }
     
-    let nextMonthButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(">", for: .normal)
-        button.tag = 1
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 8
-        
-        return button
-    }()
+    private let cancelButton = UIButton(type: .roundedRect).then {
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 6
+        $0.setTitleColor(UIColor.darkGray, for: .normal)
+        $0.setTitle("취 소", for: .normal)
+        $0.titleLabel?.font = UIFont(name: "GodoM", size: 14)
+    }
     
-    let okButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 6
-        button.setTitleColor(UIColor.darkGray, for: .normal)
-        button.setTitle("확 인", for: .normal)
-        button.titleLabel?.font = UIFont(name: "GodoM", size: 14)
-        
-        
-        return button
-    }()
+    let postponeButton = UIButton(type: .roundedRect).then {
+        $0.backgroundColor = .systemGray6
+        $0.layer.cornerRadius = 6
+        $0.setTitleColor(UIColor.darkGray, for: .normal)
+        $0.setTitle("내일 하기", for: .normal)
+        $0.titleLabel?.font = UIFont(name: "GodoM", size: 14)
+    }
     
-    let cancelButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 6
-        button.setTitleColor(UIColor.darkGray, for: .normal)
-        button.setTitle("취 소", for: .normal)
-        button.titleLabel?.font = UIFont(name: "GodoM", size: 14)
-        
-        return button
-    }()
-    
-    let postponeButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemGray6
-        button.layer.cornerRadius = 6
-        button.setTitleColor(UIColor.darkGray, for: .normal)
-        button.setTitle("내일 하기", for: .normal)
-        button.titleLabel?.font = UIFont(name: "GodoM", size: 14)
-        
-        return button
-    }()
+    private lazy var stackView = UIStackView(arrangedSubviews: [okButton, cancelButton, postponeButton]).then {
+        $0.spacing = 10
+        $0.axis = .horizontal
+        $0.distribution = .fillEqually
+    }
     
     //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubview(self.blurView)
-        self.addSubview(self.frameView)
-        
-        self.frameView.addSubview(self.selectedDateGuideLabel)
-        self.frameView.addSubview(self.selectedDateLabel)
-        self.frameView.addSubview(self.previousMonthButton)
-        self.frameView.addSubview(self.nextMonthButton)
-        self.frameView.addSubview(self.titleView)
-        self.frameView.addSubview(self.calendarView)
-        self.frameView.addSubview(self.okButton)
-        self.frameView.addSubview(self.postponeButton)
-        self.frameView.addSubview(self.cancelButton)
-        
+        self.addSubView()
         self.addTarget()
+        self.layout()
         
         self.calendarView.saveDateDelegate = self
-        
-        self.layout()
     }
     
     required init?(coder: NSCoder) {
@@ -200,108 +124,115 @@ class CalendarModalView: UIView {
     }
     
     //MARK: - Method
-    func closeModalView(){
-        self.removeFromSuperview()
-    }
     
-    //MARK: - AddTarget
-    func addTarget(){
-        self.nextMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-        self.previousMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-    
-        self.cancelButton.addTarget(self, action: #selector(self.clickCancelButton(_:)), for: .touchUpInside)
-    }
     //MARK: - Selector
     
     @objc func respondToButton(_ button:UIButton){
         let (year,month,day) = CalendarMethod().changeMonth(tag: button.tag, date: self.calendarView.presentDate)
-        
         self.calendarView.presentDate = String(year) + "." + self.returnString(month) + "." + self.returnString(day)
         
         // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
         self.calendarView.calendarView.reloadData()
-        self.titleView.label.text = CalendarMethod().convertDate(date: self.calendarView.presentDate) // 타이틀 날짜 다시표시
+        self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.calendarView.presentDate) // 타이틀 날짜 다시표시
     }
 
     @objc func clickCancelButton(_ sender: UIButton){
-        self.closeModalView()
+        self.removeFromSuperview()
+    }
+    
+    @objc func clickOkButton(_ sender: UIButton){
+        let _ = StopWatchDAO().create(date: self.saveDate)
+        let (section,row) = (indexpath.section,indexpath.row)
+        
+        NotificationCenter.default.post(name: .changeModalCalendarViewDate, object: nil, userInfo: ["modalView": self,
+                                                                                                    "indexPath": (section,row)])
+    }
+    
+    @objc func postponeList(sender: UIButton){
+        let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
+        let (section,row) = (indexpath.section,indexpath.row)
+        var date = ""
+        
+        var (intYear,intMonth,intDay): (Int,Int,Int) = CalendarMethod().splitDate(date: today)
+        let lastDayOfMonth = CalendarMethod().getDaysOfMonth(year: intYear, month: intMonth)
+        
+        if self.isTodayDate { // 수정 필요
+            if intDay == lastDayOfMonth {
+                let (year,month,_) = CalendarMethod().changeMonth(tag: 1, date: today)
+                intYear = year
+                intMonth = month
+                intDay = 1
+            }else {
+                intDay += 1
+            }
+            date = String(intYear) + "." + self.returnString(intMonth) + "." + self.returnString(intDay)
+        }else {
+            date = today
+        }
+        
+        self.saveDate = date
+        self.calendarView.saveDate = date
+        self.calendarView.presentDate = date
+        self.calendarView.calendarView.reloadData()
+        self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: date)
+        
+        let _ = StopWatchDAO().create(date: self.saveDate)
+        NotificationCenter.default.post(name: .changeModalCalendarViewDate, object: nil, userInfo: ["modalView": self,
+                                                                                                    "indexPath": (section,row)])
+    }
+    
+    //MARK: - addSubView
+    private func addSubView() {
+        self.addSubview(self.blurView)
+        self.addSubview(self.frameView)
+        
+        self.frameView.addSubview(self.selectedDateGuideLabel)
+        self.frameView.addSubview(self.selectedDateLabel)
+        self.frameView.addSubview(self.calendarView)
+        self.frameView.addSubview(self.stackView)
     }
     
     //MARK: - layout
-    func layout() {
-        NSLayoutConstraint.activate([
-            self.blurView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.blurView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.blurView.topAnchor.constraint(equalTo: self.topAnchor),
-            self.blurView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
-        ])
+    private func layout() {
+        self.blurView.snp.makeConstraints {
+            $0.top.bottom.leading.trailing.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            self.selectedDateGuideLabel.topAnchor.constraint(equalTo: self.frameView.topAnchor, constant: 10),
-            self.selectedDateGuideLabel.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
-        ])
+        self.selectedDateGuideLabel.snp.makeConstraints {
+            $0.top.leading.equalToSuperview().offset(10)
+        }
         
-        NSLayoutConstraint.activate([
-            self.selectedDateLabel.topAnchor.constraint(equalTo: self.selectedDateGuideLabel.bottomAnchor, constant: 10),
-            self.selectedDateLabel.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10)
-        ])
+        self.selectedDateLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(10)
+            $0.top.equalTo(self.selectedDateGuideLabel.snp.bottom).offset(10)
+        }
         
-        NSLayoutConstraint.activate([
-            self.frameView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 30),
-            self.frameView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -30),
-            self.frameView.heightAnchor.constraint(equalToConstant: 400),
-            self.frameView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
-        ])
+        self.frameView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(30)
+            $0.trailing.equalToSuperview().offset(-30)
+            $0.centerY.equalToSuperview()
+            $0.height.equalTo(400)
+        }
         
-        NSLayoutConstraint.activate([
-            self.titleView.topAnchor.constraint(equalTo: self.selectedDateLabel.bottomAnchor, constant: 20),
-            self.titleView.leadingAnchor.constraint(equalTo: self.calendarView.leadingAnchor),
-            self.titleView.heightAnchor.constraint(equalToConstant: 30)
-        ])
+        self.calendarView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.top.equalTo(self.selectedDateLabel.snp.bottom).offset(20)
+            $0.height.equalTo(240)
+        }
         
-        NSLayoutConstraint.activate([
-            self.calendarView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 30),
-            self.calendarView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -30),
-            self.calendarView.topAnchor.constraint(equalTo: self.titleView.bottomAnchor),
-            self.calendarView.heightAnchor.constraint(equalToConstant: 240)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.previousMonthButton.leadingAnchor.constraint(equalTo: self.titleView.trailingAnchor),
-            self.previousMonthButton.heightAnchor.constraint(equalToConstant: 24),
-            self.previousMonthButton.widthAnchor.constraint(equalToConstant: 24),
-            self.previousMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.nextMonthButton.leadingAnchor.constraint(equalTo: self.previousMonthButton.trailingAnchor, constant: 4),
-            self.nextMonthButton.widthAnchor.constraint(equalToConstant: 24),
-            self.nextMonthButton.heightAnchor.constraint(equalToConstant: 24),
-            self.nextMonthButton.centerYAnchor.constraint(equalTo: self.titleView.centerYAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.okButton.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
-            self.okButton.bottomAnchor.constraint(equalTo: self.frameView.bottomAnchor, constant: -10),
-            self.okButton.heightAnchor.constraint(equalToConstant: 40),
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.cancelButton.leadingAnchor.constraint(equalTo: self.okButton.trailingAnchor, constant: 10),
-            self.cancelButton.bottomAnchor.constraint(equalTo: self.frameView.bottomAnchor, constant: -10),
-            self.cancelButton.heightAnchor.constraint(equalToConstant: 40),
-            self.cancelButton.widthAnchor.constraint(equalTo: self.okButton.widthAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.postponeButton.leadingAnchor.constraint(equalTo: self.cancelButton.trailingAnchor, constant: 10),
-            self.postponeButton.bottomAnchor.constraint(equalTo: self.frameView.bottomAnchor, constant: -10),
-            self.postponeButton.heightAnchor.constraint(equalToConstant: 40),
-            self.postponeButton.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -10),
-            self.postponeButton.widthAnchor.constraint(equalTo: self.okButton.widthAnchor)
-        ])
+        self.stackView.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(10)
+            $0.trailing.bottom.equalToSuperview().offset(-10)
+            $0.height.equalTo(40)
+        }
     }
     
+    //MARK: - AddTarget
+    private func addTarget(){
+        self.cancelButton.addTarget(self, action: #selector(self.clickCancelButton(_:)), for: .touchUpInside)
+        self.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
+        self.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
+    }
 }
 
 extension CalendarModalView: SaveDateDetectionDelegate{
@@ -310,6 +241,4 @@ extension CalendarModalView: SaveDateDetectionDelegate{
         self.selectedDateLabel.text = year + "년 " + month + "월 " + day + "일"
         self.saveDate = date
     }
-    
-    
 }

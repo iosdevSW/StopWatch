@@ -18,7 +18,7 @@ final class StopWatchViewController: UIViewController {
     var totalGoalTime: TimeInterval = 0
 
     let realm = try! Realm()
-    var motionManager: CMMotionManager?
+    private var motionManager: CMMotionManager?
     
     var concentraionTimerVC: ConcentrationTimeViewController?
     var editTodoListView: EditTodoListView?
@@ -27,21 +27,19 @@ final class StopWatchViewController: UIViewController {
     var tapGesture: UITapGestureRecognizer?
     
     weak var delegate: StopWatchVCDelegate?
-    private weak var saveDateDelegate: SaveDateDetectionDelegate?
     
     var saveDate: String = "" {
         didSet{ // 날짜가 바뀔 때마다
             self.setGoalTime() // 목표시간 Label 재설정
             self.reloadProgressBar() // 진행바 재로딩
             self.setTimeLabel() // 현재시간 Label 재설정
-            self.titleView.label.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
+            self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
             self.toDoTableView.reloadData()
             self.calendarView.saveDate = self.saveDate
             self.calendarView.calendarView.reloadData()
         }
     }
     
-    private let titleView = TitleView()
     private let goalTimeView = GoalTimeView()
     private let barView = DrawBarView()
     private let guideLabelView = GuideLabelView()
@@ -50,32 +48,8 @@ final class StopWatchViewController: UIViewController {
     private let calendarView = CalendarView().then {
         $0.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
         $0.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        $0.backgroundColor = .blue
     }
     
-    private let previousMonthButton = UIButton(type: .system).then {
-        $0.tag = 0
-        $0.setImage(UIImage(systemName: "chevron.backward"), for: .normal)
-        $0.tintColor = .darkGray
-        $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
-    }
-    
-    private let nextMonthButton = UIButton(type: .system).then {
-        $0.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
-        $0.tintColor = .darkGray
-        $0.tag = 1
-        $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
-    }
-    
-    private let changeCalendarMode = UIButton(type: .system).then {
-        $0.setTitle("주▾", for: .normal)
-        $0.backgroundColor = .systemGray6
-        $0.layer.cornerRadius = 8
-        $0.setTitleColor(UIColor.darkGray, for: .normal)
-    }
-        
     let frameView = UIView().then {
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 50
@@ -318,6 +292,18 @@ final class StopWatchViewController: UIViewController {
         }
     }
     
+    func openCategoryVC() {
+        let categoryVC = CategoryViewController()
+        self.navigationController?.pushViewController(categoryVC, animated: true)
+    }
+    
+    //MARK: CalendarView method
+    func clickDay(saveDate: String) {
+        self.saveDate = saveDate
+        self.chartView?.saveDate = saveDate
+        self.chartView?.setNeedsDisplay() // 차트 다시 그리기
+    }
+    
     //MARK: - Selector
     @objc func respondToSwipeGesture(_ gesture: UISwipeGestureRecognizer){
         switch gesture.direction {
@@ -333,29 +319,16 @@ final class StopWatchViewController: UIViewController {
         self.closeListEditView()        //편집 뷰가 열려 있으면 편집 뷰 닫기
         self.closeGoalTimeEditView()    //골타임설정 뷰가 열려 있으면 닫기
     }
-    
-    @objc func respondToButton(_ button:UIButton){
-        let (year,month,day) = CalendarMethod().changeMonth(tag: button.tag, date: self.calendarView.presentDate)
-        
-        self.calendarView.presentDate = String(year) + "." + self.view.returnString(month) + "." + self.view.returnString(day)
-        
-        // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
-        self.calendarView.saveDate = self.saveDate
-        self.calendarView.calendarView.reloadData()
-        self.autoScrollCurrentDate()
-        self.titleView.label.text = CalendarMethod().convertDate(date: self.calendarView.presentDate) // 타이틀 날짜 다시표시
-        self.saveDateDelegate?.detectSaveDate(date: self.saveDate)
-    }
 
     //주 <-> 월 달력 변경 버튼 클릭
-    @objc func changeCalendarMode(_ sender: UIButton){
+    @objc func didClickChangeCalendarMode(_ sender: UIButton){
         UIView.animate(withDuration: 0.5) {
             switch self.calendarView.calendarMode {
             case .week:
                 self.calendarView.calendarMode = .month
                 
                 self.calendarView.snp.updateConstraints{ make in
-                    make.height.equalTo(220)
+                    make.height.equalTo(268)
                 }
                 self.calendarView.superview?.layoutIfNeeded()
                 
@@ -366,14 +339,14 @@ final class StopWatchViewController: UIViewController {
                 self.frameView.superview?.layoutIfNeeded()
                 self.mainTimeLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                 self.dDayLabel.alpha = 0
-                self.changeCalendarMode.setTitle("월▾", for: .normal)
+                self.calendarView.changeCalendarMode.setTitle("월▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
                 self.chartView?.updateConstant(0)
             case .month:
                 self.calendarView.calendarMode = .week
                 
                 self.calendarView.snp.updateConstraints { make in
-                    make.height.equalTo(66)
+                    make.height.equalTo(114)
                 }
                 self.calendarView.superview?.layoutIfNeeded()
                 
@@ -386,7 +359,7 @@ final class StopWatchViewController: UIViewController {
                 self.mainTimeLabel.font = .systemFont(ofSize: 50, weight: .regular)
                 self.mainTimeLabel.transform = .identity
                 self.dDayLabel.alpha = 1
-                self.changeCalendarMode.setTitle("주▾", for: .normal)
+                self.calendarView.changeCalendarMode.setTitle("주▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
         
                 self.chartView?.updateConstant(30)
@@ -425,7 +398,7 @@ final class StopWatchViewController: UIViewController {
         }
     }
     
-    @objc func clickToChartButton(){
+    @objc func didClickChartButton(){
         if self.chartView == nil {
             self.openChartView()
         }else {
@@ -433,13 +406,12 @@ final class StopWatchViewController: UIViewController {
         }
     }
     
-    @objc func pushCategoryVC(_ button: UIBarButtonItem){
+    @objc func didClickMenu(_ button: UIBarButtonItem){
         self.delegate?.handleMenuToggle(menuOption: nil)
-        
     }
     
     //세션(과목명)을 눌렀을때 호출되는 메소드
-    @objc func clickedSection(_ sender: UIButton){
+    @objc func didClickSection(_ sender: UIButton){
         StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
         
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
@@ -484,18 +456,6 @@ final class StopWatchViewController: UIViewController {
         }
     }
     
-    func openCategoryVC() {
-        let categoryVC = CategoryViewController()
-        self.navigationController?.pushViewController(categoryVC, animated: true)
-    }
-    
-    //MARK: CalendarView method
-    func clickDay(saveDate: String) {
-        self.saveDate = saveDate
-        self.chartView?.saveDate = saveDate
-        self.chartView?.setNeedsDisplay() // 다시 차트ㅡ 그리기
-    }
-    
     //MARK: - SideBarMenu Method
     // 메뉴 터치에 따라 반응하는 함수
     func didSelectedMenuOption(menuOption: MenuOption){
@@ -522,7 +482,6 @@ final class StopWatchViewController: UIViewController {
 }
 
 extension StopWatchViewController {
-    
     //MARK: Configured
     func configured() {
         self.view.backgroundColor = .clear
@@ -577,12 +536,8 @@ extension StopWatchViewController {
         self.view.addSubview(self.dDayLabel)
         self.view.addSubview(self.mainTimeLabel)
         self.view.addSubview(self.guideLabelView)
-        
-        self.frameView.addSubview(self.titleView)
-        self.frameView.addSubview(self.changeCalendarMode)
+    
         self.frameView.addSubview(self.calendarView)
-        self.frameView.addSubview(self.previousMonthButton)
-        self.frameView.addSubview(self.nextMonthButton)
         self.frameView.addSubview(self.barView)
         self.frameView.addSubview(self.toDoTableView)
         self.frameView.addSubview(self.goalTimeView)
@@ -604,13 +559,6 @@ extension StopWatchViewController {
         self.frameView.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview()
             make.height.equalToSuperview().multipliedBy(0.76)
-        }
-        
-        self.changeCalendarMode.snp.makeConstraints{ make in
-            make.trailing.equalTo(self.frameView.snp.trailing).offset(-30)
-            make.centerY.equalTo(self.titleView.snp.centerY)
-            make.height.equalTo(28)
-            make.width.equalTo(34)
         }
         
         self.dDayLabel.snp.makeConstraints { make in
@@ -638,30 +586,12 @@ extension StopWatchViewController {
             make.bottom.equalToSuperview().offset(-30)
             make.trailing.equalTo(self.frameView.snp.trailing).offset(-30)
         }
-        
-        self.titleView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.top.equalToSuperview().offset(30)
-            make.height.equalTo(30)
-        }
-        
-        self.previousMonthButton.snp.makeConstraints { make in
-            make.leading.equalTo(self.titleView.snp.trailing)
-            make.height.width.equalTo(28)
-            make.centerY.equalTo(titleView.snp.centerY)
-        }
-        
-        self.nextMonthButton.snp.makeConstraints { make in
-            make.leading.equalTo(self.previousMonthButton.snp.trailing).offset(4)
-            make.height.width.equalTo(28)
-            make.centerY.equalTo(titleView.snp.centerY)
-        }
-        
+
         self.calendarView.snp.makeConstraints { make in
-            make.top.equalTo(self.titleView.snp.bottom).offset(12)
+            make.top.equalToSuperview().offset(20)
             make.leading.equalTo(self.frameView.snp.leading).offset(10)
             make.trailing.equalTo(self.frameView.snp.trailing).offset(-10)
-            make.height.equalTo(66)
+            make.height.equalTo(114)
         }
         
         self.itemBoxView.snp.makeConstraints{ make in
@@ -692,11 +622,8 @@ extension StopWatchViewController {
     
     //MARK: AddTarget
     private func addTarget(){
-        self.chartViewButton.addTarget(self, action: #selector(self.clickToChartButton), for: .touchUpInside)
-        self.previousMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-        self.nextMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-        self.categoryEditButton.addTarget(self, action: #selector(self.pushCategoryVC(_:)), for: .touchUpInside)
-        self.changeCalendarMode.addTarget(self, action: #selector(self.changeCalendarMode(_:)), for: .touchUpInside)
+        self.chartViewButton.addTarget(self, action: #selector(self.didClickChartButton), for: .touchUpInside)
+        self.categoryEditButton.addTarget(self, action: #selector(self.didClickMenu(_:)), for: .touchUpInside)
     }
     
     //MARK: AddObserver
@@ -708,7 +635,11 @@ extension StopWatchViewController {
         notificationCenter.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         // 근접센서가 작동할때 호출되는 메소드 추가 !
-        notificationCenter.addObserver(self, selector: #selector(proximityChangedMtd(sender:)), name: UIDevice.proximityStateDidChangeNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(self.proximityChangedMtd(sender:)), name: UIDevice.proximityStateDidChangeNotification, object: nil)
+        
+        notificationCenter.addObserver(self, selector: #selector(self.didClickChangeCalendarMode(_:)), name: .changeCalendarMode, object: nil)
+        
+        notificationCenter.addObserver(self, selector: #selector(self.willChangeDate(_:)), name: .changeModalCalendarViewDate, object: nil)
     }
 }
 
@@ -739,7 +670,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         view.plusImageView.tintColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
         
         view.touchViewButton.tag = section
-        view.touchViewButton.addTarget(self, action: #selector(self.clickedSection(_:)), for: .touchUpInside)
+        view.touchViewButton.addTarget(self, action: #selector(self.didClickSection(_:)), for: .touchUpInside)
         
         return view
     }
@@ -943,11 +874,7 @@ extension StopWatchViewController {
                     $0.snp.makeConstraints { make in
                         make.leading.top.bottom.trailing.equalToSuperview()
                     }
-                    
                     $0.indexpath = indexPath!
-                    
-                    $0.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
-                    $0.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
                 }
                 
                 self.closeListEditView()
@@ -971,48 +898,9 @@ extension StopWatchViewController {
 
 extension StopWatchViewController {
     //MARK: - ModalCalendarView Selector
-    
-    @objc func clickOkButton(_ sender: UIButton){
-        let modalView = sender.superview?.superview as! CalendarModalView
-        let _ = StopWatchDAO().create(date: modalView.saveDate)
-        let section = modalView.indexpath.section
-        let row = modalView.indexpath.row
-        
-        self.changeDate(modalView: modalView, section: section, row: row)
-    }
-    
-    @objc func postponeList(sender: UIButton){
-        let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
-        let modalView = sender.superview?.superview as! CalendarModalView
-        let section = modalView.indexpath.section
-        let row = modalView.indexpath.row
-        var date = ""
-        
-        var (intYear,intMonth,intDay): (Int,Int,Int) = CalendarMethod().splitDate(date: today)
-        let maxDay = CalendarMethod().getMonthDay(year: intYear, month: intMonth)
-        
-        if modalView.compareDate {
-            if intDay == maxDay {
-                let (year,month,_) = CalendarMethod().changeMonth(tag: 1, date: today)
-                intYear = year
-                intMonth = month
-                intDay = 1
-            }else {
-                intDay += 1
-            }
-            date = String(intYear) + "." + self.view.returnString(intMonth) + "." + self.view.returnString(intDay)
-        }else {
-            date = today
-        }
-        
-        modalView.saveDate = date
-        modalView.calendarView.saveDate = date
-        modalView.calendarView.presentDate = date
-        modalView.calendarView.calendarView.reloadData()
-        modalView.titleView.label.text = CalendarMethod().convertDate(date: date)
-        
-        let _ = StopWatchDAO().create(date: modalView.saveDate)
-        
+    @objc func willChangeDate(_ notification: Notification) {
+        guard let modalView = notification.userInfo?["modalView"] as? CalendarModalView else { return }
+        guard let (section,row) = notification.userInfo?["indexPath"] as? (Int,Int) else { return }
         self.changeDate(modalView: modalView, section: section, row: row)
     }
     

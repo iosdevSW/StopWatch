@@ -8,6 +8,9 @@
 import UIKit
 
 class CalendarMethod {
+    let todayDate = Calendar.current.date(from: DateComponents())
+    var selectDate = Calendar.current.date(from: DateComponents())
+    
     // 날짜 년,월,일로 쪼개서 반환
     func splitDate(date: String) -> (String,String,String) {
         let split = date.split(separator: ".")
@@ -55,12 +58,19 @@ class CalendarMethod {
         }
         
         // 날짜 오류 방지
-        let maxDay = self.getMonthDay(year: year, month: month)
+        let maxDay = self.getDaysOfMonth(year: year, month: month)
         if day > maxDay {
             day = maxDay
         }
         
         return (year,month,day)
+    }
+    
+    func dateCalculation() {
+        let cal = Calendar.current
+        let firstDayOfMonth = cal.date(from: DateComponents())
+        let firstWeekday = cal.component(.weekday, from: firstDayOfMonth!)
+        let dayOfMonth = cal.range(of: .day, in: .month, for: firstDayOfMonth!)!.count
     }
     
     //요일 변화 메소드
@@ -106,7 +116,7 @@ class CalendarMethod {
         var monthDay = 0
         
         for i in 1..<month {
-            monthDay += self.getMonthDay(year: year, month: i)
+            monthDay += self.getDaysOfMonth(year: year, month: i)
         }
         days += monthDay
 
@@ -114,7 +124,7 @@ class CalendarMethod {
     }
 
     // 월마다 일 수 구하기.
-    func getMonthDay(year: Int, month: Int) -> Int {
+    func getDaysOfMonth(year: Int, month: Int) -> Int {
         switch month {
         case 4 : fallthrough
         case 6 : fallthrough

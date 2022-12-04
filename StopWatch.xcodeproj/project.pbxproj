@@ -46,6 +46,7 @@
 		DBBDF7562643DC59003F55FE /* PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF7552643DC59003F55FE /* PreView.swift */; };
 		DBBDF75826527986003F55FE /* drawBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF75726527986003F55FE /* drawBarView.swift */; };
 		DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */; };
+		DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782A293C9E270079CF1A /* NotificationName+.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
 		DBEC226A276864380083ECDA /* CustomListEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2269276864380083ECDA /* CustomListEditView.swift */; };
 		DBEC226C276B27740083ECDA /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC226B276B27740083ECDA /* TitleView.swift */; };
@@ -96,6 +97,7 @@
 		DBBDF7552643DC59003F55FE /* PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreView.swift; sourceTree = "<group>"; };
 		DBBDF75726527986003F55FE /* drawBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drawBarView.swift; sourceTree = "<group>"; };
 		DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLabel.swift; sourceTree = "<group>"; };
+		DBC6782A293C9E270079CF1A /* NotificationName+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+.swift"; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
 		DBEC2269276864380083ECDA /* CustomListEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomListEditView.swift; sourceTree = "<group>"; };
 		DBEC226B276B27740083ECDA /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				DB0F172B2614310F007C8448 /* Utils.swift */,
+				DBC67829293C9DFD0079CF1A /* extension */,
 				DBA7ED5627DDAF89004B0D0E /* Protocols.swift */,
 			);
 			path = Utils;
@@ -286,6 +289,14 @@
 			path = Resource;
 			sourceTree = "<group>";
 		};
+		DBC67829293C9DFD0079CF1A /* extension */ = {
+			isa = PBXGroup;
+			children = (
+				DBC6782A293C9E270079CF1A /* NotificationName+.swift */,
+			);
+			path = extension;
+			sourceTree = "<group>";
+		};
 		F95DBA0BF70FC8275FA2BE45 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -424,6 +435,7 @@
 				DBA7ED5527DDAC49004B0D0E /* MenuViewController.swift in Sources */,
 				DB8F532F26F085E60071F911 /* CustomTextField.swift in Sources */,
 				DBA7ED6027E0614A004B0D0E /* DdayViewController.swift in Sources */,
+				DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */,
 				DB8F533126F22FBD0071F911 /* TodoListHeaderView.swift in Sources */,
 				DB8F533326F316AE0071F911 /* TodoListCell.swift in Sources */,
 				DBB33AA52789B93D00537881 /* EditColorView.swift in Sources */,
