@@ -11,7 +11,8 @@ import RealmSwift
 class StopWatchDAO {
     let realm = try! Realm()
     
-    func create(date: String){ // 오늘의 데이터가 없을 때 오늘 데이터를 생성하는 함수
+    /// 오늘의 데이터가 없을 때 오늘 데이터를 생성하는 함수
+    func create(date: String){
         if let _ = self.realm.object(ofType: DailyData.self, forPrimaryKey: date) {
         } else {
             try! realm.write{
@@ -37,7 +38,7 @@ class StopWatchDAO {
         }
     }
     
-    //과목 추가 메소드
+    ///과목 추가 메소드
     func addSegment(row: Int, name: String, date: String){
        
         try! realm.write{
@@ -61,11 +62,13 @@ class StopWatchDAO {
         }
     }
 
+    /// seg 삭제
     func deleteSegment(date: String){
         // 해당 날짜에 빈 segmentData 가 있는지 확인
         let blankSegmentData = self.realm.objects(SegmentData.self).where {
             ($0.value == 0) && ($0.goal == 0) && ($0.toDoList.count == 0) && ($0.date == date)
         }
+        print(blankSegmentData.count)
         
         // 해당 날짜에 모든 segmentData 가 비었으면 해당 날짜 데이터 모두 삭제
         if (blankSegmentData.count) == (self.realm.objects(Segments.self).count) {
@@ -102,7 +105,47 @@ class StopWatchDAO {
             }
         }
     }
+    
+    func getSegment(_ date: String, section: Int) -> SegmentData {
+        let segment = realm.objects(SegmentData.self).where{ seg in
+            seg.date == date
+        }[section]
+        return segment
+    }
 
+    
+    //MARK: - TodoList 편집 (이동, 복사)
+    ///TodoList to에서 from으로 이동하기
+    func moveTodoList(to: SegmentData, from: SegmentData, row: Int) -> Bool {
+        let list = to.toDoList[row]
+        do {
+            try self.realm.write{
+                to.toDoList.remove(at: row)
+                to.listCheckImageIndex.remove(at: row)
+                
+                from.toDoList.append(list)
+                from.listCheckImageIndex.append(0)
+            }
+        } catch(let error) {
+            print(error.localizedDescription)
+            return false
+        }
+        return true
+    }
+    
+    ///TodoList to에서 from 으로 복사하기
+    func copyTodoList(to: SegmentData, from: SegmentData, row: Int) -> Bool {
+        do {
+            try self.realm.write{
+                from.toDoList.append(to.toDoList[row])
+                from.listCheckImageIndex.append(0)
+            }
+        } catch(let error) {
+            print(error.localizedDescription)
+            return false
+        }
+        return true
+    }
     
 }
 

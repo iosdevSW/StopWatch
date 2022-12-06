@@ -32,7 +32,4 @@ enum MenuOption: Int,CustomStringConvertible {
     }
 }
 
-enum CalendarMode {
-    case week
-    case month
-}
+

@@ -5,6 +5,10 @@
 //  Created by 신상우 on 2021/03/29.
 //
 
+// 1. 달 -> 영어로 바꾸는거 enum 모델링하기
+// 2. ModalCalendarView 뜯어고치기
+// 3. 저장될때 세이브데이트 바꿔주기
+
 import UIKit
 import CoreMotion
 import RealmSwift
@@ -28,27 +32,13 @@ final class StopWatchViewController: UIViewController {
     
     weak var delegate: StopWatchVCDelegate?
     
-    var saveDate: String = "" {
-        didSet{ // 날짜가 바뀔 때마다
-            self.setGoalTime() // 목표시간 Label 재설정
-            self.reloadProgressBar() // 진행바 재로딩
-            self.setTimeLabel() // 현재시간 Label 재설정
-            self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.saveDate) // 타이틀 날짜 다시표시
-            self.toDoTableView.reloadData()
-            self.calendarView.saveDate = self.saveDate
-            self.calendarView.calendarView.reloadData()
-        }
-    }
+    var saveDate: String = ""
     
-    private let goalTimeView = GoalTimeView()
-    private let barView = DrawBarView()
     private let guideLabelView = GuideLabelView()
+    private let calendarView = CalendarView()
+    private let goalTimeView = GoalTimeView()
     private let itemBoxView = UIView()
-    
-    private let calendarView = CalendarView().then {
-        $0.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        $0.presentDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-    }
+    private let barView = DrawBarView()
     
     let frameView = UIView().then {
         $0.backgroundColor = .white
@@ -102,14 +92,13 @@ final class StopWatchViewController: UIViewController {
         self.addTarget()
         self.addObserver()
         
-        self.calendarView.delegate = self
         self.toDoTableView.delegate = self
         self.toDoTableView.dataSource = self
         
         // gesture
         self.hideKeyboardWhenTapped()
         
-//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -159,7 +148,6 @@ final class StopWatchViewController: UIViewController {
         self.barView.progressView.setProgress(self.barView.per, animated: true)
         
         self.barView.showPersent()
-        
     }
     
     func setTimeLabel(){
@@ -366,8 +354,20 @@ final class StopWatchViewController: UIViewController {
                 self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
             }
             self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
-            
         }
+    }
+    
+    @objc func didChangeSaveDate(_ notification: Notification) {
+        if let saveDate = notification.userInfo?["selectedDate"] as? String {
+            self.saveDate = saveDate
+        }
+        self.setGoalTime() // 목표시간 Label 재설정
+        self.reloadProgressBar() // 진행바 재로딩
+        self.setTimeLabel() // 현재시간 Label 재설정
+        self.toDoTableView.reloadData()
+        self.calendarView.calendarView.reloadData()
+        self.chartView?.saveDate = self.saveDate
+        self.chartView?.setNeedsDisplay() // 차트 다시 그리기
     }
     
     @objc func proximityChangedMtd(sender: Notification){
@@ -469,14 +469,7 @@ final class StopWatchViewController: UIViewController {
             let ddayVC = DdayViewController()
             self.navigationController?.pushViewController(ddayVC, animated: true)
         case .statistics:
-//            let statisticsVC = StatisticsViewController()
-//            self.saveDateDelegate = statisticsVC
-//            statisticsVC.navigationItem.title = CalendarMethod().convertDate(date: self.saveDate)
-//            self.navigationController?.pushViewController(statisticsVC, animated: true)
-//            statisticsVC.previousMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-//            statisticsVC.nextMonthButton.addTarget(self, action: #selector(self.respondToButton(_:)), for: .touchUpInside)
-            print("준비중")
-            
+            print("미구현")
         }
     }
 }
@@ -636,10 +629,12 @@ extension StopWatchViewController {
         
         // 근접센서가 작동할때 호출되는 메소드 추가 !
         notificationCenter.addObserver(self, selector: #selector(self.proximityChangedMtd(sender:)), name: UIDevice.proximityStateDidChangeNotification, object: nil)
-        
+        //주 <-> 월 달력이 바뀔때
         notificationCenter.addObserver(self, selector: #selector(self.didClickChangeCalendarMode(_:)), name: .changeCalendarMode, object: nil)
         
-        notificationCenter.addObserver(self, selector: #selector(self.willChangeDate(_:)), name: .changeModalCalendarViewDate, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(self.willPresentAlert(_:)), name: .presentAlert, object: nil)
+        
+        notificationCenter.addObserver(self, selector: #selector(self.didChangeSaveDate(_:)), name: .changeSaveDate, object: nil)
     }
 }
 
@@ -864,22 +859,17 @@ extension StopWatchViewController {
             }
             
             if sender.tag == 3 { // 날짜 변경 버튼
-                _ = CalendarModalView().then {
-                    $0.calendarView.saveDate = self.saveDate
-                    $0.calendarView.presentDate = self.saveDate
-                    $0.changeDate = self.saveDate
-                    $0.saveDate = self.saveDate
+                _ = CalendarModalView(self.calendarView.selectDateComponent).then {
+                    $0.indexPath = indexPath!
                     
                     self.view.addSubview($0)
                     $0.snp.makeConstraints { make in
                         make.leading.top.bottom.trailing.equalToSuperview()
                     }
-                    $0.indexpath = indexPath!
                 }
                 
                 self.closeListEditView()
             }
-            
         }
     }
     
@@ -898,54 +888,8 @@ extension StopWatchViewController {
 
 extension StopWatchViewController {
     //MARK: - ModalCalendarView Selector
-    @objc func willChangeDate(_ notification: Notification) {
-        guard let modalView = notification.userInfo?["modalView"] as? CalendarModalView else { return }
-        guard let (section,row) = notification.userInfo?["indexPath"] as? (Int,Int) else { return }
-        self.changeDate(modalView: modalView, section: section, row: row)
-    }
-    
-    func changeDate(modalView: CalendarModalView, section: Int, row: Int){
-        let segment = realm.objects(SegmentData.self).where{ seg in
-            seg.date == modalView.changeDate
-        }[section]
-        
-        let text = segment.toDoList[row]
-        let destination = realm.objects(SegmentData.self).where{ seg in
-            seg.date == modalView.saveDate
-        }[section]
-        
-        let alert = UIAlertController(title: nil, message: "선 택", preferredStyle: .alert)
-        let move = UIAlertAction(title: "이동하기", style: .default){ _ in
-            try! self.realm.write{
-                segment.toDoList.remove(at: row)
-                segment.listCheckImageIndex.remove(at: row)
-                
-                destination.toDoList.append(text)
-                destination.listCheckImageIndex.append(0)
-            }
-            StopWatchDAO().deleteSegment(date: modalView.changeDate)
-            modalView.removeFromSuperview()
-            self.toDoTableView.reloadData()
-            self.calendarView.calendarView.reloadData()
-        }
-        
-        let copy = UIAlertAction(title: "복사하기", style: .default){ _ in
-            try! self.realm.write{
-                //복사
-                destination.toDoList.append(text)
-                destination.listCheckImageIndex.append(0)
-            }
-            StopWatchDAO().deleteSegment(date: modalView.changeDate)
-            modalView.removeFromSuperview()
-            self.toDoTableView.reloadData()
-            self.calendarView.calendarView.reloadData()
-        }
-        
-        let cancel = UIAlertAction(title: "취소", style: .cancel)
-        alert.addAction(move)
-        alert.addAction(copy)
-        alert.addAction(cancel)
-        
-        present(alert, animated: true)
+    @objc func willPresentAlert(_ notification: Notification) {
+        guard let alert = notification.userInfo?["alert"] as? UIAlertController else { return }
+        self.present(alert, animated: true)
     }
 }

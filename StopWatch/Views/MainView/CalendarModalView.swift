@@ -10,38 +10,16 @@ import RealmSwift
 import Then
 import SnapKit
 
-class CalendarModalView: UIView {
+protocol ChangeSelectDateDelegate: AnyObject {
+    func changeSelectDate()
+}
+
+final class CalendarModalView: UIView {
     //MARK: - Properties
-    var saveDate = "" {
-        didSet{
-            let (year,month,day): (String,String,String) = CalendarMethod().splitDate(date: self.saveDate)
-            self.selectedDateLabel.text = year + "년 " + month + "월 " + day + "일"
-        }
-    }
-    var indexpath: IndexPath!
-    var changeDate = "" {
-        didSet{
-            self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.calendarView.saveDate) // 타이틀 날짜 다시표시
-            
-            let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
-            let formatter = DateFormatter()
-            formatter.timeZone = .autoupdatingCurrent
-            formatter.dateFormat = "YYYY.MM.dd"
-            let date_today = formatter.date(from: today)
-            let date_changeDate = formatter.date(from: self.changeDate)
-            
-            let result = date_today!.compare(date_changeDate!)
-            switch result {
-            case.orderedSame:
-                self.isTodayDate = true
-                break
-            case.orderedAscending: fallthrough
-            case.orderedDescending:
-                self.isTodayDate = false
-            }
-        }
-    }
-    var isTodayDate: Bool = true {
+    var indexPath: IndexPath!
+    var changeDateComponent = DateComponents()
+    
+    private var isTodayDate: Bool = true {
         didSet{
             let title = self.isTodayDate ? "내일 하기" : "오늘 하기"
             self.postponeButton.setTitle(title, for: .normal)
@@ -71,15 +49,15 @@ class CalendarModalView: UIView {
         $0.layer.shadowColor = UIColor.darkGray.cgColor
     }
 
-    let calendarView = CalendarView().then {
+    lazy var calendarView = CalendarView().then {
         $0.calendarMode = .month
         $0.calendarView.layer.cornerRadius = 20
-        $0.collectionHeaderView.layer.cornerRadius = 20
         $0.calendarInfo.cellSize = (UIScreen.main.bounds.width - 60) / 7
         $0.yearMonthLabel.font = UIFont(name: "GodoM", size: 16)
+        $0.modalCalendarDelegate = self
     }
     
-    let okButton = UIButton(type: .roundedRect).then {
+    private let okButton = UIButton(type: .roundedRect).then {
         $0.backgroundColor = .systemGray6
         $0.layer.cornerRadius = 6
         $0.setTitleColor(UIColor.darkGray, for: .normal)
@@ -95,7 +73,7 @@ class CalendarModalView: UIView {
         $0.titleLabel?.font = UIFont(name: "GodoM", size: 14)
     }
     
-    let postponeButton = UIButton(type: .roundedRect).then {
+    private let postponeButton = UIButton(type: .roundedRect).then {
         $0.backgroundColor = .systemGray6
         $0.layer.cornerRadius = 6
         $0.setTitleColor(UIColor.darkGray, for: .normal)
@@ -110,75 +88,85 @@ class CalendarModalView: UIView {
     }
     
     //MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(_ selectDateComponent: DateComponents) {
+        self.changeDateComponent = selectDateComponent
+        
+        super.init(frame: .zero)
         self.addSubView()
         self.addTarget()
         self.layout()
         
-        self.calendarView.saveDateDelegate = self
+        self.calendarView.selectDateComponent = self.changeDateComponent
+        
+        self.selectedDateLabel.text = self.calendarView.getSelectDateString()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        self.isTodayDate = CalendarMethod().isTodayDate(self.changeDateComponent)
+    }
+    
     //MARK: - Method
+    func changeDateTodoList(){
+        let toSegment = StopWatchDAO().getSegment(self.changeDateComponent.stringFormat, section: indexPath.section)
+        let fromSegment = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
+     
+        let alert = UIAlertController(title: nil, message: "선 택", preferredStyle: .alert)
+        let move = UIAlertAction(title: "이동하기", style: .default){ [weak self] _ in
+            guard let self else { return }
+            _ = StopWatchDAO().moveTodoList(to: toSegment, from: fromSegment, row: self.indexPath.row)
+            StopWatchDAO().deleteSegment(date: self.changeDateComponent.stringFormat)
+            
+            NotificationCenter.default.post(name: .changeSaveDate, object: nil)
+            self.removeFromSuperview()
+        }
+        
+        let copy = UIAlertAction(title: "복사하기", style: .default){ [weak self] _ in
+            guard let self else { return }
+            _ = StopWatchDAO().copyTodoList(to: toSegment, from: fromSegment, row: self.indexPath.row)
+            
+            NotificationCenter.default.post(name: .changeSaveDate, object: nil)
+            self.removeFromSuperview()
+        }
+        
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        
+        [move,copy,cancel].forEach { alert.addAction($0) }
+        
+        NotificationCenter.default.post(name: .presentAlert, object: nil, userInfo: ["alert" : alert])
+    }
     
     //MARK: - Selector
-    
-    @objc func respondToButton(_ button:UIButton){
-        let (year,month,day) = CalendarMethod().changeMonth(tag: button.tag, date: self.calendarView.presentDate)
-        self.calendarView.presentDate = String(year) + "." + self.returnString(month) + "." + self.returnString(day)
-        
-        // 바뀐 값 캘린더뷰로 전달하고 컬렉션뷰 리로드
-        self.calendarView.calendarView.reloadData()
-        self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: self.calendarView.presentDate) // 타이틀 날짜 다시표시
-    }
-
     @objc func clickCancelButton(_ sender: UIButton){
         self.removeFromSuperview()
     }
     
     @objc func clickOkButton(_ sender: UIButton){
-        let _ = StopWatchDAO().create(date: self.saveDate)
-        let (section,row) = (indexpath.section,indexpath.row)
+        let _ = StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat)
         
-        NotificationCenter.default.post(name: .changeModalCalendarViewDate, object: nil, userInfo: ["modalView": self,
-                                                                                                    "indexPath": (section,row)])
+        self.changeDateTodoList()
     }
     
     @objc func postponeList(sender: UIButton){
-        let today = (UIApplication.shared.delegate as! AppDelegate).resetDate
-        let (section,row) = (indexpath.section,indexpath.row)
-        var date = ""
+        let todayComponents = self.calendarView.todayDateComponent
         
-        var (intYear,intMonth,intDay): (Int,Int,Int) = CalendarMethod().splitDate(date: today)
-        let lastDayOfMonth = CalendarMethod().getDaysOfMonth(year: intYear, month: intMonth)
-        
-        if self.isTodayDate { // 수정 필요
-            if intDay == lastDayOfMonth {
-                let (year,month,_) = CalendarMethod().changeMonth(tag: 1, date: today)
-                intYear = year
-                intMonth = month
-                intDay = 1
-            }else {
-                intDay += 1
+        if self.isTodayDate { // 오늘 데이터라면
+            if CalendarMethod().isLastDayOfMonth(todayComponents) { //오늘이 달의 마지막 날이라면
+                self.calendarView.selectDateComponent = CalendarMethod().changeMonth(todayComponents, tag: 1) // 다음 달 1일로 설정
+                self.calendarView.selectDateComponent.day = 1
+            } else { // 오늘이 달의 마지막이 아니라면
+                self.calendarView.selectDateComponent.day = self.calendarView.selectDateComponent.day! + 1 // 내일로 설정
             }
-            date = String(intYear) + "." + self.returnString(intMonth) + "." + self.returnString(intDay)
-        }else {
-            date = today
+        } else { // 오늘 데이터가 아니라면
+            self.calendarView.selectDateComponent = todayComponents // 오늘로 설정
         }
         
-        self.saveDate = date
-        self.calendarView.saveDate = date
-        self.calendarView.presentDate = date
-        self.calendarView.calendarView.reloadData()
-        self.calendarView.yearMonthLabel.text = CalendarMethod().convertDate(date: date)
+        let _ = StopWatchDAO().create(date: CalendarMethod().componentToDateString(self.calendarView.selectDateComponent))// 선택한 날짜 데이터 생성
         
-        let _ = StopWatchDAO().create(date: self.saveDate)
-        NotificationCenter.default.post(name: .changeModalCalendarViewDate, object: nil, userInfo: ["modalView": self,
-                                                                                                    "indexPath": (section,row)])
+        self.changeDateTodoList()
     }
     
     //MARK: - addSubView
@@ -228,17 +216,17 @@ class CalendarModalView: UIView {
     }
     
     //MARK: - AddTarget
-    private func addTarget(){
+    private func addTarget() {
         self.cancelButton.addTarget(self, action: #selector(self.clickCancelButton(_:)), for: .touchUpInside)
         self.okButton.addTarget(self, action: #selector(self.clickOkButton(_:)), for: .touchUpInside)
         self.postponeButton.addTarget(self, action: #selector(self.postponeList(sender:)), for: .touchUpInside)
     }
 }
 
-extension CalendarModalView: SaveDateDetectionDelegate{
-    func detectSaveDate(date: String) {
-        let (year,month,day): (String,String,String) = CalendarMethod().splitDate(date: date)
-        self.selectedDateLabel.text = year + "년 " + month + "월 " + day + "일"
-        self.saveDate = date
+// 저장할 날짜가 변경되었을 경우
+extension CalendarModalView: ChangeSelectDateDelegate {
+    func changeSelectDate() {
+        self.selectedDateLabel.text = self.calendarView.getSelectDateString()
+        self.isTodayDate = CalendarMethod().isTodayDate(self.calendarView.selectDateComponent)
     }
 }

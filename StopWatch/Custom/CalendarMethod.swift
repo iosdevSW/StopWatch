@@ -1,5 +1,5 @@
 //
-//  CalendarViewMethod.swift
+//  CalendarMethod.swift
 //  StopWatch
 //
 //  Created by 신상우 on 2022/03/17.
@@ -7,9 +7,74 @@
 
 import UIKit
 
-class CalendarMethod {
-    let todayDate = Calendar.current.date(from: DateComponents())
-    var selectDate = Calendar.current.date(from: DateComponents())
+final class CalendarMethod {
+    private let cal = Calendar.current
+    
+    /// Return YearMonthLabel
+    func convertYearMonth(_ components: DateComponents) -> String {
+        guard let year = components.year,
+              let month = components.month else { return "" }
+        
+        return "\(year%100) \(MonthName(rawValue: month)!.title)"
+    }
+    
+    /// DB String Fomat 반환
+    func componentToDateString(_ components: DateComponents) -> String {
+        guard let year = components.year,
+              let month = components.month,
+              let day = components.day else { return "" }
+        
+        return "\(year).\(String(format: "%02d", month)).\(String(format: "%02d", day))"
+    }
+    
+    /// 달의 마지막 날(총 일 수) 반환
+    func getLastDayOfMonth(_ components: DateComponents) -> Int {
+        let date = cal.date(from: components)
+        return cal.range(of: .day, in: .month, for: date!)!.count
+    }
+    
+    func isLastDayOfMonth(_ components: DateComponents) -> Bool {
+        let lastDay = self.getLastDayOfMonth(components)
+        return components.day! == lastDay ? true : false
+    }
+    
+    /// 달을 변경하는 함수 tag 0: 감소 1: 증가
+    func changeMonth(_ components: DateComponents, tag: Int) -> DateComponents{
+        var newComponents = components
+        var newMonth = tag == 0 ? components.month! - 1 : components.month! + 1
+        var newYear = tag == 0 ? components.year! - 1 : components.year! + 1
+        if newMonth < 1 {
+            newMonth = 12
+        } else if newMonth > 12 {
+            newMonth = 1
+        } else {
+            newYear = components.year!
+        }
+        newComponents.year = newYear
+        newComponents.month = newMonth
+        
+        return newComponents
+    }
+    
+    func isTodayDate(_ componenets: DateComponents) -> Bool {
+        let date = Date()
+        
+        var todayComponents = DateComponents()
+        todayComponents.year = cal.component(.year, from: date)
+        todayComponents.month = cal.component(.month, from: date)
+        todayComponents.day = cal.component(.day, from: date)
+
+        return todayComponents.stringFormat == componenets.stringFormat
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // 날짜 년,월,일로 쪼개서 반환
     func splitDate(date: String) -> (String,String,String) {
@@ -66,13 +131,6 @@ class CalendarMethod {
         return (year,month,day)
     }
     
-    func dateCalculation() {
-        let cal = Calendar.current
-        let firstDayOfMonth = cal.date(from: DateComponents())
-        let firstWeekday = cal.component(.weekday, from: firstDayOfMonth!)
-        let dayOfMonth = cal.range(of: .day, in: .month, for: firstDayOfMonth!)!.count
-    }
-    
     //요일 변화 메소드
     func convertDate(date: String)-> String{
         var (year,month,_):(String,String,String) = CalendarMethod().splitDate(date: date)
@@ -100,12 +158,16 @@ class CalendarMethod {
         return year + " " + monthWord
     }
     
+    
+    
+    
+    
     func isLeapYear(year: Int) -> Bool {
         if (year%4 == 0 && year%100 != 0) || year%400 == 0{
             return true //4로 떨어지고 100으로 안떨어지거나 400으로 떨어지면 윤년
         } else { return false } //아니면 평년
     }
-
+    
     func getFirstDay(date: String) -> Int {
         let (year,month,_): (Int,Int,Int) = CalendarMethod().splitDate(date: date)
         let first = (year-1) / 400 // 400으로 떨어진건 무조건 윤년.
@@ -119,10 +181,10 @@ class CalendarMethod {
             monthDay += self.getDaysOfMonth(year: year, month: i)
         }
         days += monthDay
-
+        
         return days % 7
     }
-
+    
     // 월마다 일 수 구하기.
     func getDaysOfMonth(year: Int, month: Int) -> Int {
         switch month {

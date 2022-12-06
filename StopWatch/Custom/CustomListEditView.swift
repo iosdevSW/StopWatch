@@ -6,31 +6,25 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
-class CustomListEditView: UIView {
-    let buttonSize: CGFloat = 40
+final class CustomListEditView: UIView {
+    private let buttonSize: CGFloat = 44
     
-    lazy var button: UIButton = { // 수정 버튼
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = self.buttonSize / 2
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .light)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = .lightGray
-        button.tintColor = .darkGray
-        
-        return button
-    }()
+    lazy var button = UIButton(type: .system).then { // 수정 버튼
+        $0.layer.cornerRadius = self.buttonSize / 2
+        $0.titleLabel?.font = .systemFont(ofSize: 18, weight: .light)
+        $0.setTitleColor(.black, for: .normal)
+        $0.backgroundColor = .lightGray
+        $0.tintColor = .darkGray
+    }
     
-    lazy var label: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 14, weight: .light)
-        label.textColor = .black
-        label.textAlignment = .center
-        
-        return label
-    }()
+    let label = UILabel().then {
+        $0.font = .systemFont(ofSize: 14, weight: .light)
+        $0.textColor = .black
+        $0.textAlignment = .center
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,21 +37,15 @@ class CustomListEditView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.button.topAnchor.constraint(equalTo: self.topAnchor),
-            self.button.widthAnchor.constraint(equalToConstant: self.buttonSize),
-            self.button.heightAnchor.constraint(equalToConstant: self.buttonSize),
-            self.button.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-        ])
+    private func layout(){
+        self.button.snp.makeConstraints {
+            $0.top.centerX.equalToSuperview()
+            $0.width.height.equalTo(self.buttonSize)
+        }
         
-        NSLayoutConstraint.activate([
-            self.label.topAnchor.constraint(equalTo: self.button.bottomAnchor, constant: 4),
-            self.label.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.label.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-        ])
+        self.label.snp.makeConstraints {
+            $0.top.equalTo(self.button.snp.bottom).offset(4)
+            $0.leading.trailing.equalToSuperview()
+        }
     }
-    
-    
-    
 }

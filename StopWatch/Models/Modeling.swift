@@ -23,14 +23,6 @@ enum CheckImage: Int {
         }
     }
 }
-//struct CheckImage {
-//    let images: [UIImage?] = [
-//        nil,
-//        UIImage(systemName: "circle"),
-//        UIImage(systemName: "triangle"),
-//        UIImage(systemName: "xmark")
-//    ]
-//}
 
 struct Palette {
     

@@ -15,7 +15,3 @@ protocol StopWatchVCDelegate: AnyObject {
 extension StopWatchVCDelegate {
     func closeMenu() { }
 }
-
-protocol SaveDateDetectionDelegate: AnyObject {
-    func detectSaveDate(date: String)
-}

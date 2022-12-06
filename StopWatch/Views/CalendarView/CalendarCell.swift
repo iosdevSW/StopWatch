@@ -6,39 +6,30 @@
 //
 
 import UIKit
+import Then
+import SnapKit
 
-class CalendarCell: UICollectionViewCell {
-    //MARK: ProPerties
-    let frameView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 16
-        
-        return view
-    }()
+final class CalendarCell: UICollectionViewCell {
+    //MARK: - Properties
+    private let frameView = UIView().then {
+        $0.layer.cornerRadius = 16
+    }
     
-    let dataCheckView: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.tintColor = .darkGray
-        view.image = UIImage(systemName: "checkmark")
-        
-        return view
-    }()
+    let dataCheckView = UIImageView().then {
+        $0.tintColor = .darkGray
+        $0.image = UIImage(systemName: "checkmark")
+    }
     
-    let dateLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont(name: "Chalkboard SE", size: 16)
-        
-        return label
-    }()
+    let dateLabel = UILabel().then {
+        $0.font = UIFont(name: "Chalkboard SE", size: 16)
+    }
     
     //MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubView()
         self.layout()
+        
         self.layer.cornerRadius = 10
         self.backgroundColor = .white
     }
@@ -47,34 +38,45 @@ class CalendarCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK:Method
-    func addSubView(){
+    //MARK: - Configure
+    func configureHeaderCell(_ row: Int) {
+        self.isUserInteractionEnabled = false
+        self.dateLabel.textColor = .darkGray
+        self.dataCheckView.isHidden = true
+        
+        if row == 0 { self.dateLabel.textColor = .red }
+        if row == 6 { self.dateLabel.textColor = .blue }
+    }
+    
+    func configureCell() {
+        self.dateLabel.textColor = .darkGray
+        self.backgroundColor = .white
+        self.isUserInteractionEnabled = true
+        self.dataCheckView.isHidden = true
+    }
+    
+    //MARK: - addSubView
+    private func addSubView(){
         self.addSubview(self.frameView)
         
         self.frameView.addSubview(self.dataCheckView)
         self.frameView.addSubview(self.dateLabel)
     }
     
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.frameView.leadingAnchor.constraint(equalTo: self.leadingAnchor,constant:  1),
-            self.frameView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant:  -1),
-            self.frameView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -1),
-            self.frameView.topAnchor.constraint(equalTo: self.topAnchor, constant: 1)
-        ])
+    private func layout(){
+        self.frameView.snp.makeConstraints {
+            $0.top.bottom.leading.trailing.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            self.dataCheckView.centerXAnchor.constraint(equalTo: self.frameView.centerXAnchor),
-            self.dataCheckView.widthAnchor.constraint(equalToConstant: 10),
-            self.dataCheckView.heightAnchor.constraint(equalToConstant: 10),
-            self.dataCheckView.bottomAnchor.constraint(equalTo: self.dateLabel.topAnchor, constant: 0)
-        ])
+        self.dateLabel.snp.makeConstraints {
+            $0.centerY.centerX.equalToSuperview()
+        }
+
+        self.dataCheckView.snp.makeConstraints {
+            $0.width.height.equalTo(10)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(self.dateLabel.snp.top)
         
-        NSLayoutConstraint.activate([
-            self.dateLabel.centerXAnchor.constraint(equalTo: self.frameView.centerXAnchor),
-            self.dateLabel.centerYAnchor.constraint(equalTo: self.frameView.centerYAnchor),
-        ])
-        
+        }
     }
-    
 }

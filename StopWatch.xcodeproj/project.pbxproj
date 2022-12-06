@@ -37,8 +37,7 @@
 		DBA7ED5927DDAFF4004B0D0E /* MenuOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */; };
 		DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED5B27DDB790004B0D0E /* MenuOptionCell.swift */; };
 		DBA7ED6027E0614A004B0D0E /* DdayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */; };
-		DBA7ED6227E1D2A7004B0D0E /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED6127E1D2A6004B0D0E /* StatisticsViewController.swift */; };
-		DBA7ED6427E301C5004B0D0E /* CalendarViewMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED6327E301C5004B0D0E /* CalendarViewMethod.swift */; };
+		DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA7ED6327E301C5004B0D0E /* CalendarMethod.swift */; };
 		DBAD2A4926D3E4370083478E /* BlackViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBAD2A4826D3E4370083478E /* BlackViewController.swift */; };
 		DBB33AA52789B93D00537881 /* EditColorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB33AA42789B93C00537881 /* EditColorView.swift */; };
 		DBBD53002636B109002F5157 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBD52FF2636B109002F5157 /* CategoryViewController.swift */; };
@@ -47,6 +46,9 @@
 		DBBDF75826527986003F55FE /* drawBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF75726527986003F55FE /* drawBarView.swift */; };
 		DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */; };
 		DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782A293C9E270079CF1A /* NotificationName+.swift */; };
+		DBC6782D293DDF900079CF1A /* DateInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782C293DDF900079CF1A /* DateInfo.swift */; };
+		DBC6782F293E991E0079CF1A /* MonthName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782E293E991E0079CF1A /* MonthName.swift */; };
+		DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC67830293F07D40079CF1A /* DateComponents+.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
 		DBEC226A276864380083ECDA /* CustomListEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2269276864380083ECDA /* CustomListEditView.swift */; };
 		DBEC226C276B27740083ECDA /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC226B276B27740083ECDA /* TitleView.swift */; };
@@ -88,8 +90,7 @@
 		DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuOption.swift; sourceTree = "<group>"; };
 		DBA7ED5B27DDB790004B0D0E /* MenuOptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuOptionCell.swift; sourceTree = "<group>"; };
 		DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DdayViewController.swift; sourceTree = "<group>"; };
-		DBA7ED6127E1D2A6004B0D0E /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
-		DBA7ED6327E301C5004B0D0E /* CalendarViewMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewMethod.swift; sourceTree = "<group>"; };
+		DBA7ED6327E301C5004B0D0E /* CalendarMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMethod.swift; sourceTree = "<group>"; };
 		DBAD2A4826D3E4370083478E /* BlackViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackViewController.swift; sourceTree = "<group>"; };
 		DBB33AA42789B93C00537881 /* EditColorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditColorView.swift; sourceTree = "<group>"; };
 		DBBD52FF2636B109002F5157 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
@@ -98,6 +99,9 @@
 		DBBDF75726527986003F55FE /* drawBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drawBarView.swift; sourceTree = "<group>"; };
 		DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLabel.swift; sourceTree = "<group>"; };
 		DBC6782A293C9E270079CF1A /* NotificationName+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+.swift"; sourceTree = "<group>"; };
+		DBC6782C293DDF900079CF1A /* DateInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateInfo.swift; sourceTree = "<group>"; };
+		DBC6782E293E991E0079CF1A /* MonthName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthName.swift; sourceTree = "<group>"; };
+		DBC67830293F07D40079CF1A /* DateComponents+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+.swift"; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
 		DBEC2269276864380083ECDA /* CustomListEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomListEditView.swift; sourceTree = "<group>"; };
 		DBEC226B276B27740083ECDA /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
@@ -173,7 +177,6 @@
 				DBAD2A4826D3E4370083478E /* BlackViewController.swift */,
 				DBA7ED5427DDAC49004B0D0E /* MenuViewController.swift */,
 				DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */,
-				DBA7ED6127E1D2A6004B0D0E /* StatisticsViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -266,7 +269,7 @@
 				DB8F532E26F085E60071F911 /* CustomTextField.swift */,
 				DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */,
 				DBEC2269276864380083ECDA /* CustomListEditView.swift */,
-				DBA7ED6327E301C5004B0D0E /* CalendarViewMethod.swift */,
+				DBA7ED6327E301C5004B0D0E /* CalendarMethod.swift */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -276,6 +279,8 @@
 			children = (
 				DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */,
 				DB4FE82326BF80F100B1DF3E /* Modeling.swift */,
+				DBC6782C293DDF900079CF1A /* DateInfo.swift */,
+				DBC6782E293E991E0079CF1A /* MonthName.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -293,6 +298,7 @@
 			isa = PBXGroup;
 			children = (
 				DBC6782A293C9E270079CF1A /* NotificationName+.swift */,
+				DBC67830293F07D40079CF1A /* DateComponents+.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -429,17 +435,18 @@
 				DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */,
 				DBF7E79226AFF438009902BE /* EditGoalTimeView.swift in Sources */,
 				DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */,
-				DBA7ED6227E1D2A7004B0D0E /* StatisticsViewController.swift in Sources */,
 				DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */,
 				DB8DB18D2611E67900A5814A /* StopWatchViewController.swift in Sources */,
 				DBA7ED5527DDAC49004B0D0E /* MenuViewController.swift in Sources */,
 				DB8F532F26F085E60071F911 /* CustomTextField.swift in Sources */,
+				DBC6782F293E991E0079CF1A /* MonthName.swift in Sources */,
 				DBA7ED6027E0614A004B0D0E /* DdayViewController.swift in Sources */,
 				DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */,
 				DB8F533126F22FBD0071F911 /* TodoListHeaderView.swift in Sources */,
 				DB8F533326F316AE0071F911 /* TodoListCell.swift in Sources */,
 				DBB33AA52789B93D00537881 /* EditColorView.swift in Sources */,
 				DBEC226C276B27740083ECDA /* TitleView.swift in Sources */,
+				DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */,
 				DB8F532826F07A3A0071F911 /* PaletteCell.swift in Sources */,
 				DB0E89B9262842BE00533009 /* StopButtonTappedModalView.swift in Sources */,
 				DBBD53002636B109002F5157 /* CategoryViewController.swift in Sources */,
@@ -448,10 +455,11 @@
 				DBBDF7562643DC59003F55FE /* PreView.swift in Sources */,
 				DBBDF75826527986003F55FE /* drawBarView.swift in Sources */,
 				DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */,
+				DBC6782D293DDF900079CF1A /* DateInfo.swift in Sources */,
 				DBA7ED5927DDAFF4004B0D0E /* MenuOption.swift in Sources */,
 				DBEC226A276864380083ECDA /* CustomListEditView.swift in Sources */,
 				DB0F172C2614310F007C8448 /* Utils.swift in Sources */,
-				DBA7ED6427E301C5004B0D0E /* CalendarViewMethod.swift in Sources */,
+				DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */,
 				DB10DB8927E363BD000560A3 /* CalendarMonthCell.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
 				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
