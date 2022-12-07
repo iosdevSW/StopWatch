@@ -35,6 +35,7 @@ final class TimeLabel: UILabel {
     func configure() {
         self.text = "00 : 00 : 00"
         self.textAlignment = .center
+        self.textColor = .darkGray
     }
     
     //MARK: - updateTime

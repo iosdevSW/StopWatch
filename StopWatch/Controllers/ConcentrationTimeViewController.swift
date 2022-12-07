@@ -9,175 +9,79 @@ import UIKit
 import RealmSwift
 import CoreData
 
-private let reuseIdentifier = "Cell"
+final class ConcentrationTimeViewController: UIViewController{
+    //MARK: - Properties
+    private let realm = try! Realm()
 
-class ConcentrationTimeViewController: UIViewController{
-    //MARK: Properties
-    var startDate:TimeInterval = 0.0
-    var timeInterval: TimeInterval = 0.0
-    var totalTime: TimeInterval = 0.0
-    var pickCategoryRow = 0
-    var blackViewController: BlackViewController?
-    var saveDate = ""
-    var resetDate = "" // 초기화 기준 날짜
-    let realm = try! Realm()
+    private var timeInterval: TimeInterval = 0.0
     
-    let frameView:UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 20
-        return view
-    }()
+    private var pickCategoryRow = 0
+    private var blackViewController: BlackViewController?
     
-    let label: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Focus Time"
-        label.font = UIFont(name: "Zapf Dingbats", size: 30)
-        label.textAlignment = .center
-        label.textColor = .darkGray
-        
-        return label
-    }()
+    var resetDate = "" // 초기화 시간 기준 날짜
     
-    let guideLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "다시 시작하시려면 핸드폰을 뒤집어주세요."
-        label.textColor = .systemGray4
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 16)
-        label.layer.cornerRadius = 10
-        label.numberOfLines = 2
-        
-        return label
-    }()
     
-    lazy var pickerCategory: UIPickerView = {
-        let pickerView = UIPickerView()
-        pickerView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(pickerView)
-        pickerView.layer.cornerRadius = 10
-        pickerView.backgroundColor = .systemGray6
-        
-        return pickerView
-    }()
+    private lazy var modalView = TimeSaveModalView()
     
-    lazy var mainLabel: UILabel = {
-        let label = UILabel()
-        
-//        label.layer.borderWidth = 2
-        label.text = "00 : 00 : 00"
-        label.textAlignment = .center
-        label.layer.masksToBounds = true
-        label.layer.cornerRadius = 20
-        label.backgroundColor = .white
-        label.textColor = .darkGray
-        label.layer.shadowColor = UIColor.black.cgColor
-        label.layer.shadowOffset = .zero
-        label.layer.shadowOpacity = 0.3
-        label.font = .systemFont(ofSize: 50, weight:.regular)
-        self.view.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
+    private lazy var blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     
-    lazy var subLabel: UILabel = {
-        let label = UILabel()
-        label.text = "00"
-        label.textAlignment = .center
-        label.textColor = .white
-        label.font = .boldSystemFont(ofSize: 20)
-//        self.mainLabel.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
+    private let frameView = UIView().then {
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = 20
+    }
     
-    lazy var aceptButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(" 확 인 ", for: .normal)
-        button.layer.cornerRadius = 10
-        button.layer.shadowColor = UIColor.black.cgColor
-//        button.layer.borderWidth = 1
-        button.layer.shadowOpacity = 0.3
-        button.layer.shadowOffset = .zero
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .medium)
-        button.setTitleColor(.darkGray, for: .normal)
-        button.layer.backgroundColor = UIColor.white.cgColor
-        self.view.addSubview(button)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        return button
-    }()
+    private let guideLabel = UILabel().then {
+        $0.text = "다시 시작하시려면 핸드폰을 뒤집어주세요."
+        $0.textColor = .systemGray4
+        $0.textAlignment = .center
+        $0.font = .systemFont(ofSize: 16)
+        $0.layer.cornerRadius = 10
+        $0.numberOfLines = 2
+    }
     
-    lazy var modalView: StopButtonTappedModalView = {
-        let modalView = StopButtonTappedModalView()
-        modalView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return modalView
-    }()
+    private lazy var pickerCategory = UIPickerView().then {
+        $0.layer.cornerRadius = 10
+        $0.backgroundColor = .systemGray6
+    }
     
-    lazy var blurView: UIVisualEffectView = {
-        let blurView = UIBlurEffect(style: .dark)
-        let effectView = UIVisualEffectView(effect: blurView)
-        effectView.translatesAutoresizingMaskIntoConstraints = false
-        return effectView
-    }()
+    private let mainLabel = TimeLabel(.hms).then {
+        $0.font = .systemFont(ofSize: 50, weight:.regular)
+    }
     
-    lazy var bottomview: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(view)
-        view.backgroundColor = .darkGray
-        view.alpha = 0.7
-        
-        NSLayoutConstraint.activate([
-            view.bottomAnchor.constraint(equalTo: self.mainLabel.bottomAnchor, constant: 10),
-            view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
-            view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
-            view.heightAnchor.constraint(equalToConstant: 2)
-        ])
-        
-        return view
-    }()
+    private let acceptButton = UIButton(type: .system).then {
+        $0.setTitle(" 확 인 ", for: .normal)
+        $0.setTitleColor(.darkGray, for: .normal)
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 22, weight: .medium)
+        $0.layer.cornerRadius = 10
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOpacity = 0.3
+        $0.layer.shadowOffset = .zero
+        $0.layer.backgroundColor = UIColor.white.cgColor
+    }
     
-    lazy var topView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(view)
-        view.backgroundColor = .darkGray
-        view.alpha = 0.7
-        
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: self.mainLabel.topAnchor, constant: -10),
-            view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
-            view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
-            view.heightAnchor.constraint(equalToConstant: 2)
-        ])
-        
-        return view
-    }()
+    private let topLineView = UIView().then {
+        $0.alpha = 0.7
+        $0.backgroundColor = .darkGray
+    }
+ 
+    private let bottomLineView = UIView().then {
+        $0.alpha = 0.7
+        $0.backgroundColor = .darkGray
+    }
     
-    let addCategoryButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
+    private let addCategoryButton = UIButton(type: .system).then {
         let title = "원하는 카테고리가 없으신가요?"
         let attributedTitle = NSMutableAttributedString(string: title)
         let range = NSRange(location: 0, length: title.count)
-        attributedTitle.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
-        attributedTitle.addAttribute(.foregroundColor, value: UIColor.systemGray2, range: range)
-        attributedTitle.addAttribute(.font, value: UIFont.systemFont(ofSize: 14, weight: .semibold), range: range)
+        attributedTitle.addAttributes([.underlineStyle : NSUnderlineStyle.single.rawValue,
+                                       .foregroundColor : UIColor.systemGray2,
+                                       .font : UIFont.systemFont(ofSize: 14, weight: .semibold)],
+                                      range: range)
         
-        button.setAttributedTitle(attributedTitle, for: .normal)
-        
-        return button
-    }()
+        $0.setAttributedTitle(attributedTitle, for: .normal)
+    }
     
-    //MARK: Method
-    
+    //MARK: - Method
     deinit {
         print("--------------ConcetrationTimeViewCotroller deinit----------")
     }
@@ -185,45 +89,39 @@ class ConcentrationTimeViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         self.configure()
-        self.openBlackView()
         self.addSubView()
-        self.layOut()
+        self.layout()
         self.addTarget()
-        self.startDate = Date().timeIntervalSince1970
+        
+        self.openBlackView()
+        
         self.pickerCategory.delegate = self
         self.pickerCategory.dataSource = self
-        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
-        self.totalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
-        self.navigationController?.navigationBar.isHidden = true
+        
         self.resetDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
+        
         StopWatchDAO().create(date: self.resetDate) // 오늘 데이터 없으면 생성
-        //vibrate iphone when the timer starts
-        self.changeUI(row: 0)
-     
+        
+        self.changeUIColor(row: 0)
     }
+    
     override func viewWillAppear(_ animated: Bool) {
-//        print("viewWillappear")
         self.pickerCategory.reloadAllComponents()
     }
-    override func viewWillDisappear(_ animated: Bool) {
-        //timer start
-//        self.generatePhone()
-        
+    
+    private func setTimeLabel(){
+        self.mainLabel.updateTime(self.view.divideSecond(timeInterval: self.timeInterval ))
     }
     
-    func setTimeLabel(){
-        let (subSecond,second,minute,hour) = self.view.divideSecond(timeInterval: self.timeInterval )
-        self.subLabel.text = subSecond
-        self.mainLabel.text = "\(hour) : \(minute) : \(second)"
-    }
-    
-    func openStopModalView(){
-        let categoryName = self.realm.objects(Segments.self)[pickCategoryRow].name
+    private func openTimeSaveModalView() {
+        let categoryName = self.realm.objects(Segments.self)[self.pickCategoryRow].name
         self.view.addSubview(self.blurView)
         self.view.addSubview(self.modalView)
+        
         self.modalView.alpha = 0
         self.blurView.alpha = 0
         self.modalLayout()
+        
         self.modalView.delegate = self
         self.modalView.guideLabel.text = "'\(categoryName)'에 저장하시겠습니까?"
         
@@ -233,63 +131,48 @@ class ConcentrationTimeViewController: UIViewController{
         }
     }
     
-    func changeUI(row: Int) {
-        let segment = self.realm.objects(Segments.self)
-        self.label.text = segment[row].name
-//        self.label.textColor = .white
-//        self.frameView.backgroundColor = self.uiColorFromHexCode(segment[row].colorCode)
-        self.topView.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
-        self.bottomview.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
-//        self.mainLabel.textColor = self.uiColorFromHexCode(segment[row].colorCode)
-        self.pickerCategory.backgroundColor = self.view.uiColorFromHexCode(segment[row].colorCode)
+    private func changeUIColor(row: Int) {
+        let segment = self.realm.objects(Segments.self)[row]
+
+        self.topLineView.backgroundColor = self.view.uiColorFromHexCode(segment.colorCode)
+        self.bottomLineView.backgroundColor = self.view.uiColorFromHexCode(segment.colorCode)
+        self.pickerCategory.backgroundColor = self.view.uiColorFromHexCode(segment.colorCode)
     }
     
-    func closeStopModalView(){
+    private func closeTimeSaveModalView() {
         if let stopWatchVC = self.navigationController?.viewControllers[0] as? StopWatchViewController {
             stopWatchVC.setTimeLabel()
             stopWatchVC.concentraionTimerVC = nil
         }
         
-        let segments = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.resetDate) // 오늘 과목
+        guard let data = StopWatchDAO().getDailyData(self.resetDate) else { return }// 오늘 과목
         
-        try! self.realm.write{
-            segments?.dailySegment[pickCategoryRow].value += self.timeInterval //선택한 과목에 시간 추가
-            var totalTime: TimeInterval = 0
-            for segValue in segments!.dailySegment {
-                totalTime += segValue.value
-            }
-            segments?.totalTime = totalTime
-        }
+        StopWatchDAO().addTotalTime(self.timeInterval, data: data, row: self.pickCategoryRow)
         
         self.cancelModalView()
         
         navigationController?.popViewController(animated: true)
     }
     
-    func openBlackView(){
-//        self.navigationController?.setNavigationBarHidden(true, animated: true)
-        if self.blackViewController == nil {
-            self.blackViewController = BlackViewController()
-            self.blackViewController?.delegate = self
-            self.blackViewController!.view.backgroundColor = .black
-            self.blackViewController?.modalPresentationStyle = .fullScreen
-            present(self.blackViewController!, animated: true, completion: nil)
+    func openBlackView() {
+        guard self.blackViewController == nil else { return }
+        self.blackViewController = BlackViewController().then {
+            $0.delegate = self
+            $0.modalPresentationStyle = .fullScreen
         }
+        
+        present(self.blackViewController!, animated: true, completion: nil)
     }
-    
     
     func closeBlackView(){
-        if let _ = self.blackViewController{
+        guard let _ = self.blackViewController else { return }
             dismiss(animated: true, completion: nil)
             self.blackViewController = nil
-//            self.navigationController?.setNavigationBarHidden(false, animated: true)
-            
-        }
     }
     
-    //MARK: Selector
-    @objc func aceptButtonMtd(){
-        self.openStopModalView()
+    //MARK: - Selector
+    @objc func acceptButtonMtd(){
+        self.openTimeSaveModalView()
     }
     
     @objc func addCategoryButtonMtd(){
@@ -298,99 +181,105 @@ class ConcentrationTimeViewController: UIViewController{
     }
     
 }
+
 extension ConcentrationTimeViewController {
-    //MARK: Configured
-    func configure(){
+    //MARK: - Configured
+    private func configure(){
         self.view.backgroundColor = .white
         self.navigationItem.hidesBackButton = true
+        self.navigationController?.navigationBar.isHidden = true
     }
     
-    //MARK: AddTarget
-    func addTarget(){
-        self.aceptButton.addTarget(self, action: #selector(self.aceptButtonMtd), for: .touchUpInside)
+    //MARK: - AddTarget
+    private func addTarget(){
+        self.acceptButton.addTarget(self, action: #selector(self.acceptButtonMtd), for: .touchUpInside)
         self.addCategoryButton.addTarget(self, action: #selector(self.addCategoryButtonMtd), for: .touchUpInside)
     }
-    //MARK: AddSubView
-    func addSubView(){
+    
+    //MARK: - AddSubView
+    private func addSubView(){
         self.view.addSubview(self.frameView)
+        self.view.addSubview(self.mainLabel)
+        self.view.addSubview(self.acceptButton)
+        self.view.addSubview(self.pickerCategory)
         self.view.addSubview(self.guideLabel)
         self.view.addSubview(self.addCategoryButton)
         
-        self.frameView.addSubview(self.label)
+        self.view.addSubview(self.topLineView)
+        self.view.addSubview(self.bottomLineView)
     }
     
-    //MARK: LayOut
-    func layOut(){
-        //Level 1
-        NSLayoutConstraint.activate([
-            self.frameView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 140),
-            self.frameView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 60),
-            self.frameView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -60),
-            self.frameView.heightAnchor.constraint(equalToConstant: 100)
-        ])
+    //MARK: - Layout
+    private func layout(){
+        self.frameView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(140)
+            $0.leading.equalToSuperview().offset(60)
+            $0.trailing.equalToSuperview().offset(-60)
+            $0.height.equalTo(100)
+        }
         
-        NSLayoutConstraint.activate([
-            self.mainLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            self.mainLabel.topAnchor.constraint(equalTo: self.frameView.bottomAnchor, constant: 80),
-            self.mainLabel.widthAnchor.constraint(equalToConstant: self.view.frame.width - 80),
-            self.mainLabel.heightAnchor.constraint(equalToConstant: 80)
-        ])
+        self.pickerCategory.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(160)
+            $0.height.equalTo(100)
+            $0.leading.equalToSuperview().offset(30)
+            $0.trailing.equalToSuperview().offset(-30)
+        }
         
-        NSLayoutConstraint.activate([
-            self.aceptButton.topAnchor.constraint(equalTo: self.mainLabel.bottomAnchor, constant: 60),
-            self.aceptButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            self.aceptButton.widthAnchor.constraint(equalToConstant: 160),
-            self.aceptButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
+        self.acceptButton.snp.makeConstraints {
+            $0.top.equalTo(self.mainLabel.snp.bottom).offset(60)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(160)
+            $0.height.equalTo(50)
+        }
         
-        NSLayoutConstraint.activate([
-            self.pickerCategory.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 160),
-            self.pickerCategory.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 30),
-            self.pickerCategory.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30),
-            self.pickerCategory.heightAnchor.constraint(equalToConstant: 100)
-        ])
+        self.guideLabel.snp.makeConstraints {
+            $0.top.equalTo(self.acceptButton.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(self.view.frame.width-120)
+            $0.height.equalTo(60)
+        }
         
-        NSLayoutConstraint.activate([
-            self.guideLabel.topAnchor.constraint(equalTo: self.aceptButton.bottomAnchor, constant: 20),
-            self.guideLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            self.guideLabel.widthAnchor.constraint(equalToConstant: self.view.frame.width - 120),
-            self.guideLabel.heightAnchor.constraint(equalToConstant: 60)
-        ])
+        self.mainLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(self.frameView.snp.bottom).offset(80)
+            $0.width.equalTo(self.view.frame.width - 80)
+            $0.height.equalTo(80)
+        }
         
-        NSLayoutConstraint.activate([
-            self.addCategoryButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -50),
-            self.addCategoryButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-        ])
+        self.addCategoryButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().offset(-50)
+            $0.centerX.equalToSuperview()
+        }
         
-        //Level 2
-        NSLayoutConstraint.activate([
-            self.label.centerYAnchor.constraint(equalTo: self.frameView.centerYAnchor),
-            self.label.centerXAnchor.constraint(equalTo: self.frameView.centerXAnchor),
-            ])
-//
-//        NSLayoutConstraint.activate([
-//            self.subLabel.centerYAnchor.constraint(equalTo: self.mainLabel.centerYAnchor, constant: 3),
-//            self.subLabel.trailingAnchor.constraint(equalTo: self.mainLabel.trailingAnchor, constant: -16),
-//        ])
+        self.topLineView.snp.makeConstraints {
+            $0.top.equalTo(self.mainLabel.snp.top).offset(-10)
+            $0.leading.equalToSuperview().offset(30)
+            $0.trailing.equalToSuperview().offset(-30)
+            $0.height.equalTo(2)
+        }
+        
+        self.bottomLineView.snp.makeConstraints {
+            $0.bottom.equalTo(self.mainLabel.snp.bottom).offset(10)
+            $0.leading.equalToSuperview().offset(30)
+            $0.trailing.equalToSuperview().offset(-30)
+            $0.height.equalTo(2)
+        }
     }
-    func modalLayout(){
+    
+    private func modalLayout(){
+        self.blurView.snp.makeConstraints {
+            $0.leading.trailing.top.bottom.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            self.blurView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.blurView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.blurView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.blurView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.modalView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            self.modalView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-            self.modalView.widthAnchor.constraint(equalToConstant: self.view.frame.width - 80),
-            self.modalView.heightAnchor.constraint(equalToConstant: 200)
-        ])
+        self.modalView.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+            $0.width.equalTo(self.view.frame.width - 80)
+            $0.height.equalTo(200)
+        }
     }
 }
-extension ConcentrationTimeViewController: StopModalViewDelegate{
+
+extension ConcentrationTimeViewController: TimeSaveModalViewDelegate{
     func exitModalView() {
         if let stopWatchVC = self.navigationController?.viewControllers[0] as? StopWatchViewController {
             stopWatchVC.setTimeLabel()
@@ -401,7 +290,7 @@ extension ConcentrationTimeViewController: StopModalViewDelegate{
     }
     
     func closeModalView() {
-        self.closeStopModalView()
+        self.closeTimeSaveModalView()
     }
     
     func cancelModalView() {
@@ -427,7 +316,7 @@ extension ConcentrationTimeViewController: UIPickerViewDelegate,UIPickerViewData
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         self.pickCategoryRow = row // 카테고리 선택했을때 호출
-        self.changeUI(row: row)
+        self.changeUIColor(row: row)
     }
     
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
@@ -438,17 +327,16 @@ extension ConcentrationTimeViewController: UIPickerViewDelegate,UIPickerViewData
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         return self.view.frame.width - 60
     }
+    
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 40
     }
-    
 }
 
 //timer가 멈출 때
 extension ConcentrationTimeViewController: TimerTriggreDelegate{
     func timerStop(_ startDate: TimeInterval) {
-        self.startDate = startDate
-        let result = Date().timeIntervalSince1970 - self.startDate
+        let result = Date().timeIntervalSince1970 - startDate
         self.timeInterval += result
         self.setTimeLabel()
     }

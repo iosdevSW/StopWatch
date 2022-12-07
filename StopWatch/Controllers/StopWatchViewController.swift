@@ -5,10 +5,6 @@
 //  Created by 신상우 on 2021/03/29.
 //
 
-// 1. 달 -> 영어로 바꾸는거 enum 모델링하기
-// 2. ModalCalendarView 뜯어고치기
-// 3. 저장될때 세이브데이트 바꿔주기
-
 import UIKit
 import CoreMotion
 import RealmSwift
@@ -20,10 +16,11 @@ final class StopWatchViewController: UIViewController {
     //전체 시간, 전체 목표시간 저장 프로퍼티
     var totalTime: TimeInterval = 0
     var totalGoalTime: TimeInterval = 0
-
+    var todoList = List<SegmentData>()
     let realm = try! Realm()
-    private var motionManager: CMMotionManager?
     
+    private var motionManager: CMMotionManager?
+
     var concentraionTimerVC: ConcentrationTimeViewController?
     var editTodoListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
@@ -47,7 +44,6 @@ final class StopWatchViewController: UIViewController {
     }
     
     private let mainTimeLabel = TimeLabel(.hms).then {
-        $0.textColor = .darkGray
         $0.font = .systemFont(ofSize: 50, weight: .regular)
     }
     
@@ -98,7 +94,7 @@ final class StopWatchViewController: UIViewController {
         // gesture
         self.hideKeyboardWhenTapped()
         
-        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -112,6 +108,7 @@ final class StopWatchViewController: UIViewController {
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
         self.setDday()
+        self.setTimeLabel()
         self.guideLabelView.isHidden = false
     }
     
@@ -151,13 +148,13 @@ final class StopWatchViewController: UIViewController {
     }
     
     func setTimeLabel(){
-        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        let dailyData = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)
         let time = dailyData?.totalTime ?? 0 // 오늘의 데이터가 없으면 0
         self.mainTimeLabel.updateTime(self.view.divideSecond(timeInterval: time))
     }
     
     func setGoalTime(){
-        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        let dailyData = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)
         let goal = dailyData?.totalGoalTime ?? 0 // 오늘의 데이터가 없으면 0
         self.goalTimeView.timeLabel.updateTime(self.view.divideSecond(timeInterval: goal))
     }
@@ -361,6 +358,7 @@ final class StopWatchViewController: UIViewController {
         if let saveDate = notification.userInfo?["selectedDate"] as? String {
             self.saveDate = saveDate
         }
+        let a = StopWatchDAO().getDailyData(saveDate)?.dailySegment
         self.setGoalTime() // 목표시간 Label 재설정
         self.reloadProgressBar() // 진행바 재로딩
         self.setTimeLabel() // 현재시간 Label 재설정
@@ -390,7 +388,6 @@ final class StopWatchViewController: UIViewController {
             self.reloadProgressBar()
             
             self.closeGoalTimeEditView()
-           
         }
         //취소버튼
         if sender.tag == 2 {
@@ -454,6 +451,11 @@ final class StopWatchViewController: UIViewController {
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn){
             self.view.bounds.origin = .zero
         }
+    }
+    
+    @objc func willPresentAlert(_ notification: Notification) {
+        guard let alert = notification.userInfo?["alert"] as? UIAlertController else { return }
+        self.present(alert, animated: true)
     }
     
     //MARK: - SideBarMenu Method
@@ -541,7 +543,7 @@ extension StopWatchViewController {
     }
     
     //MARK: SetLayOut
-    func layOut(){
+    private func layOut(){
         //Level 1
         self.mainTimeLabel.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
@@ -672,8 +674,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TodoListCell
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        let segment = filter?.dailySegment
+        let segment = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)?.dailySegment
         
         cell.saveDate = self.saveDate
         cell.getListTextField.tag = indexPath.section // 섹션구분 태그 이용
@@ -702,8 +703,6 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
             cell.checkImageView.isHidden = false
             cell.getListTextField.isHidden = true
         }
-
-        cell.selectionStyle = .none
         
         return cell
     }
@@ -883,13 +882,5 @@ extension StopWatchViewController {
                 self.removeTapGesture()
             }
         }
-    }
-}
-
-extension StopWatchViewController {
-    //MARK: - ModalCalendarView Selector
-    @objc func willPresentAlert(_ notification: Notification) {
-        guard let alert = notification.userInfo?["alert"] as? UIAlertController else { return }
-        self.present(alert, animated: true)
     }
 }

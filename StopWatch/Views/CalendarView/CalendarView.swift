@@ -13,7 +13,6 @@ import SnapKit
 final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataSource {
     //MARK: - Properties
     private let realm = try! Realm()
-    var calendarInfo: CalendarViewInfo = CalendarViewInfo()
     let calendarMethod = CalendarMethod()
     weak var modalCalendarDelegate: ChangeSelectDateDelegate?
     
@@ -88,7 +87,6 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.modelingInit()
         self.addSubView()
         self.layout()
         self.addTarget()
@@ -110,14 +108,6 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
     }
     
     //MARK: - Method
-    func modelingInit(){
-        let bounds = UIScreen.main.bounds
-        let width = bounds.size.width - 20 //화면 너비
-        
-        self.calendarInfo.cellSize = width / 7
-        self.calendarInfo.heightNumberOfCell = 6
-    }
-    
     private func setTodayDate() {
         let date = Date()
         self.todayDateComponent.year = calendar.component(.year, from: date)
@@ -250,7 +240,9 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
             cell.dataCheckView.isHidden = !isData(days[indexPath.row])
             cell.dateLabel.text = days[indexPath.row]
             if let day = Int(days[indexPath.row]) {
-                let bgColor = self.selectDateComponent.day == day ? UIColor.standardColor : UIColor.white
+                var tempComponent = self.currentCalendarComponent
+                tempComponent.day = day
+                let bgColor = self.selectDateComponent.stringFormat == tempComponent.stringFormat ? UIColor.standardColor : UIColor.white
                 cell.backgroundColor = bgColor
             } else {
                 cell.isUserInteractionEnabled = false
@@ -281,7 +273,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     //뷰 크기 리턴
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(
-            width: self.calendarInfo.cellSize!,
+            width: (UIScreen.main.bounds.size.width - 20) / 7,
             height: 32
         )
     }

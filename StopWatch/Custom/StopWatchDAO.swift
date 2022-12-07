@@ -106,6 +106,10 @@ class StopWatchDAO {
         }
     }
     
+    func getDailyData(_ date: String) -> DailyData? {
+        return self.realm.object(ofType: DailyData.self, forPrimaryKey: date)
+    }
+    
     func getSegment(_ date: String, section: Int) -> SegmentData {
         let segment = realm.objects(SegmentData.self).where{ seg in
             seg.date == date
@@ -147,5 +151,19 @@ class StopWatchDAO {
         return true
     }
     
+    //MARK: - 스톱워치 시간 추가
+    func addTotalTime(_ timeInterval: TimeInterval, data: DailyData, row: Int) {
+        do {
+            try self.realm.write{
+                data.dailySegment[row].value += timeInterval //선택한 과목에 시간 추가
+                var totalTime: TimeInterval = 0
+                for segValue in data.dailySegment {
+                    totalTime += segValue.value
+                }
+                data.totalTime = totalTime
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
 }
-

@@ -55,6 +55,10 @@ final class CalendarCell: UICollectionViewCell {
         self.dataCheckView.isHidden = true
     }
     
+    func checkCell(_ day: Int) {
+        
+    }
+    
     //MARK: - addSubView
     private func addSubView(){
         self.addSubview(self.frameView)

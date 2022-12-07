@@ -9,12 +9,14 @@ import UIKit
 
 class CustomTextField: UITextField{
     var underLineWidth: CGFloat = 2
+    
     let underLine: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         
         return view
     }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubView()

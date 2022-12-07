@@ -9,17 +9,18 @@
 /* Begin PBXBuildFile section */
 		43228812FC89EC6FE9668022 /* Pods_StopWatch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D5E8619A05D6284273C99B3 /* Pods_StopWatch.framework */; };
 		DB08F0C32765DB88001EBBEE /* StopWatchDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */; };
-		DB0E89B9262842BE00533009 /* StopButtonTappedModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0E89B8262842BE00533009 /* StopButtonTappedModalView.swift */; };
+		DB0E89B9262842BE00533009 /* TimeSaveModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0E89B8262842BE00533009 /* TimeSaveModalView.swift */; };
 		DB0F172C2614310F007C8448 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F172B2614310F007C8448 /* Utils.swift */; };
-		DB10DB8927E363BD000560A3 /* CalendarMonthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB10DB8827E363BD000560A3 /* CalendarMonthCell.swift */; };
 		DB10DB8C27E4A081000560A3 /* GodoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DB10DB8B27E4A081000560A3 /* GodoM.ttf */; };
 		DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */; };
 		DB2890752623074A00FCC4BC /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2890742623074900FCC4BC /* ChartView.swift */; };
+		DB340BC82940750100795FFC /* UITextField+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC72940750100795FFC /* UITextField+.swift */; };
+		DB340BCA2940753400795FFC /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC92940753400795FFC /* UIColor+.swift */; };
 		DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */; };
 		DB40D2002609B32C00A4E9FC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB40D1FE2609B32C00A4E9FC /* Main.storyboard */; };
 		DB40D2022609B32E00A4E9FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB40D2012609B32E00A4E9FC /* Assets.xcassets */; };
 		DB40D2052609B32E00A4E9FC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */; };
-		DB4FE82426BF80F100B1DF3E /* Modeling.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FE82326BF80F100B1DF3E /* Modeling.swift */; };
+		DB4FE82426BF80F100B1DF3E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FE82326BF80F100B1DF3E /* Model.swift */; };
 		DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A7276CB61C00CF737C /* CalendarView.swift */; };
 		DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */; };
 		DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */; };
@@ -46,7 +47,6 @@
 		DBBDF75826527986003F55FE /* drawBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBDF75726527986003F55FE /* drawBarView.swift */; };
 		DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */; };
 		DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782A293C9E270079CF1A /* NotificationName+.swift */; };
-		DBC6782D293DDF900079CF1A /* DateInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782C293DDF900079CF1A /* DateInfo.swift */; };
 		DBC6782F293E991E0079CF1A /* MonthName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC6782E293E991E0079CF1A /* MonthName.swift */; };
 		DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC67830293F07D40079CF1A /* DateComponents+.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
@@ -60,19 +60,20 @@
 		8D5E8619A05D6284273C99B3 /* Pods_StopWatch.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StopWatch.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A46D2DC1AD4790441A1758B2 /* Pods-StopWatch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StopWatch.release.xcconfig"; path = "Target Support Files/Pods-StopWatch/Pods-StopWatch.release.xcconfig"; sourceTree = "<group>"; };
 		DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatchDAO.swift; sourceTree = "<group>"; };
-		DB0E89B8262842BE00533009 /* StopButtonTappedModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopButtonTappedModalView.swift; sourceTree = "<group>"; };
+		DB0E89B8262842BE00533009 /* TimeSaveModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSaveModalView.swift; sourceTree = "<group>"; };
 		DB0F172B2614310F007C8448 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		DB10DB8827E363BD000560A3 /* CalendarMonthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMonthCell.swift; sourceTree = "<group>"; };
 		DB10DB8B27E4A081000560A3 /* GodoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GodoM.ttf; sourceTree = "<group>"; };
 		DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideLabelView.swift; sourceTree = "<group>"; };
 		DB2890742623074900FCC4BC /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		DB340BC72940750100795FFC /* UITextField+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+.swift"; sourceTree = "<group>"; };
+		DB340BC92940753400795FFC /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
 		DB40D1F52609B32C00A4E9FC /* StopWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DB40D1FF2609B32C00A4E9FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DB40D2012609B32E00A4E9FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DB40D2042609B32E00A4E9FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DB40D2062609B32E00A4E9FC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB4FE82326BF80F100B1DF3E /* Modeling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Modeling.swift; path = StopWatch/Models/Modeling.swift; sourceTree = SOURCE_ROOT; };
+		DB4FE82326BF80F100B1DF3E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Model.swift; path = StopWatch/Models/Model.swift; sourceTree = SOURCE_ROOT; };
 		DB5AE4A7276CB61C00CF737C /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTimeView.swift; sourceTree = "<group>"; };
@@ -99,7 +100,6 @@
 		DBBDF75726527986003F55FE /* drawBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = drawBarView.swift; sourceTree = "<group>"; };
 		DBBFFBEE29334A3500CA3FBC /* TimeLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLabel.swift; sourceTree = "<group>"; };
 		DBC6782A293C9E270079CF1A /* NotificationName+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificationName+.swift"; sourceTree = "<group>"; };
-		DBC6782C293DDF900079CF1A /* DateInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateInfo.swift; sourceTree = "<group>"; };
 		DBC6782E293E991E0079CF1A /* MonthName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthName.swift; sourceTree = "<group>"; };
 		DBC67830293F07D40079CF1A /* DateComponents+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+.swift"; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
@@ -123,7 +123,7 @@
 		DB076D5826A696110063D3C6 /* MainView */ = {
 			isa = PBXGroup;
 			children = (
-				DB0E89B8262842BE00533009 /* StopButtonTappedModalView.swift */,
+				DB0E89B8262842BE00533009 /* TimeSaveModalView.swift */,
 				DB2890742623074900FCC4BC /* ChartView.swift */,
 				DBEC226B276B27740083ECDA /* TitleView.swift */,
 				DB8F533026F22FBD0071F911 /* TodoListHeaderView.swift */,
@@ -249,7 +249,6 @@
 			children = (
 				DB5AE4A7276CB61C00CF737C /* CalendarView.swift */,
 				DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */,
-				DB10DB8827E363BD000560A3 /* CalendarMonthCell.swift */,
 			);
 			path = CalendarView;
 			sourceTree = "<group>";
@@ -278,9 +277,8 @@
 			isa = PBXGroup;
 			children = (
 				DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */,
-				DB4FE82326BF80F100B1DF3E /* Modeling.swift */,
-				DBC6782C293DDF900079CF1A /* DateInfo.swift */,
 				DBC6782E293E991E0079CF1A /* MonthName.swift */,
+				DB4FE82326BF80F100B1DF3E /* Model.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -299,6 +297,8 @@
 			children = (
 				DBC6782A293C9E270079CF1A /* NotificationName+.swift */,
 				DBC67830293F07D40079CF1A /* DateComponents+.swift */,
+				DB340BC72940750100795FFC /* UITextField+.swift */,
+				DB340BC92940753400795FFC /* UIColor+.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -434,6 +434,7 @@
 				DBBD53052636BB78002F5157 /* CategoryCell.swift in Sources */,
 				DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */,
 				DBF7E79226AFF438009902BE /* EditGoalTimeView.swift in Sources */,
+				DB340BC82940750100795FFC /* UITextField+.swift in Sources */,
 				DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */,
 				DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */,
 				DB8DB18D2611E67900A5814A /* StopWatchViewController.swift in Sources */,
@@ -448,22 +449,21 @@
 				DBEC226C276B27740083ECDA /* TitleView.swift in Sources */,
 				DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */,
 				DB8F532826F07A3A0071F911 /* PaletteCell.swift in Sources */,
-				DB0E89B9262842BE00533009 /* StopButtonTappedModalView.swift in Sources */,
+				DB0E89B9262842BE00533009 /* TimeSaveModalView.swift in Sources */,
 				DBBD53002636B109002F5157 /* CategoryViewController.swift in Sources */,
 				DB2890752623074A00FCC4BC /* ChartView.swift in Sources */,
 				DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */,
 				DBBDF7562643DC59003F55FE /* PreView.swift in Sources */,
 				DBBDF75826527986003F55FE /* drawBarView.swift in Sources */,
 				DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */,
-				DBC6782D293DDF900079CF1A /* DateInfo.swift in Sources */,
+				DB340BCA2940753400795FFC /* UIColor+.swift in Sources */,
 				DBA7ED5927DDAFF4004B0D0E /* MenuOption.swift in Sources */,
 				DBEC226A276864380083ECDA /* CustomListEditView.swift in Sources */,
 				DB0F172C2614310F007C8448 /* Utils.swift in Sources */,
 				DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */,
-				DB10DB8927E363BD000560A3 /* CalendarMonthCell.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
 				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
-				DB4FE82426BF80F100B1DF3E /* Modeling.swift in Sources */,
+				DB4FE82426BF80F100B1DF3E /* Model.swift in Sources */,
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,
 				DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */,
 				DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */,

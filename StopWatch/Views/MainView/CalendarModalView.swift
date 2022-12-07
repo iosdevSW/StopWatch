@@ -52,9 +52,9 @@ final class CalendarModalView: UIView {
     lazy var calendarView = CalendarView().then {
         $0.calendarMode = .month
         $0.calendarView.layer.cornerRadius = 20
-        $0.calendarInfo.cellSize = (UIScreen.main.bounds.width - 60) / 7
         $0.yearMonthLabel.font = UIFont(name: "GodoM", size: 16)
         $0.modalCalendarDelegate = self
+        $0.changeCalendarMode.isHidden = true
     }
     
     private let okButton = UIButton(type: .roundedRect).then {

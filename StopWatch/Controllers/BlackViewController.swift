@@ -7,18 +7,20 @@
 
 import UIKit
 
-protocol TimerTriggreDelegate{
-    func timerStop(_ startDate:TimeInterval)
+protocol TimerTriggreDelegate: AnyObject {
+    func timerStop(_ startDate: TimeInterval)
 }
 
-class BlackViewController: UIViewController {
+final class BlackViewController: UIViewController {
+    weak var delegate: TimerTriggreDelegate?
     var startDate: TimeInterval = 0
-    var delegate: TimerTriggreDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.startDate = Date().timeIntervalSince1970
         self.generatePhone()
+        
+        self.view.backgroundColor = .black
     }
     
     override func viewWillDisappear(_ animated: Bool) {
