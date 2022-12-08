@@ -358,7 +358,7 @@ final class StopWatchViewController: UIViewController {
         if let saveDate = notification.userInfo?["selectedDate"] as? String {
             self.saveDate = saveDate
         }
-        let a = StopWatchDAO().getDailyData(saveDate)?.dailySegment
+        
         self.setGoalTime() // 목표시간 Label 재설정
         self.reloadProgressBar() // 진행바 재로딩
         self.setTimeLabel() // 현재시간 Label 재설정

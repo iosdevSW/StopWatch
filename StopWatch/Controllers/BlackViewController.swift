@@ -27,7 +27,7 @@ final class BlackViewController: UIViewController {
         self.delegate?.timerStop(self.startDate)
     }
     
-    func generatePhone(){
+    private func generatePhone(){
         let generator = UIImpactFeedbackGenerator(style:.heavy)
         generator.impactOccurred()
     }

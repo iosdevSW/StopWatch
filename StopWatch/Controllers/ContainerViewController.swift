@@ -7,12 +7,12 @@
 
 import UIKit
 
-class ContainerViewController: UIViewController {
+final class ContainerViewController: UIViewController {
     //MARK: - Properties
-    var homeVC: UIViewController!
-    var menuVC: MenuViewController!
-    var StopWatchVC: StopWatchViewController!
-    var isExpanded = false
+    private var homeVC: UIViewController!
+    private var menuVC: MenuViewController!
+    private var StopWatchVC: StopWatchViewController!
+    private var isExpanded = false
     
     //MARK: - Method
     override func viewDidLoad() {
@@ -22,7 +22,7 @@ class ContainerViewController: UIViewController {
     }
     
     // StopWatchVC 구성 함수
-    func configureStopWatchViewController() {
+    private func configureStopWatchViewController() {
         self.StopWatchVC = StopWatchViewController() // 메인홈컨트롤러 객체 생성
         self.homeVC = UINavigationController(rootViewController: self.StopWatchVC) // 네비게이션컨트롤러 생성
         self.StopWatchVC.delegate = self
@@ -76,7 +76,6 @@ class ContainerViewController: UIViewController {
         }
     }
     //MARK: - Selector
-    
     @objc func respondToswipe(gesture: UISwipeGestureRecognizer) {
         if !self.isExpanded {
             self.ConfigureMenuViewController()

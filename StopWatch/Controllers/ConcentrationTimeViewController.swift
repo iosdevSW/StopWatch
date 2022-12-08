@@ -18,8 +18,7 @@ final class ConcentrationTimeViewController: UIViewController{
     private var pickCategoryRow = 0
     private var blackViewController: BlackViewController?
     
-    var resetDate = "" // 초기화 시간 기준 날짜
-    
+    private var resetDate = "" // 초기화 시간 기준 날짜
     
     private lazy var modalView = TimeSaveModalView()
     

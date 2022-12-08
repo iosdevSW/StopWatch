@@ -172,9 +172,9 @@
 				DBA7ED5227DDAC39004B0D0E /* ContainerViewController.swift */,
 				DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */,
 				DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */,
+				DBAD2A4826D3E4370083478E /* BlackViewController.swift */,
 				DB8F532426F05C1A0071F911 /* EditCategoryViewController.swift */,
 				DBBD52FF2636B109002F5157 /* CategoryViewController.swift */,
-				DBAD2A4826D3E4370083478E /* BlackViewController.swift */,
 				DBA7ED5427DDAC49004B0D0E /* MenuViewController.swift */,
 				DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */,
 			);
