@@ -7,15 +7,10 @@
 
 import UIKit
 
-class CustomTextField: UITextField{
-    var underLineWidth: CGFloat = 2
+final class CustomTextField: UITextField{
+    private var underLineWidth: CGFloat = 2
     
-    let underLine: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        return view
-    }()
+    let underLine = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,18 +21,17 @@ class CustomTextField: UITextField{
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    func addSubView(){
+
+    //MARK: - AddSubView
+    private func addSubView(){
         self.addSubview(self.underLine)
     }
     
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.underLine.bottomAnchor.constraint(equalTo:self.bottomAnchor),
-            self.underLine.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.underLine.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.underLine.heightAnchor.constraint(equalToConstant: self.underLineWidth)
-            ])
+    //MARK: - Layout
+    private func layout(){
+        self.underLine.snp.makeConstraints {
+            $0.bottom.leading.trailing.equalToSuperview()
+            $0.height.equalTo(self.underLineWidth)
+        }
     }
-    
 }

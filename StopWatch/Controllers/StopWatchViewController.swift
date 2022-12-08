@@ -201,7 +201,7 @@ final class StopWatchViewController: UIViewController {
             UIView.animate(withDuration: 0.5,animations: {
                 _editGoalTimeView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
             }){_ in
-                StopWatchDAO().deleteSegment(date: self.saveDate)
+                StopWatchDAO().deleteDailyData(date: self.saveDate)
                 _editGoalTimeView.removeFromSuperview()
                 self.editGoalTimeView = nil
                 self.removeTapGesture()
@@ -779,7 +779,7 @@ extension StopWatchViewController: UITextFieldDelegate {
                 segment[textField.tag].toDoList.remove(at: row)
                 segment[textField.tag].listCheckImageIndex.remove(at: row)
             }
-            StopWatchDAO().deleteSegment(date: self.saveDate)
+            StopWatchDAO().deleteDailyData(date: self.saveDate)
             
         }else {
 
@@ -840,7 +840,7 @@ extension StopWatchViewController {
                         segment[section].toDoList.remove(at: row) // 리스트 삭제
                         segment[section].listCheckImageIndex.remove(at: row)
                     }
-                    StopWatchDAO().deleteSegment(date: self.saveDate) // 데이터베이스에서 삭제
+                    StopWatchDAO().deleteDailyData(date: self.saveDate) // 데이터베이스에서 삭제
                     self.toDoTableView.reloadData()
                     self.calendarView.calendarView.reloadData()
                     self.closeListEditView()

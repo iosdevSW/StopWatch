@@ -72,7 +72,6 @@ final class ContainerViewController: UIViewController {
                 guard let MenuOption = MenuOption else { return }
                 self.StopWatchVC.didSelectedMenuOption(menuOption: MenuOption)
             }
-            
         }
     }
     //MARK: - Selector

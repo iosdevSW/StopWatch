@@ -118,7 +118,7 @@ final class CalendarModalView: UIView {
         let move = UIAlertAction(title: "이동하기", style: .default){ [weak self] _ in
             guard let self else { return }
             _ = StopWatchDAO().moveTodoList(to: toSegment, from: fromSegment, row: self.indexPath.row)
-            StopWatchDAO().deleteSegment(date: self.changeDateComponent.stringFormat)
+            StopWatchDAO().deleteDailyData(date: self.changeDateComponent.stringFormat)
             
             NotificationCenter.default.post(name: .changeSaveDate, object: nil)
             self.removeFromSuperview()

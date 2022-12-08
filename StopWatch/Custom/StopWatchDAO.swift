@@ -62,13 +62,12 @@ class StopWatchDAO {
         }
     }
 
-    /// seg 삭제
-    func deleteSegment(date: String){
+    /// date날짜 데이터 삭제
+    func deleteDailyData(date: String){
         // 해당 날짜에 빈 segmentData 가 있는지 확인
         let blankSegmentData = self.realm.objects(SegmentData.self).where {
             ($0.value == 0) && ($0.goal == 0) && ($0.toDoList.count == 0) && ($0.date == date)
         }
-        print(blankSegmentData.count)
         
         // 해당 날짜에 모든 segmentData 가 비었으면 해당 날짜 데이터 모두 삭제
         if (blankSegmentData.count) == (self.realm.objects(Segments.self).count) {
@@ -110,11 +109,27 @@ class StopWatchDAO {
         return self.realm.object(ofType: DailyData.self, forPrimaryKey: date)
     }
     
+    //MARK: - SegemntData 편집(읽기, 삭제)
     func getSegment(_ date: String, section: Int) -> SegmentData {
         let segment = realm.objects(SegmentData.self).where{ seg in
             seg.date == date
         }[section]
         return segment
+    }
+    
+    func deleteSegment( row: Int) {
+        let segment = self.realm.objects(Segments.self)[row]
+    
+        let filter = self.realm.objects(SegmentData.self).where{
+            $0.segment == segment
+        }
+        
+        try! self.realm.write {
+            for data in filter {
+                self.realm.delete(data)
+            }
+            self.realm.delete(segment)
+        }
     }
 
     
