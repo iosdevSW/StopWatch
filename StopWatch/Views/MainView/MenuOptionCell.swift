@@ -6,51 +6,50 @@
 //
 
 import UIKit
+import Then
+import SnapKit
 
-class MenuOptionCell: UITableViewCell{
+final class MenuOptionCell: UITableViewCell{
     //MARK: - Properties
-    let menuImageView: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        return view
-    }()
+    private let menuImageView = UIImageView()
     
-    let menuTitleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .darkGray
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
-        label.text = "Sample text"
-        
-        return label
-    }()
+    private let menuTitleLabel = UILabel().then {
+        $0.textColor = .darkGray
+        $0.font = .systemFont(ofSize: 14, weight: .semibold)
+        $0.text = "Sample text"
+    }
     
     //MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.backgroundColor = .standardColor
+        self.selectionStyle = .none
         
         self.addSubview(self.menuImageView)
         self.addSubview(self.menuTitleLabel)
         
-        NSLayoutConstraint.activate([
-            self.menuImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
-            self.menuImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-            self.menuImageView.heightAnchor.constraint(equalToConstant: 24),
-            self.menuImageView.widthAnchor.constraint(equalToConstant: 24)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.menuTitleLabel.leadingAnchor.constraint(equalTo: self.menuImageView.trailingAnchor, constant: 16),
-            self.menuTitleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-        ])
+        self.layout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Method
+    func configureCell(_ menu: MenuOption?) {
+        self.menuImageView.image = menu?.image
+        self.menuTitleLabel.text = menu?.description
+    }
     
+    private func layout() {
+        self.menuImageView.snp.makeConstraints {
+            $0.height.width.equalTo(24)
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().offset(16)
+        }
+        
+        self.menuTitleLabel.snp.makeConstraints {
+            $0.leading.equalTo(self.menuImageView.snp.trailing).offset(16)
+            $0.centerY.equalToSuperview()
+        }
+    }
 }

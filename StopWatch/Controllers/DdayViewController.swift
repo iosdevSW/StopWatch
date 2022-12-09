@@ -6,121 +6,102 @@
 //
 
 import UIKit
+import Then
+import SnapKit
 
-class DdayViewController: UIViewController{
+final class DdayViewController: UIViewController{
     //MARK: - Properties
-    var dday: Date!
+    private var dday: Date!
     
-    let ddayLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "D-0"
-        label.font = .systemFont(ofSize: 30)
-        label.textColor = .darkGray
-        
-        return label
-    }()
+    private let ddayLabel = UILabel().then {
+        $0.text = "D-0"
+        $0.font = .systemFont(ofSize: 30)
+        $0.textColor = .darkGray
+    }
     
-    let guideLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "목표 날짜를 입력하세요."
-        label.textColor = .darkGray
-        label.font = .systemFont(ofSize: 22)
-        
-        return label
-    }()
+    private let guideLabel = UILabel().then {
+        $0.text = "목표 날짜를 입력하세요."
+        $0.textColor = .darkGray
+        $0.font = .systemFont(ofSize: 22)
+    }
     
-    let dateLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = " "
-        label.textColor = UIColor(red: 134/255, green: 118/255, blue: 116/255, alpha: 1.0)
-        label.font = .systemFont(ofSize: 24, weight: .semibold )
-        
-        return label
-    }()
+    private let dateLabel = UILabel().then {
+        $0.text = " "
+        $0.textColor = UIColor(red: 134/255, green: 118/255, blue: 116/255, alpha: 1.0)
+        $0.font = .systemFont(ofSize: 24, weight: .semibold )
+    }
     
-    let datePickerView: UIDatePicker = {
-        let view = UIDatePicker()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.preferredDatePickerStyle = .wheels
-        view.datePickerMode = .date
-        view.locale = Locale(identifier: "ko-KR")
-        view.timeZone = .autoupdatingCurrent
-        view.minimumDate = Date() // 최소 오늘 이상
-        
-        return view
-    }()
+    private let datePickerView = UIDatePicker().then {
+        $0.preferredDatePickerStyle = .wheels
+        $0.datePickerMode = .date
+        $0.locale = Locale(identifier: "ko-KR")
+        $0.timeZone = .autoupdatingCurrent
+        $0.minimumDate = Date() // 최소 오늘 이상
+    }
     
-    let okButton: UIButton = {
-        let button = UIButton(type: .roundedRect)
-        button.layer.cornerRadius = 10
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("확 인", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = UIColor(red: 134/255, green: 118/255, blue: 116/255, alpha: 1.0)
-        
-        return button
-    }()
+    private let okButton = UIButton(type: .roundedRect).then {
+        $0.layer.cornerRadius = 10
+        $0.setTitle("확 인", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.backgroundColor = UIColor(red: 134/255, green: 118/255, blue: 116/255, alpha: 1.0)
+    }
     
     //MARK: - Method
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
-        self.addsubView()
+        self.addSubView()
         self.layout()
-       
-        self.datePickerView.addTarget(self, action: #selector(self.didChangeDate), for: .valueChanged)
-        self.okButton.addTarget(self, action: #selector(self.clickOKButton), for: .touchUpInside)
+        self.addTarget()
         
-        self.navigationController?.navigationBar.isHidden = false
-        
-        let label = UILabel()
-        label.text = "공부 습관"
-        label.textColor = .darkGray
-        label.font = UIFont(name: "GodoM", size: 18)
-        self.navigationItem.titleView = label
+        self.configureNavigationBar()
         
         self.dday = UserDefaults.standard.value(forKey: "dday") as? Date ?? Date()
         self.datePickerView.date = self.dday
-        self.returnDday(date: self.dday)
-        self.dateLabel.text = self.returnToday(date: self.dday)
+        self.returnDday(self.dday)
+        self.dateLabel.text = self.returnToday(self.dday)
     }
     
-    func returnDday(date: Date){
+    private func returnDday(_ date: Date){
         let dayCount = Double(date.timeIntervalSinceNow / 86400) // 하루86400초
         let dday =  Int(ceil(dayCount)) // 소수점 올림
-        if dday >= 0 {
-            self.ddayLabel.text = "D-" + "\(dday)"
-        }else {
-            self.ddayLabel.text = "D+" + "\(abs(dday))"
-        }
-        
+        let text = dday >= 0 ? "D-" + "\(dday)" : "D+" + "\(abs(dday))"
+        self.ddayLabel.text = text
     }
     
-    func returnToday(date: Date) -> String{
-        let date = date
+    private func returnToday(_ date: Date) -> String{
         let formatter = DateFormatter()
         formatter.dateFormat = "YYYY년 MM월 dd일"
+        
         return formatter.string(from: date)
+    }
+    
+    private func configureNavigationBar() {
+        self.navigationController?.navigationBar.isHidden = false
+        _ = UILabel().then {
+            $0.text = "공부 습관"
+            $0.textColor = .darkGray
+            $0.font = UIFont(name: "GodoM", size: 18)
+            
+            self.navigationItem.titleView = $0
+        }
     }
     
     //MARK: - Selector
     @objc func didChangeDate(){
         self.dday = self.datePickerView.date
-        self.dateLabel.text = self.returnToday(date: self.dday)
-        self.returnDday(date: self.dday)
+        self.dateLabel.text = self.returnToday(self.dday)
+        self.returnDday(self.dday)
     }
     
-    @objc func clickOKButton(){
+    @objc func didClickOKButton(){
         let ud = UserDefaults.standard
         ud.setValue(self.dday, forKey: "dday")
         self.navigationController?.popViewController(animated: true)
     }
     
-    //MARK: - AddsubView
-    func addsubView() {
+    //MARK: - AddSubView
+    private func addSubView() {
         self.view.addSubview(self.ddayLabel)
         self.view.addSubview(self.guideLabel)
         self.view.addSubview(self.dateLabel)
@@ -129,34 +110,38 @@ class DdayViewController: UIViewController{
     }
     
     //MARK: - layout
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.ddayLabel.topAnchor.constraint(equalTo: self.datePickerView.bottomAnchor, constant: 20),
-            self.ddayLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-        ])
+    private func layout(){
+        self.ddayLabel.snp.makeConstraints {
+            $0.top.equalTo(self.datePickerView.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            self.guideLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            self.guideLabel.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 200)
-        ])
+        self.guideLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalToSuperview().offset(200)
+        }
         
-        NSLayoutConstraint.activate([
-            self.dateLabel.topAnchor.constraint(equalTo: self.guideLabel.bottomAnchor, constant: 20),
-            self.dateLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-        ])
+        self.dateLabel.snp.makeConstraints {
+            $0.top.equalTo(self.guideLabel.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+        }
         
-        NSLayoutConstraint.activate([
-            self.datePickerView.topAnchor.constraint(equalTo: self.dateLabel.bottomAnchor, constant: 10),
-            self.datePickerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.datePickerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.datePickerView.heightAnchor.constraint(equalToConstant: 200),
-        ])
+        self.datePickerView.snp.makeConstraints {
+            $0.top.equalTo(self.dateLabel.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(200)
+        }
         
-        NSLayoutConstraint.activate([
-            self.okButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -50),
-            self.okButton.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 50),
-            self.okButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -50),
-            self.okButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
+        self.okButton.snp.makeConstraints {
+            $0.bottom.trailing.equalToSuperview().offset(-50)
+            $0.leading.equalToSuperview().offset(50)
+            $0.height.equalTo(50)
+        }
+    }
+    
+    //MARK: - AddTarget
+    private func addTarget() {
+        self.datePickerView.addTarget(self, action: #selector(self.didChangeDate), for: .valueChanged)
+        self.okButton.addTarget(self, action: #selector(self.didClickOKButton), for: .touchUpInside)
     }
 }
