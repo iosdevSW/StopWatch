@@ -1,5 +1,5 @@
 //
-//  CustomListEditView.swift
+//  ListEditItemView.swift
 //  StopWatch
 //
 //  Created by 신상우 on 2021/12/13.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-final class CustomListEditView: UIView {
+final class ListEditItemView: UIView {
     private let buttonSize: CGFloat = 44
     
     lazy var button = UIButton(type: .system).then { // 수정 버튼

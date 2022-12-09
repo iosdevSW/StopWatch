@@ -133,7 +133,7 @@ class StopWatchDAO {
     }
 
     
-    //MARK: - TodoList 편집 (이동, 복사)
+    //MARK: - TodoList 편집 (이동, 복사, 수정, 삭제, 체크 이미지 변경)
     ///TodoList to에서 from으로 이동하기
     func moveTodoList(to: SegmentData, from: SegmentData, row: Int) -> Bool {
         let list = to.toDoList[row]
@@ -164,6 +164,42 @@ class StopWatchDAO {
             return false
         }
         return true
+    }
+    
+    /// TodoList 수정
+    func editTodoList(_ segData: SegmentData, row: Int, text: String) {
+        do {
+            try self.realm.write{
+                segData.toDoList[row] = text
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
+    
+    /// TodoList 삭제
+    func deleteTodoList(_ segData: SegmentData, row: Int) {
+        do {
+            try self.realm.write {
+                segData.toDoList.remove(at: row) // 리스트 삭제
+                segData.listCheckImageIndex.remove(at: row)
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
+    
+    /// TodoList 체크 이미지 변경
+    func changeListCheckImage(_ segData: SegmentData, row : Int) {
+        var index = segData.listCheckImageIndex[row]
+        index += 1
+        do {
+            try self.realm.write{
+                segData.listCheckImageIndex[row] = index % 4
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
     }
     
     //MARK: - 스톱워치 시간 추가

@@ -49,7 +49,6 @@ final class GuideLabelView: UIView {
                 self.stopAnimate()
             }
         }
-        
     }
     
     /// 애니메이션 중단

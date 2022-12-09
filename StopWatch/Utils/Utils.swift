@@ -22,7 +22,7 @@ extension UIViewController {
     }
     
     ///기본적인 확인/취소 버튼이 존재하는 알림창
-    func defaultAlert(title: String?, message: String?, complete: @escaping (()->()) ){
+    func defaultAlert(title: String?, message: String?, complete: @escaping (()->()) ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
         let okAction = UIAlertAction(title: "확인", style: .default) { _ in complete() }
@@ -43,7 +43,7 @@ extension UIViewController {
 
 extension UIView {
     // Timeinterval을 입력받아 시, 분, 초 튜플로 반환하는 함수.
-    func divideSecond(timeInterval: TimeInterval) -> (String,String,String,String){
+    func divideSecond(timeInterval: TimeInterval) -> (String,String,String,String) {
         let subSecond = Int(timeInterval / 0.01)
         let second = subSecond / 100
         let minute = second / 60
@@ -59,7 +59,7 @@ extension UIView {
     }
     
     //색상코드를 UIColor로 바꿔주는 메소드
-    func uiColorFromHexCode(_ hex:Int)->UIColor{
+    func uiColorFromHexCode(_ hex:Int)->UIColor {
         let red = CGFloat((hex & 0xFF0000) >> 16) / 0xFF
         let green = CGFloat((hex & 0x00FF00) >> 8) / 0xFF
         let blue = CGFloat(hex & 0x0000FF) / 0xFF

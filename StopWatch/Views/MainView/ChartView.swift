@@ -61,16 +61,6 @@ final class ChartView: UIView {
         }
     }
     
-    // 날짜형식 문자열 리턴
-    func date() -> String{
-        let date = DateFormatter()
-        date.locale = Locale(identifier: Locale.current.identifier)
-        date.timeZone = TimeZone(identifier: TimeZone.current.identifier)
-        date.dateFormat = "YYYY.MM.dd"
-        
-        return date.string(from: Date())
-    }
-    
     //MARK: - Layout
     private func layout() {
         self.closeLabel.snp.makeConstraints { make in

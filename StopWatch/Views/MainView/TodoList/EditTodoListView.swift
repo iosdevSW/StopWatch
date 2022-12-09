@@ -9,10 +9,10 @@ import UIKit
 import Then
 import SnapKit
 
-final class EditTodoListView: UIView{
-    var indexPath: IndexPath? // 선택한 리스트의 IndexPath를 받아올 프로퍼티
+final class EditTodoListView: UIView {
+    let (section, row): (Int,Int) // 선택한 리스트의 IndexPath를 받아올 프로퍼티
     
-    private lazy var buttonStackView = UIStackView(arrangedSubviews: [editButton,deleteButton,changeDateButton,changeCheckImageButton]).then {
+    lazy var buttonStackView = UIStackView(arrangedSubviews: [editButton,deleteButton,changeDateButton,changeCheckImageButton]).then {
         $0.spacing = 10
         $0.distribution = .fillEqually
     }
@@ -23,34 +23,37 @@ final class EditTodoListView: UIView{
         $0.textAlignment = .center
     }
     
-    let editButton = CustomListEditView().then { // 수정 버튼
+    private let editButton = ListEditItemView().then { // 수정 버튼
         $0.button.setImage(UIImage(systemName: "pencil"), for: .normal)
         $0.label.text = "수 정"
         $0.button.tag = 0
     }
     
-    let deleteButton = CustomListEditView().then { // 삭제 버튼
+    private let deleteButton = ListEditItemView().then { // 삭제 버튼
         $0.button.setImage(UIImage(systemName: "trash"), for: .normal)
         $0.label.text = "삭 제"
         $0.button.tag = 1
     }
     
-    let changeCheckImageButton = CustomListEditView().then { // todolist 체크이미지 변경 버튼
+    private let changeCheckImageButton = ListEditItemView().then { // todolist 체크이미지 변경 버튼
         $0.button.setImage(UIImage(systemName: "rectangle.2.swap" ), for: .normal)
         $0.label.text = "모양 변경"
         $0.button.tag = 2
     }
     
-    let changeDateButton = CustomListEditView().then { // todolist 날짜,과목 변경 버튼
+    private let changeDateButton = ListEditItemView().then { // todolist 날짜,과목 변경 버튼
         $0.button.setImage(UIImage(systemName: "calendar" ), for: .normal)
         $0.label.text = "날짜 변경"
         $0.button.tag = 3
     }
     
     //MARK: - Init
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(_ indexPath: IndexPath) {
+        self.section = indexPath.section
+        self.row = indexPath.row
+        
+        super.init(frame: .zero)
+        
         self.backgroundColor = .white
         self.alpha = 0.94
         self.layer.cornerRadius = 14
@@ -60,21 +63,13 @@ final class EditTodoListView: UIView{
         
         self.addSubview(self.buttonStackView)
         self.addSubview(self.title)
-        
+    
         self.layout()
-        self.addTarget()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    //MARK: - Selector
-    
-    //MARK: - addTarget
-    private func addTarget() {
-    }
-    
     
     //MARK: - layout
     private func layout() {

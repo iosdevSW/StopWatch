@@ -20,7 +20,7 @@ final class StopWatchViewController: UIViewController {
     let realm = try! Realm()
     
     private var motionManager: CMMotionManager?
-
+    
     var concentraionTimerVC: ConcentrationTimeViewController?
     var editTodoListView: EditTodoListView?
     var editGoalTimeView: EditGoalTimeView?
@@ -94,9 +94,9 @@ final class StopWatchViewController: UIViewController {
         // gesture
         self.hideKeyboardWhenTapped()
         
-//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        //        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // 프로퍼티 값 갱신
@@ -141,7 +141,7 @@ final class StopWatchViewController: UIViewController {
         self.totalGoalTime = object?.totalGoalTime ?? 0
         self.totalTime = object?.totalTime ?? 0
         self.barView.per =
-            self.totalGoalTime != 0 ? Float(self.totalTime / self.totalGoalTime): 0
+        self.totalGoalTime != 0 ? Float(self.totalTime / self.totalGoalTime): 0
         self.barView.progressView.setProgress(self.barView.per, animated: true)
         
         self.barView.showPersent()
@@ -304,7 +304,7 @@ final class StopWatchViewController: UIViewController {
         self.closeListEditView()        //편집 뷰가 열려 있으면 편집 뷰 닫기
         self.closeGoalTimeEditView()    //골타임설정 뷰가 열려 있으면 닫기
     }
-
+    
     //주 <-> 월 달력 변경 버튼 클릭
     @objc func didClickChangeCalendarMode(_ sender: UIButton){
         UIView.animate(withDuration: 0.5) {
@@ -346,7 +346,7 @@ final class StopWatchViewController: UIViewController {
                 self.dDayLabel.alpha = 1
                 self.calendarView.changeCalendarMode.setTitle("주▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
-        
+                
                 self.chartView?.updateConstant(30)
                 self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
             }
@@ -382,7 +382,7 @@ final class StopWatchViewController: UIViewController {
             let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
             try! self.realm.write{
                 dailyData!.totalGoalTime =
-                    self.editGoalTimeView!.selectedHour + self.editGoalTimeView!.selectedMinute
+                self.editGoalTimeView!.selectedHour + self.editGoalTimeView!.selectedMinute
             }
             self.setGoalTime()
             self.reloadProgressBar()
@@ -417,16 +417,16 @@ final class StopWatchViewController: UIViewController {
         // 그 날의 과목 데이터가 있는지 체크
         
         let toDoList = segments[section].toDoList // section번째 과목의 할 일들
-
+        
         let row = toDoList.count // section번째 과목의 할 일 번호
         let indexPath = IndexPath(row: row, section: section )
-
+        
         
         try! self.realm.write{
             toDoList.append("")
             segments[section].listCheckImageIndex.append(0)
         }
-
+        
         self.toDoTableView.reloadData()
         self.toDoTableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
         self.calendarView.calendarView.reloadData()
@@ -434,7 +434,7 @@ final class StopWatchViewController: UIViewController {
         let cell = self.toDoTableView.cellForRow(at:indexPath) as? TodoListCell
         
         cell?.getListTextField.becomeFirstResponder()
-       
+        
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -498,11 +498,11 @@ extension StopWatchViewController {
             guard let attitude = motion?.attitude else{
                 print("motion error")
                 return }
-
+            
             let radian = abs(attitude.roll * 180.0 / Double.pi) //코어 모션 회전각도!
-            if radian >= 100{ //proxitmiysensor On 
+            if radian >= 100{ //proxitmiysensor On
                 UIDevice.current.isProximityMonitoringEnabled = true
-               
+                
                 if radian >= 160 { // timer start
                     if proximityState == true {
                         if self.concentraionTimerVC != nil {
@@ -531,7 +531,7 @@ extension StopWatchViewController {
         self.view.addSubview(self.dDayLabel)
         self.view.addSubview(self.mainTimeLabel)
         self.view.addSubview(self.guideLabelView)
-    
+        
         self.frameView.addSubview(self.calendarView)
         self.frameView.addSubview(self.barView)
         self.frameView.addSubview(self.toDoTableView)
@@ -581,7 +581,7 @@ extension StopWatchViewController {
             make.bottom.equalToSuperview().offset(-30)
             make.trailing.equalTo(self.frameView.snp.trailing).offset(-30)
         }
-
+        
         self.calendarView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20)
             make.leading.equalTo(self.frameView.snp.leading).offset(10)
@@ -602,7 +602,7 @@ extension StopWatchViewController {
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
         }
-    
+        
         self.categoryEditButton.snp.makeConstraints{ make in
             make.top.bottom.leading.equalToSuperview()
             make.width.equalTo(34)
@@ -655,19 +655,17 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let segment = self.realm.objects(Segments.self)
-        
-        let view = TodoListHeaderView()
-
         let colorCode = segment[section].colorCode
         let color = self.view.uiColorFromHexCode(colorCode)
-        view.categoryNameLabel.text = segment[section].name
-        view.frameView.backgroundColor = color
-
-        view.categoryNameLabel.textColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
-        view.plusImageView.tintColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
         
-        view.touchViewButton.tag = section
-        view.touchViewButton.addTarget(self, action: #selector(self.didClickSection(_:)), for: .touchUpInside)
+        let view = TodoListHeaderView().then {
+            $0.categoryNameLabel.text = segment[section].name
+            $0.frameView.backgroundColor = color
+            $0.categoryNameLabel.textColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
+            $0.plusImageView.tintColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
+            $0.touchViewButton.tag = section
+            $0.touchViewButton.addTarget(self, action: #selector(self.didClickSection(_:)), for: .touchUpInside)
+        }
         
         return view
     }
@@ -686,7 +684,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         cell.listLabel.text = ""
         cell.checkImageView.image = nil
         cell.checkImageView.isHidden = true
-
+        
         let colorCode = self.realm.objects(Segments.self)[indexPath.section].colorCode
         let color = self.view.uiColorFromHexCode(colorCode)
         let text = segment?[indexPath.section].toDoList[indexPath.row]
@@ -710,23 +708,23 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard self.editTodoListView == nil else { return }
         
-        self.editTodoListView = EditTodoListView().then {
+        self.editTodoListView = EditTodoListView(indexPath).then {
             self.view.addSubview($0)
             self.hideSubviewWhenTapped()
+        
+            let segData = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
+            let title = segData.toDoList[indexPath.row] // list 불러오기
             
-            $0.editButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            $0.deleteButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            $0.changeCheckImageButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
-            $0.changeDateButton.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            $0.title.text = "' \(title) '"
             
-            let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-            let title = object?.dailySegment[indexPath.section].toDoList[indexPath.row] // list 불러오기
-            $0.title.text = "' \(title!) '"
+            $0.buttonStackView.subviews.forEach {
+                ($0 as? ListEditItemView)?.button.addTarget(self, action: #selector(self.editListMethod(_:)), for: .touchUpInside)
+            }
             
             $0.frame.size = CGSize(width: self.view.frame.width - 40, height: 100)
             $0.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height + 45)
-            $0.indexPath = indexPath
         }
+        
         UIView.animate(withDuration: 0.5) {
             self.editTodoListView?.center = CGPoint(x: self.view.frame.width / 2, y: self.view.frame.height - 80)
         }
@@ -747,7 +745,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         
         // 마지막 섹션에 문구 출력
         if section == (categoryCount - 1) {
-           // 오늘의 데이터가 nil일때
+            // 오늘의 데이터가 nil일때
             guard let category = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate) else { return guideText }
             
             var sum = 0 // todolist 합
@@ -770,11 +768,10 @@ extension StopWatchViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let segment = filter!.dailySegment
-
+        
         let row = segment[textField.tag].toDoList.count - 1
         
         if textField.text == "" {
-
             try! self.realm.write{
                 segment[textField.tag].toDoList.remove(at: row)
                 segment[textField.tag].listCheckImageIndex.remove(at: row)
@@ -782,7 +779,6 @@ extension StopWatchViewController: UITextFieldDelegate {
             StopWatchDAO().deleteDailyData(date: self.saveDate)
             
         }else {
-
             try! self.realm.write{
                 segment[textField.tag].toDoList[row] = textField.text!
             }
@@ -793,13 +789,14 @@ extension StopWatchViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
         return true
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
         let segment = filter!.dailySegment
-
+        
         let row = segment[textField.tag].toDoList.count - 1
         let indexPath = IndexPath(row: row, section: textField.tag)
         self.toDoTableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
@@ -808,67 +805,47 @@ extension StopWatchViewController: UITextFieldDelegate {
 
 //MARK: - editListMethod
 extension StopWatchViewController {
-    
     @objc func editListMethod(_ sender: UIButton){
-        if let editView = self.editTodoListView {
-            let indexPath = editView.indexPath
-            let (section,row) = (indexPath!.section,indexPath!.row)
-            guard let segment = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.dailySegment else { return }
-            let toDoList = segment[indexPath!.section].toDoList[editView.indexPath!.row] // 이전텍스트 불러오기
-            
-            if sender.tag == 0 { // 수정버튼이면
-                let alert = UIAlertController(title: "무엇으로 변경할까요?", message: nil, preferredStyle: .alert)
-                alert.addTextField(){
-                    $0.text = toDoList
-                }
-                alert.addAction(UIAlertAction(title: "취소", style: .cancel))
-                alert.addAction(UIAlertAction(title: "확인", style: .default){ (_) in
-                    
-                    try! self.realm.write{
-                        segment[section].toDoList[row] = (alert.textFields?[0].text)!
-                    }
-                    self.toDoTableView.reloadData()
-                    self.closeListEditView()
-                    
-                })
-                self.present(alert, animated: false)
-            }
-
-            if sender.tag == 1 { // 삭제 버튼이면
-                self.defaultAlert(title: nil, message: "정말 삭제 하시겠습니까?") {
-                    try! self.realm.write{
-                        segment[section].toDoList.remove(at: row) // 리스트 삭제
-                        segment[section].listCheckImageIndex.remove(at: row)
-                    }
-                    StopWatchDAO().deleteDailyData(date: self.saveDate) // 데이터베이스에서 삭제
-                    self.toDoTableView.reloadData()
-                    self.calendarView.calendarView.reloadData()
-                    self.closeListEditView()
-                }
-            }
-            
-            if sender.tag == 2 { //모양변경 버튼이면
-                var index = segment[section].listCheckImageIndex[row]
-                index += 1
-                try! self.realm.write{
-                    segment[section].listCheckImageIndex[row] = index % 4
-                }
-                
+        guard let editView = self.editTodoListView else { return }
+        let segData = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: editView.section)
+        let toDoList = segData.toDoList[editView.row] // 이전텍스트 불러오기
+        
+        switch sender.tag {
+        case 0:
+            let alert = UIAlertController(title: "무엇으로 변경할까요?", message: nil, preferredStyle: .alert)
+            alert.addTextField() { $0.text = toDoList }
+            alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+            alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
+                StopWatchDAO().editTodoList(segData, row: editView.row, text: (alert.textFields?[0].text)!)
                 self.toDoTableView.reloadData()
+                self.closeListEditView()
+            })
+            
+            self.present(alert, animated: true)
+        case 1:
+            self.defaultAlert(title: nil, message: "정말 삭제 하시겠습니까?") {
+                StopWatchDAO().deleteTodoList(segData, row: editView.row)
             }
             
-            if sender.tag == 3 { // 날짜 변경 버튼
-                _ = CalendarModalView(self.calendarView.selectDateComponent).then {
-                    $0.indexPath = indexPath!
-                    
-                    self.view.addSubview($0)
-                    $0.snp.makeConstraints { make in
-                        make.leading.top.bottom.trailing.equalToSuperview()
-                    }
-                }
+            StopWatchDAO().deleteDailyData(date: self.calendarView.selectDateComponent.stringFormat) // 데이터베이스에서 삭제
+            self.toDoTableView.reloadData()
+            self.calendarView.calendarView.reloadData()
+            self.closeListEditView()
+        case 2:
+            StopWatchDAO().changeListCheckImage(segData, row: editView.row)
+            self.toDoTableView.reloadData()
+        case 3:
+            _ = CalendarModalView(self.calendarView.selectDateComponent).then {
+                $0.indexPath = IndexPath(row: editView.row, section: editView.section)
                 
-                self.closeListEditView()
+                self.view.addSubview($0)
+                $0.snp.makeConstraints { make in
+                    make.leading.top.bottom.trailing.equalToSuperview()
+                }
             }
+            self.closeListEditView()
+        default:
+            print("This button tag does not exist.")
         }
     }
     
