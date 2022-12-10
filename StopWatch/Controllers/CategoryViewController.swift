@@ -54,7 +54,7 @@ final class CategoryViewController: UIViewController {
     //MARK: - Method 
     private func deleteCategory(point: CGPoint) {
         if let indexPath = self.categoryTableView.indexPathForRow(at: point) {
-            StopWatchDAO().deleteSegment(row: indexPath.row)
+            StopWatchDAO().deleteSegmentData(row: indexPath.row)
             StopWatchDAO().create(date: self.saveDate)
             self.categoryTableView.reloadData()
         }

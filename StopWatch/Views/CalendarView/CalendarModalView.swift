@@ -111,8 +111,8 @@ final class CalendarModalView: UIView {
     
     //MARK: - Method
     func changeDateTodoList(){
-        let toSegment = StopWatchDAO().getSegment(self.changeDateComponent.stringFormat, section: indexPath.section)
-        let fromSegment = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
+        let toSegment = StopWatchDAO().getSegmentData(self.changeDateComponent.stringFormat, section: indexPath.section)
+        let fromSegment = StopWatchDAO().getSegmentData(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
      
         let alert = UIAlertController(title: nil, message: "선 택", preferredStyle: .alert)
         let move = UIAlertAction(title: "이동하기", style: .default){ [weak self] _ in

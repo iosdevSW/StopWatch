@@ -14,8 +14,6 @@ import SnapKit
 final class StopWatchViewController: UIViewController {
     //MARK: - Properties
     //전체 시간, 전체 목표시간 저장 프로퍼티
-    var totalTime: TimeInterval = 0
-    var totalGoalTime: TimeInterval = 0
     var todoList = List<SegmentData>()
     let realm = try! Realm()
     
@@ -84,7 +82,7 @@ final class StopWatchViewController: UIViewController {
         super.viewDidLoad()
         self.configured()
         self.addSubView()
-        self.layOut()
+        self.layout()
         self.addTarget()
         self.addObserver()
         
@@ -101,9 +99,7 @@ final class StopWatchViewController: UIViewController {
         super.viewWillAppear(animated)
         // 프로퍼티 값 갱신
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate //오늘 날짜!
-        self.totalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
-        self.totalGoalTime = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalGoalTime ?? 0
-        
+    
         self.setDeviceMotion()   // coremotion 시작
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
@@ -137,25 +133,18 @@ final class StopWatchViewController: UIViewController {
     }
     
     private func reloadProgressBar(){
-        let object = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        self.totalGoalTime = object?.totalGoalTime ?? 0
-        self.totalTime = object?.totalTime ?? 0
-        self.barView.per =
-        self.totalGoalTime != 0 ? Float(self.totalTime / self.totalGoalTime): 0
-        self.barView.progressView.setProgress(self.barView.per, animated: true)
-        
-        self.barView.showPersent()
+        let time = StopWatchDAO().getTotalTime(self.calendarView.selectDateComponent)
+        let goal = StopWatchDAO().getTotalGoalTime(self.calendarView.selectDateComponent)
+        self.barView.per = goal != 0 ? Float(time / goal) : 0
     }
     
     func setTimeLabel(){
-        let dailyData = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)
-        let time = dailyData?.totalTime ?? 0 // 오늘의 데이터가 없으면 0
+        let time = StopWatchDAO().getTotalTime(self.calendarView.selectDateComponent)
         self.mainTimeLabel.updateTime(self.view.divideSecond(timeInterval: time))
     }
     
     func setGoalTime(){
-        let dailyData = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)
-        let goal = dailyData?.totalGoalTime ?? 0 // 오늘의 데이터가 없으면 0
+        let goal = StopWatchDAO().getTotalGoalTime(self.calendarView.selectDateComponent)
         self.goalTimeView.timeLabel.updateTime(self.view.divideSecond(timeInterval: goal))
     }
     
@@ -282,13 +271,6 @@ final class StopWatchViewController: UIViewController {
         self.navigationController?.pushViewController(categoryVC, animated: true)
     }
     
-    //MARK: CalendarView method
-    func clickDay(saveDate: String) {
-        self.saveDate = saveDate
-        self.chartView?.saveDate = saveDate
-        self.chartView?.setNeedsDisplay() // 차트 다시 그리기
-    }
-    
     //MARK: - Selector
     @objc func respondToSwipeGesture(_ gesture: UISwipeGestureRecognizer){
         switch gesture.direction {
@@ -412,10 +394,10 @@ final class StopWatchViewController: UIViewController {
         StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
         
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
-        let segments = dailyData.dailySegment // 오늘 과목들
-        let section = sender.tag //section번째 과목 인덱스
-        // 그 날의 과목 데이터가 있는지 체크
         
+        let segments = dailyData.dailySegment // 오늘 과목들
+        let section = sender.tag
+        // 그 날의 과목 데이터가 있는지 체크
         let toDoList = segments[section].toDoList // section번째 과목의 할 일들
         
         let row = toDoList.count // section번째 과목의 할 일 번호
@@ -430,11 +412,10 @@ final class StopWatchViewController: UIViewController {
         self.toDoTableView.reloadData()
         self.toDoTableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
         self.calendarView.calendarView.reloadData()
-        
+
         let cell = self.toDoTableView.cellForRow(at:indexPath) as? TodoListCell
-        
+
         cell?.getListTextField.becomeFirstResponder()
-        
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -482,51 +463,45 @@ extension StopWatchViewController {
         self.view.backgroundColor = .clear
     }
     
-    //타이머 구동 방식
+    // 타이머 구동 방식
     func setDeviceMotion(){
         // 메뉴 닫기
         self.delegate?.closeMenu()
         
         self.motionManager = CMMotionManager()
         self.motionManager?.deviceMotionUpdateInterval = 0.1;
-        self.motionManager?.startDeviceMotionUpdates(to: .main){
+        self.motionManager?.startDeviceMotionUpdates(to: .main) {
             (motion, error) in
             
-            //get proximity state!
-            let proximityState = UIDevice.current.proximityState
-            //get radian
-            guard let attitude = motion?.attitude else{
+            guard let attitude = motion?.attitude else {
                 print("motion error")
                 return }
             
-            let radian = abs(attitude.roll * 180.0 / Double.pi) //코어 모션 회전각도!
-            if radian >= 100{ //proxitmiysensor On
+            let proximityState = UIDevice.current.proximityState //get proximity state!
+            let degree = abs(attitude.roll * 180.0 / Double.pi) //get degree
+
+            if degree >= 100{ // 100도 이상 기울어지면 근접 센서 가동
                 UIDevice.current.isProximityMonitoringEnabled = true
-                
-                if radian >= 160 { // timer start
-                    if proximityState == true {
-                        if self.concentraionTimerVC != nil {
-                            self.concentraionTimerVC!.openBlackView()
-                        }else{
-                            self.concentraionTimerVC = ConcentrationTimeViewController()
-                            self.navigationController?.pushViewController(self.concentraionTimerVC!, animated: false)
-                        }
-                        self.motionManager?.stopDeviceMotionUpdates()
+                if degree >= 160 && proximityState == true { // 160도 이상 기울어지고 근접 센서가 true이면 타이머 시작
+                    if self.concentraionTimerVC != nil { // 집중화면 인스턴스 존재시엔 타이머 재시작
+                        self.concentraionTimerVC!.openBlackView()
+                    }else{
+                        self.concentraionTimerVC = ConcentrationTimeViewController() // 집중화면 인스턴스 없으면 타이머 최초시작
+                        self.navigationController?.pushViewController(self.concentraionTimerVC!, animated: false)
                     }
+                    
+                    self.motionManager?.stopDeviceMotionUpdates() // 코어모션 업데이트 메소드 중단! ( 근접센서 false시 재 작동 )
                 }
-            } else if radian < 100 { //timer stop
-                if proximityState == false {
-                    UIDevice.current.isProximityMonitoringEnabled = false
-                    if let timerVC = self.concentraionTimerVC{
-                        timerVC.closeBlackView()
-                    }
-                }
+            } else if degree < 100 && proximityState == false { // 100도 이하고 근접 센스가 false면 근접센서 작동 중단 + 타이머 가동중이면 타이머도 중단
+                UIDevice.current.isProximityMonitoringEnabled = false
+                guard let timerVC = self.concentraionTimerVC else { return }
+                timerVC.closeBlackView()
             }
         }
     }
     
-    //MARK: AddSubView
-    func addSubView(){
+    //MARK: - AddSubView
+    private func addSubView(){
         self.view.addSubview(self.frameView)
         self.view.addSubview(self.dDayLabel)
         self.view.addSubview(self.mainTimeLabel)
@@ -542,8 +517,8 @@ extension StopWatchViewController {
         self.itemBoxView.addSubview(self.categoryEditButton)
     }
     
-    //MARK: SetLayOut
-    private func layOut(){
+    //MARK: - Layout
+    private func layout(){
         //Level 1
         self.mainTimeLabel.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
@@ -615,13 +590,13 @@ extension StopWatchViewController {
         }
     }
     
-    //MARK: AddTarget
+    //MARK: - AddTarget
     private func addTarget(){
         self.chartViewButton.addTarget(self, action: #selector(self.didClickChartButton), for: .touchUpInside)
         self.categoryEditButton.addTarget(self, action: #selector(self.didClickMenu(_:)), for: .touchUpInside)
     }
     
-    //MARK: AddObserver
+    //MARK: - AddObserver
     private func addObserver() {
         let notificationCenter = NotificationCenter.default
         // 키보드 나오고 들어갈때 호출되는 메소드 추가!
@@ -660,7 +635,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         
         let view = TodoListHeaderView().then {
             $0.categoryNameLabel.text = segment[section].name
-            $0.frameView.backgroundColor = color
+            $0.frameStackView.backgroundColor = color
             $0.categoryNameLabel.textColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
             $0.plusImageView.tintColor = color.isDarkColor ? UIColor.systemGray4 : UIColor.white
             $0.touchViewButton.tag = section
@@ -672,34 +647,19 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TodoListCell
-        let segment = StopWatchDAO().getDailyData(self.calendarView.selectDateComponent.stringFormat)?.dailySegment
+        let segData = StopWatchDAO().getSegmentData(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
         
-        cell.saveDate = self.saveDate
+        cell.saveDateComponents = self.calendarView.selectDateComponent
         cell.getListTextField.tag = indexPath.section // 섹션구분 태그 이용
-        cell.contentView.tag = indexPath.section
-        cell.changeImageButton.tag = indexPath.row
+        cell.indexPath = indexPath
         cell.getListTextField.delegate = self
-        cell.getListTextField.isHidden = true
-        cell.getListTextField.text = ""
-        cell.listLabel.text = ""
-        cell.checkImageView.image = nil
-        cell.checkImageView.isHidden = true
         
-        let colorCode = self.realm.objects(Segments.self)[indexPath.section].colorCode
-        let color = self.view.uiColorFromHexCode(colorCode)
-        let text = segment?[indexPath.section].toDoList[indexPath.row]
-        let checkImageIndex = segment?[indexPath.section].listCheckImageIndex[indexPath.row]
-        let checkImage = CheckImage.init(rawValue: checkImageIndex ?? 0)
-        if text == ""{
-            cell.getListTextField.isHidden = false
-            cell.getListTextField.underLine.backgroundColor = color
-            cell.getListTextField.attributedPlaceholder = NSAttributedString(string: "입력", attributes: [.foregroundColor: color])
-        }else{
-            cell.listLabel.text = text
-            cell.lineView.backgroundColor = color
-            cell.checkImageView.image = checkImage?.image
-            cell.checkImageView.isHidden = false
-            cell.getListTextField.isHidden = true
+        let text = segData.toDoList[indexPath.row]
+        
+        if text == "" {
+            cell.configureCellWhenAddingTodoList()
+        } else {
+            cell.configureCell(segData)
         }
         
         return cell
@@ -712,7 +672,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
             self.view.addSubview($0)
             self.hideSubviewWhenTapped()
         
-            let segData = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
+            let segData = StopWatchDAO().getSegmentData(self.calendarView.selectDateComponent.stringFormat, section: indexPath.section)
             let title = segData.toDoList[indexPath.row] // list 불러오기
             
             $0.title.text = "' \(title) '"
@@ -807,7 +767,7 @@ extension StopWatchViewController: UITextFieldDelegate {
 extension StopWatchViewController {
     @objc func editListMethod(_ sender: UIButton){
         guard let editView = self.editTodoListView else { return }
-        let segData = StopWatchDAO().getSegment(self.calendarView.selectDateComponent.stringFormat, section: editView.section)
+        let segData = StopWatchDAO().getSegmentData(self.calendarView.selectDateComponent.stringFormat, section: editView.section)
         let toDoList = segData.toDoList[editView.row] // 이전텍스트 불러오기
         
         switch sender.tag {

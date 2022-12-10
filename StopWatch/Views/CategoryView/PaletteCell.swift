@@ -6,27 +6,22 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
-class PaltteCell: UICollectionViewCell {
+final class PaltteCell: UICollectionViewCell {
+    //MARK: - Properties
+    let paintView = UIView().then {
+        $0.layer.cornerRadius = 23
+        $0.layer.masksToBounds = true
+    }
     
-    let paintView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 23
-        view.layer.masksToBounds = true
-        
-        return view
-    }()
+    let checkImageView = UIImageView().then {
+        $0.tintColor = .white
+        $0.image = UIImage(systemName: "checkmark")
+    }
     
-    let checkImageView: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.tintColor = .white
-        view.image = UIImage(systemName: "checkmark")
-        
-        return view
-    }()
-    
+    //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubView()
@@ -37,27 +32,25 @@ class PaltteCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func addSubView(){
+    //MARK: - AddSubView
+    private func addSubView(){
         self.addSubview(self.paintView)
         
         self.paintView.addSubview(self.checkImageView)
     }
     
     
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.paintView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 4),
-            self.paintView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -4),
-            self.paintView.topAnchor.constraint(equalTo: self.topAnchor, constant: 4),
-            self.paintView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant:  -4)
-        ])
+    //MARK: - Layout
+    private func layout(){
+        self.snp.makeConstraints {
+            $0.leading.top.equalToSuperview().offset(4)
+            $0.trailing.bottom.equalToSuperview().offset(-4)
+        }
         
-        NSLayoutConstraint.activate([
-            self.checkImageView.centerYAnchor.constraint(equalTo: self.paintView.centerYAnchor),
-            self.checkImageView.centerXAnchor.constraint(equalTo: self.paintView.centerXAnchor),
-            self.checkImageView.widthAnchor.constraint(equalToConstant: 20),
-            self.checkImageView.heightAnchor.constraint(equalToConstant: 20)
-        ])
+        self.checkImageView.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
+            $0.width.height.equalTo(20)
+        }
     }
 }
 

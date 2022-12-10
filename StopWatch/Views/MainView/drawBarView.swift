@@ -6,42 +6,38 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
-class DrawBarView: UIView {
-    //MARK: Properties
-    var per: Float = 0
+final class DrawBarView: UIView {
+    //MARK: - Properties
+    var per: Float = 0 {
+        didSet {
+            self.showPersent()
+        }
+    }
     
-    lazy var persentLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "0%"
-        label.textColor = .darkGray
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 14, weight: .light)
-        self.progressView.addSubview(label)
-        
-        return label
-    }()
+    private let persentLabel = UILabel().then {
+        $0.text = "0%"
+        $0.textColor = .darkGray
+        $0.textAlignment = .center
+        $0.font = .systemFont(ofSize: 14, weight: .light)
+    }
     
-    lazy var progressView: UIProgressView = {
-        let view = UIProgressView(progressViewStyle: .default)
-        view.progressTintColor = .systemGray4
-        view.translatesAutoresizingMaskIntoConstraints = false
-//        view.layer.position = CGPoint(x: 100, y: 200)
+    private let progressView = UIProgressView(progressViewStyle: .default).then {
+        $0.progressTintColor = .systemGray4
+        $0.progress = 0.0
         
-        view.progress = 0.0
-        self.addSubview(view)
-        view.layer.borderWidth = 1
-        view.layer.cornerRadius = 10
-        view.layer.masksToBounds = true
-        view.progressViewStyle = .default
-        return view
-        
-    }()
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 10
+        $0.layer.masksToBounds = true
+        $0.progressViewStyle = .default
+    }
     
-    //MARK: Init
+    //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.addSubView()
         self.layOut()
     }
     
@@ -49,32 +45,28 @@ class DrawBarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: Method
-    func showPersent(){
-        if per <= 1 {
-        let persent = String(format:"%.2f",per * 100)
-        self.persentLabel.text = "\(persent)%"
-            
-        }else {
-            self.persentLabel.text = "100%"
+    //MARK: - Method
+    private func showPersent(){
+        let text = per <= 1 ? "\(String(format:"%.2f",per * 100))%" : "100%"
+        self.persentLabel.text = text
+        self.progressView.setProgress(self.per, animated: true)
+    }
+    
+    //MARK: - AddSubView
+    private func addSubView() {
+        self.addSubview(self.progressView)
+        self.progressView.addSubview(self.persentLabel)
+    }
+    
+    //MARK: - Layout
+    private func layOut(){
+        self.progressView.snp.makeConstraints {
+            $0.leading.trailing.top.equalToSuperview()
+            $0.height.equalTo(35)
+        }
+        
+        self.persentLabel.snp.makeConstraints {
+            $0.centerX.centerY.equalToSuperview()
         }
     }
-    //MARK: configure
-    
-    //MARK: Layout
-    func layOut(){
-        NSLayoutConstraint.activate([
-            self.progressView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            self.progressView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            self.progressView.topAnchor.constraint(equalTo: self.topAnchor),
-            self.progressView.heightAnchor.constraint(equalToConstant: 35)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.persentLabel.centerYAnchor.constraint(equalTo: self.progressView.centerYAnchor),
-            self.persentLabel.centerXAnchor.constraint(equalTo: self.progressView.centerXAnchor)
-        ])
-
-    }
-    
 }

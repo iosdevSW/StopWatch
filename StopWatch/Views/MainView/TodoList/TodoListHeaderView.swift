@@ -6,46 +6,32 @@
 //
 
 import UIKit
+import SnapKit
+import Then
 
-class TodoListHeaderView: UIView {
-    //레이블 길이에 따라 동적 크기 할당
-    let frameView: UIStackView = {
-        let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 6
-        view.layer.shadowOpacity = 0.4
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = .zero
-        view.backgroundColor = .white
-        
-        return view
-    }()
+final class TodoListHeaderView: UIView {
+    //MARK: - Properties
+    let frameStackView = UIStackView().then { //레이블 길이에 따라 동적 크기 할당
+        $0.layer.cornerRadius = 6
+        $0.layer.shadowOpacity = 0.4
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = .zero
+        $0.backgroundColor = .white
+    }
 
-    let plusImageView: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.image = UIImage(systemName: "plus.square.on.square")
-        view.tintColor = .white
-        
-        return view
-    }()
+    let plusImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "plus.square.on.square")
+        $0.tintColor = .white
+    }
     
-    let categoryNameLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 16, weight: .regular)
-        label.textColor = .white
-        
-        return label
-    }()
+    let categoryNameLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 16, weight: .regular)
+        $0.textColor = .white
+    }
     
-    let touchViewButton : UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        return button
-    }()
+    let touchViewButton = UIButton()
     
+    //MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
@@ -57,43 +43,36 @@ class TodoListHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: addsubView
-    func addSubView(){
-        self.addSubview(self.frameView)
+    //MARK: - addSubView
+    private func addSubView(){
+        self.addSubview(self.frameStackView)
         
-        self.frameView.addSubview(self.categoryNameLabel)
-        self.frameView.addSubview(self.plusImageView)
-        self.frameView.addSubview(self.touchViewButton)
+        self.frameStackView.addSubview(self.categoryNameLabel)
+        self.frameStackView.addSubview(self.plusImageView)
+        self.frameStackView.addSubview(self.touchViewButton)
     }
     
-    //MARK: layout
-    func layout(){
-        NSLayoutConstraint.activate([
-            self.frameView.leadingAnchor.constraint(equalTo: self.leadingAnchor,constant: 4),
-            self.frameView.topAnchor.constraint(equalTo: self.topAnchor, constant: 4),
-//            self.frameView.widthAnchor.constraint(equalToConstant: 80),
-            self.frameView.heightAnchor.constraint(equalToConstant: 30)
-        ])
+    //MARK: - layout
+    private func layout(){
+        self.frameStackView.snp.makeConstraints {
+            $0.leading.top.equalToSuperview().offset(4)
+            $0.height.equalTo(30)
+        }
         
-        NSLayoutConstraint.activate([
-            self.categoryNameLabel.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor, constant: 10),
-            
-            self.categoryNameLabel.centerYAnchor.constraint(equalTo: self.frameView.centerYAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.plusImageView.centerYAnchor.constraint(equalTo: self.frameView.centerYAnchor),
-            self.plusImageView.leadingAnchor.constraint(equalTo: self.categoryNameLabel.trailingAnchor, constant: 6),
-            self.plusImageView.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor, constant: -10),
-            self.plusImageView.widthAnchor.constraint(equalToConstant: 16),
-            self.plusImageView.heightAnchor.constraint(equalToConstant: 16)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.touchViewButton.leadingAnchor.constraint(equalTo: self.frameView.leadingAnchor),
-            self.touchViewButton.trailingAnchor.constraint(equalTo: self.frameView.trailingAnchor),
-            self.touchViewButton.topAnchor.constraint(equalTo: self.frameView.topAnchor),
-            self.touchViewButton.bottomAnchor.constraint(equalTo: self.frameView.bottomAnchor)
-        ])
+        self.categoryNameLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalToSuperview().offset(10)
+        }
+
+        self.plusImageView.snp.makeConstraints {
+            $0.width.height.equalTo(16)
+            $0.leading.equalTo(self.categoryNameLabel.snp.trailing).offset(6)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview().offset(-10)
+        }
+
+        self.touchViewButton.snp.makeConstraints {
+            $0.leading.trailing.top.bottom.equalToSuperview()
+        }
     }
 }

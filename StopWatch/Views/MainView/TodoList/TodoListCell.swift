@@ -12,24 +12,29 @@ import Then
 
 final class TodoListCell: UITableViewCell {
     private let realm = try! Realm()
-    
-    var saveDate = ""
+    var indexPath: IndexPath?
+    var saveDateComponents: DateComponents?
 
     let listLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 16, weight: .regular)
         $0.textColor = .black
+        $0.text = ""
     }
     
     let getListTextField = CustomTextField().then {
         $0.font = .systemFont(ofSize: 16, weight: .light)
         $0.textColor = .black
+        $0.text = ""
         $0.underLine.backgroundColor = .black
+        $0.isHidden = true
+        
     }
 
     let checkImageView = UIImageView().then {
         $0.layer.cornerRadius = 4
         $0.contentMode = .center
         $0.tintColor = .darkGray
+        $0.isHidden = true
     }
     
     let lineView = UIView()
@@ -49,6 +54,35 @@ final class TodoListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        self.getListTextField.text = ""
+        self.listLabel.text = ""
+        
+        self.getListTextField.isHidden = true
+        self.checkImageView.isHidden = true
+        
+        self.checkImageView.image = nil
+        super.prepareForReuse()
+    }
+    
+    func configureCellWhenAddingTodoList() {
+        self.getListTextField.isHidden = false
+        let seg = StopWatchDAO().getSegment(self.indexPath!.section)
+        let color = self.uiColorFromHexCode(seg.colorCode)
+        
+        self.getListTextField.underLine.backgroundColor = color
+        self.getListTextField.attributedPlaceholder = NSAttributedString(string: "입력", attributes: [.foregroundColor: color])
+    }
+    
+    func configureCell(_ segData: SegmentData) {
+        self.listLabel.text = segData.toDoList[indexPath!.row]
+        self.lineView.backgroundColor = self.uiColorFromHexCode(segData.segment!.colorCode)
+        self.checkImageView.image = CheckImage(rawValue: segData.listCheckImageIndex[indexPath!.row])?.image
+        
+        self.checkImageView.isHidden = false
+    }
+    
+    //MARK: - AddSubView
     private func addSubView(){
         self.contentView.addSubview(self.listLabel)
         self.contentView.addSubview(self.getListTextField)
@@ -57,6 +91,7 @@ final class TodoListCell: UITableViewCell {
         self.checkImageView.addSubview(self.lineView)
     }
     
+    //MARK: - Layout
     private func layout() {
         self.listLabel.snp.makeConstraints {
             $0.leading.equalTo(self.contentView.snp.leading).offset(20)
@@ -94,24 +129,19 @@ final class TodoListCell: UITableViewCell {
         }
     }
     
-    //MARK: addTarget
+    //MARK: - addTarget
     private func addTarget(){
         self.changeImageButton.addTarget(self, action: #selector(self.didClickChangeImageButton(_:)), for: .touchUpInside)
     }
     
-    //MARK: Selector
+    //MARK: - Selector
     @objc private func didClickChangeImageButton(_ sender: UIButton){
-        let row = sender.tag
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
-        let segment = filter!.dailySegment
+        guard let indexPath else { return }
+        guard let saveDateComponents else { return }
         
-        guard let section = sender.superview?.tag else { return }
-
-        var index = segment[section].listCheckImageIndex[row]
-        index += 1
-        try! self.realm.write{
-            segment[section].listCheckImageIndex[row] = index % 4
-        }
+        let segData = StopWatchDAO().getSegmentData(saveDateComponents.stringFormat, section: indexPath.section)
+        
+        StopWatchDAO().changeListCheckImage(segData, row: indexPath.row)
         
         NotificationCenter.default.post(name: .changeSaveDate, object: nil)
     }

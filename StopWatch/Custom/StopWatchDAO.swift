@@ -40,7 +40,7 @@ class StopWatchDAO {
     
     ///과목 추가 메소드
     func addSegment(row: Int, name: String, date: String){
-       
+        
         try! realm.write{
             let segment = Segments() // 과목리스트 추가
             segment.colorCode = row
@@ -57,11 +57,11 @@ class StopWatchDAO {
             realm.add(segmentData)
             
             let dailyData = realm.object(ofType: DailyData.self, forPrimaryKey: date) // 오늘 데이터 불러오기
-        
+            
             dailyData?.dailySegment.append(segmentData) // 오늘 데이터에 추가한 과목 추가
         }
     }
-
+    
     /// date날짜 데이터 삭제
     func deleteDailyData(date: String){
         // 해당 날짜에 빈 segmentData 가 있는지 확인
@@ -81,7 +81,7 @@ class StopWatchDAO {
         }
     }
     
-    func checkSegmentData(date: String){
+    func checkSegmentData(date: String) {
         let segmentData = self.realm.objects(SegmentData.self).where {
             $0.date == date
         }
@@ -104,22 +104,42 @@ class StopWatchDAO {
             }
         }
     }
-    
+    //MARK: - DailyData 편집(읽기)
+    /// DailyData 읽기
     func getDailyData(_ date: String) -> DailyData? {
         return self.realm.object(ofType: DailyData.self, forPrimaryKey: date)
     }
     
+    func getDailyDatad(_ date: DateComponents) -> DailyData? {
+        return self.realm.object(ofType: DailyData.self, forPrimaryKey: date.stringFormat)
+    }
+    
+    
+    /// 총 시간 읽기!
+    func getTotalTime(_ date: DateComponents) -> TimeInterval {
+        guard let data = self.realm.object(ofType: DailyData.self, forPrimaryKey: date.stringFormat) else { return 0 }
+        
+        return data.totalTime
+    }
+    
+    ///총 목표 시간 읽기
+    func getTotalGoalTime(_ date: DateComponents) -> TimeInterval {
+        guard let data = self.realm.object(ofType: DailyData.self, forPrimaryKey: date.stringFormat) else { return 0 }
+        
+        return data.totalGoalTime
+    }
+    
     //MARK: - SegemntData 편집(읽기, 삭제)
-    func getSegment(_ date: String, section: Int) -> SegmentData {
+    func getSegmentData(_ date: String, section: Int) -> SegmentData {
         let segment = realm.objects(SegmentData.self).where{ seg in
             seg.date == date
         }[section]
         return segment
     }
     
-    func deleteSegment( row: Int) {
+    func deleteSegmentData( row: Int) {
         let segment = self.realm.objects(Segments.self)[row]
-    
+        
         let filter = self.realm.objects(SegmentData.self).where{
             $0.segment == segment
         }
@@ -131,7 +151,7 @@ class StopWatchDAO {
             self.realm.delete(segment)
         }
     }
-
+    
     
     //MARK: - TodoList 편집 (이동, 복사, 수정, 삭제, 체크 이미지 변경)
     ///TodoList to에서 from으로 이동하기
@@ -217,4 +237,12 @@ class StopWatchDAO {
             print(error.localizedDescription)
         }
     }
+    
+    //MARK: - Segment
+    
+    /// Segment 불러오기
+    func getSegment(_ row: Int) -> Segments {
+        return self.realm.objects(Segments.self)[row]
+    }
 }
+

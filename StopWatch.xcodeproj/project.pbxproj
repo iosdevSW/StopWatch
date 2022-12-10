@@ -145,8 +145,8 @@
 		DB0F172A261430F7007C8448 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				DB0F172B2614310F007C8448 /* Utils.swift */,
 				DBC67829293C9DFD0079CF1A /* extension */,
+				DB0F172B2614310F007C8448 /* Utils.swift */,
 				DBA7ED5627DDAF89004B0D0E /* Protocols.swift */,
 			);
 			path = Utils;

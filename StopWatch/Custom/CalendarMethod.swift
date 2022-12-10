@@ -67,15 +67,6 @@ final class CalendarMethod {
         return todayComponents.stringFormat == componenets.stringFormat
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
     // 날짜 년,월,일로 쪼개서 반환
     func splitDate(date: String) -> (String,String,String) {
         let split = date.split(separator: ".")
