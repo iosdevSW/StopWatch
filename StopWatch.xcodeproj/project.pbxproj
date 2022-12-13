@@ -10,10 +10,11 @@
 		43228812FC89EC6FE9668022 /* Pods_StopWatch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D5E8619A05D6284273C99B3 /* Pods_StopWatch.framework */; };
 		DB08F0C32765DB88001EBBEE /* StopWatchDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */; };
 		DB0E89B9262842BE00533009 /* TimeSaveModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0E89B8262842BE00533009 /* TimeSaveModalView.swift */; };
-		DB0F172C2614310F007C8448 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0F172B2614310F007C8448 /* Utils.swift */; };
 		DB10DB8C27E4A081000560A3 /* GodoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DB10DB8B27E4A081000560A3 /* GodoM.ttf */; };
 		DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */; };
 		DB2890752623074A00FCC4BC /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2890742623074900FCC4BC /* ChartView.swift */; };
+		DB30E09829487CFA00F1151A /* UIViewController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB30E09729487CFA00F1151A /* UIViewController+.swift */; };
+		DB30E09A29487D1800F1151A /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB30E09929487D1800F1151A /* UIView+.swift */; };
 		DB340BC82940750100795FFC /* UITextField+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC72940750100795FFC /* UITextField+.swift */; };
 		DB340BCA2940753400795FFC /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC92940753400795FFC /* UIColor+.swift */; };
 		DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */; };
@@ -60,10 +61,11 @@
 		A46D2DC1AD4790441A1758B2 /* Pods-StopWatch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StopWatch.release.xcconfig"; path = "Target Support Files/Pods-StopWatch/Pods-StopWatch.release.xcconfig"; sourceTree = "<group>"; };
 		DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatchDAO.swift; sourceTree = "<group>"; };
 		DB0E89B8262842BE00533009 /* TimeSaveModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSaveModalView.swift; sourceTree = "<group>"; };
-		DB0F172B2614310F007C8448 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		DB10DB8B27E4A081000560A3 /* GodoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GodoM.ttf; sourceTree = "<group>"; };
 		DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideLabelView.swift; sourceTree = "<group>"; };
 		DB2890742623074900FCC4BC /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		DB30E09729487CFA00F1151A /* UIViewController+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+.swift"; sourceTree = "<group>"; };
+		DB30E09929487D1800F1151A /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		DB340BC72940750100795FFC /* UITextField+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+.swift"; sourceTree = "<group>"; };
 		DB340BC92940753400795FFC /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
 		DB40D1F52609B32C00A4E9FC /* StopWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,7 +148,6 @@
 			isa = PBXGroup;
 			children = (
 				DBC67829293C9DFD0079CF1A /* extension */,
-				DB0F172B2614310F007C8448 /* Utils.swift */,
 				DBA7ED5627DDAF89004B0D0E /* Protocols.swift */,
 			);
 			path = Utils;
@@ -304,6 +305,8 @@
 				DBC67830293F07D40079CF1A /* DateComponents+.swift */,
 				DB340BC72940750100795FFC /* UITextField+.swift */,
 				DB340BC92940753400795FFC /* UIColor+.swift */,
+				DB30E09729487CFA00F1151A /* UIViewController+.swift */,
+				DB30E09929487D1800F1151A /* UIView+.swift */,
 			);
 			path = extension;
 			sourceTree = "<group>";
@@ -462,8 +465,8 @@
 				DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */,
 				DB340BCA2940753400795FFC /* UIColor+.swift in Sources */,
 				DBA7ED5927DDAFF4004B0D0E /* MenuOption.swift in Sources */,
+				DB30E09A29487D1800F1151A /* UIView+.swift in Sources */,
 				DBEC226A276864380083ECDA /* ListEditItemView.swift in Sources */,
-				DB0F172C2614310F007C8448 /* Utils.swift in Sources */,
 				DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
 				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
@@ -471,6 +474,7 @@
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,
 				DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */,
 				DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */,
+				DB30E09829487CFA00F1151A /* UIViewController+.swift in Sources */,
 				DBA7ED5727DDAF89004B0D0E /* Protocols.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
