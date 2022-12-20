@@ -19,6 +19,7 @@ final class PaltteCell: UICollectionViewCell {
     let checkImageView = UIImageView().then {
         $0.tintColor = .white
         $0.image = UIImage(systemName: "checkmark")
+        $0.isHidden = true
     }
     
     //MARK: - Init
@@ -32,6 +33,12 @@ final class PaltteCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        self.checkImageView.image = UIImage(systemName: "checkmark")
+        self.checkImageView.isHidden = true
+        self.gestureRecognizers = nil
+    }
+    
     //MARK: - AddSubView
     private func addSubView(){
         self.addSubview(self.paintView)
@@ -42,7 +49,7 @@ final class PaltteCell: UICollectionViewCell {
     
     //MARK: - Layout
     private func layout(){
-        self.snp.makeConstraints {
+        self.paintView.snp.makeConstraints {
             $0.leading.top.equalToSuperview().offset(4)
             $0.trailing.bottom.equalToSuperview().offset(-4)
         }
