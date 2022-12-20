@@ -254,6 +254,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView.tag == 1{
+            self.selectDateComponent = currentCalendarComponent
             self.selectDateComponent.day = Int(days[indexPath.row])!
             self.dateCalculate()
             self.calendarView.reloadData()
