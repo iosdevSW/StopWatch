@@ -6,8 +6,8 @@ target 'StopWatch' do
   use_frameworks!
 
   # Pods for StopWatch
-	pod 'RealmSwift', '~>10'
-	pod 'Realm', '~>10'
+	pod 'RealmSwift'
+	pod 'Realm'
 	pod 'SnapKit', '~> 5.0.0'
 	pod 'Then'
 
