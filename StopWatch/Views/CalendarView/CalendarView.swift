@@ -126,7 +126,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
         let daysOfMonth = calendarMethod.getLastDayOfMonth(self.currentCalendarComponent)
         let weekDayAdding = 2 - weekDay
         self.yearMonthLabel.text = calendarMethod.convertYearMonth(self.currentCalendarComponent)
-
+        
         self.days = []
         for day in weekDayAdding...daysOfMonth {
             if day < 1 {
@@ -143,6 +143,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
         var tempComponent = self.currentCalendarComponent
         tempComponent.day = day
         let dateString = dateFormatter.string(from: calendar.date(from: tempComponent)!)
+        StopWatchDAO().deleteDailyData(date: currentCalendarComponent.stringFormat)
         if realm.object(ofType: DailyData.self, forPrimaryKey: dateString) == nil {
             return false
         } else {
@@ -237,6 +238,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
             cell.dateLabel.text = self.dayArray[indexPath.row]
         } else {
             cell.configureCell()
+            
             cell.dataCheckView.isHidden = !isData(days[indexPath.row])
             cell.dateLabel.text = days[indexPath.row]
             if let day = Int(days[indexPath.row]) {
