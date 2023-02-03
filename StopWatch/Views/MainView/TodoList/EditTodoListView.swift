@@ -9,7 +9,7 @@ import UIKit
 import Then
 import SnapKit
 
-final class EditTodoListView: UIView {
+class EditTodoListView: UIView {
     let (section, row): (Int,Int) // 선택한 리스트의 IndexPath를 받아올 프로퍼티
     
     lazy var buttonStackView = UIStackView(arrangedSubviews: [editButton,deleteButton,changeDateButton,changeCheckImageButton]).then {
@@ -29,7 +29,7 @@ final class EditTodoListView: UIView {
         $0.button.tag = 0
     }
     
-    private let deleteButton = ListEditItemView().then { // 삭제 버튼
+    fileprivate let deleteButton = ListEditItemView().then { // 삭제 버튼
         $0.button.setImage(UIImage(systemName: "trash"), for: .normal)
         $0.label.text = "삭 제"
         $0.button.tag = 1
@@ -86,3 +86,4 @@ final class EditTodoListView: UIView {
         }
     }
 }
+

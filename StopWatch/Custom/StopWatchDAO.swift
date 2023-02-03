@@ -32,7 +32,7 @@ class StopWatchDAO {
                     
                     day.dailySegment.append(object) // 오늘 데이터에 오늘 과목들 넣기
                 }
-                
+                print(day)
                 realm.add(day)
             }
         }
@@ -48,17 +48,16 @@ class StopWatchDAO {
             
             realm.add(segment)
             
-            let segmentData = SegmentData() // 오늘의 과목에 추가
-            segmentData.date = date
-            segmentData.goal = 0
-            segmentData.value = 0
-            segmentData.segment = segment
-            
-            realm.add(segmentData)
-            
-            let dailyData = realm.object(ofType: DailyData.self, forPrimaryKey: date) // 오늘 데이터 불러오기
-            
-            dailyData?.dailySegment.append(segmentData) // 오늘 데이터에 추가한 과목 추가
+            if let dailyData = realm.object(ofType: DailyData.self, forPrimaryKey: date)  {// 오늘 데이터 불러오기
+                let segmentData = SegmentData() // 오늘의 과목에 추가
+                segmentData.date = date
+                segmentData.goal = 0
+                segmentData.value = 0
+                segmentData.segment = segment
+                
+                realm.add(segmentData)
+                dailyData.dailySegment.append(segmentData) // 오늘 데이터에 추가한 과목 추가
+            }
         }
     }
     

@@ -8,91 +8,70 @@
 import UIKit
 import RealmSwift
 
-class EditColorView: UIView {
-    var hexCode = 0
-    var palettes: Palettes?
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .darkGray
-        label.text = "색상 추가"
-        label.font = UIFont(name: "GodoM", size: 18)
-        
-        return label
-    }()
+enum ColorViewMode {
+    case edit
+    case add
+}
+
+final class EditColorView: UIView {
+    //MARK: - Properties
+    var palette: Palettes?
+    let colorViewMode: ColorViewMode
+    let realm = try! Realm()
     
-    let guideLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 16, weight: .light)
-        label.textColor = .darkGray
-        label.textAlignment = .center
-        label.text = "색상코드를 입력해주세요."
-        
-        return label
-    }()
+    private let titleLabel = UILabel().then {
+        $0.textColor = .darkGray
+        $0.text = "색상 추가"
+        $0.font = UIFont(name: "GodoM", size: 18)
+    }
     
-    let getColorCodeTextfield:UITextField = {
-        let tf = UITextField()
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.borderStyle = .roundedRect
-        tf.autocapitalizationType = .allCharacters // 대문자만 입력
+    private let guideLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 16, weight: .light)
+        $0.textColor = .darkGray
+        $0.textAlignment = .center
+        $0.text = "색상코드를 입력해주세요."
+    }
+    
+    private let getColorCodeTextfield = UITextField().then {
+        $0.borderStyle = .roundedRect
+        $0.autocapitalizationType = .allCharacters // 대문자만 입력
         let attributes = [ NSAttributedString.Key.font : UIFont.systemFont(ofSize: 14) ]
-        tf.attributedPlaceholder = NSAttributedString(
-            string: "ex)ABCDEF", attributes: attributes )
-        
-        return tf
-    }()
+        $0.attributedPlaceholder = NSAttributedString(string: "ex)ABCDEF",
+                                                      attributes: attributes )
+    }
     
-    let colorPreView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 4
-        return view
-    }()
+    private let colorPreView = UIView().then {
+        $0.layer.cornerRadius = 4
+    }
     
-    let addButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Add", for: .normal)
-        button.setTitleColor(.darkGray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .light)
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = 6
-        button.layer.borderColor = UIColor.darkGray.cgColor
+    private let addButton = UIButton().then {
+        $0.setTitle("add", for: .normal)
+        $0.setTitleColor(.darkGray, for: .normal)
+        $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .light)
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 6
+        $0.layer.borderColor = UIColor.darkGray.cgColor
+    }
     
-        return button
-    }()
+    private let cancelButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "xmark"), for: .normal)
+        $0.tintColor = .red
+    }
     
-    let cancelButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
-        button.tintColor = .red
-        
-        return button
-    }()
+    private let deleteColrButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "trash.fill"), for: .normal)
+        $0.tintColor = .darkGray
+        $0.isHidden = true
+    }
     
-    let deleteColrButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "trash.fill"), for: .normal)
-        button.tintColor = .darkGray
-        
-        return button
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(_ mode: ColorViewMode, _ palette: Palettes?) {
+        self.colorViewMode = mode
+        self.palette = palette
+        super.init(frame: .zero)
         self.addsubView()
         self.layout()
         self.addTarget()
-        
-        self.backgroundColor = .white
-        self.layer.cornerRadius = 4
-        self.layer.borderColor = UIColor.darkGray.cgColor
-        self.layer.borderWidth = 1
-        self.deleteColrButton.isHidden = true
+        self.configure()
     }
     
     required init?(coder: NSCoder) {
@@ -103,69 +82,17 @@ class EditColorView: UIView {
         print("addViewDeinit")
     }
     
-    func addsubView(){
-        self.addSubview(self.titleLabel)
-        self.addSubview(self.guideLabel)
-        self.addSubview(self.getColorCodeTextfield)
-        self.addSubview(self.colorPreView)
-        self.addSubview(self.addButton)
-        self.addSubview(self.cancelButton)
-        self.addSubview(self.deleteColrButton)
-    }
-    
-    func addTarget(){
-        //글자 수를 제한하기 textfield에 액션 추가.
-        self.getColorCodeTextfield.addTarget(self, action: #selector(self.didEditingChanged(_:)), for: .editingChanged)
-    }
-    
-    func layout() {
-        NSLayoutConstraint.activate([
-            self.titleLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
-            self.titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-        ])
-        
-        NSLayoutConstraint.activate([
-            self.guideLabel.topAnchor.constraint(equalTo: self.titleLabel.bottomAnchor, constant: 10),
-            self.guideLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            
-            self.getColorCodeTextfield.topAnchor.constraint(equalTo: self.guideLabel.bottomAnchor, constant: 20),
-            self.getColorCodeTextfield.leadingAnchor.constraint(equalTo: self.guideLabel.leadingAnchor),
-            self.getColorCodeTextfield.widthAnchor.constraint(equalToConstant: 100),
-            
-            self.addButton.leadingAnchor.constraint(equalTo: self.getColorCodeTextfield.trailingAnchor, constant: 10),
-            self.addButton.topAnchor.constraint(equalTo: self.getColorCodeTextfield.topAnchor),
-            self.addButton.bottomAnchor.constraint(equalTo: self.getColorCodeTextfield.bottomAnchor),
-            self.addButton.widthAnchor.constraint(equalToConstant: 40),
-            
-            self.colorPreView.topAnchor.constraint(equalTo: self.getColorCodeTextfield.bottomAnchor, constant: 14),
-            self.colorPreView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -14),
-            self.colorPreView.leadingAnchor.constraint(equalTo: getColorCodeTextfield.leadingAnchor),
-            self.colorPreView.trailingAnchor.constraint(equalTo: self.addButton.trailingAnchor),
-            
-            self.cancelButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 8),
-            self.cancelButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
-            self.cancelButton.widthAnchor.constraint(equalToConstant: 20),
-            self.cancelButton.heightAnchor.constraint(equalToConstant: 20),
-            ])
-        
-        NSLayoutConstraint.activate([
-            self.deleteColrButton.leadingAnchor.constraint(equalTo: self.colorPreView.trailingAnchor, constant: 10),
-            self.deleteColrButton.centerYAnchor.constraint(equalTo: self.colorPreView.centerYAnchor, constant: -1),
-            self.deleteColrButton.widthAnchor.constraint(equalToConstant: 24),
-            self.deleteColrButton.heightAnchor.constraint(equalToConstant: 24)
-        ])
-    }
-    
-    //16진수인지 검사하는 메소드
-    func isChar(ascii: UInt8) -> Bool {
+    //MARK: - Method
+    /// 16진수인지 검사하는 메소드
+    private func isHexCode(_ ascii: UInt8) -> Bool {
         if ascii >= 65 && ascii <= 70 { return true } // A - F 만 통과
         if ascii >= 48 && ascii <= 57 { return true } // 숫자만 통과
         
         return false
     }
     
-    //글자 수 제한 메소드
-    func checkMaxLength(textField: UITextField!, maxLength: Int) {
+    ///글자 수 제한 메소드
+    private func checkMaxLength(textField: UITextField!, maxLength: Int) {
         if (textField.text?.count ?? 0 > maxLength) {
             textField.deleteBackward()
         }else {
@@ -176,25 +103,140 @@ class EditColorView: UIView {
             }
             guard let ascii = textField.text?.last?.asciiValue else { return }
             
-            guard self.isChar(ascii: ascii) else { // 16진수가 아니면 지우기
+            guard self.isHexCode(ascii) else { // 16진수가 아니면 지우기
                 textField.deleteBackward()
                 return
             }
         }
-        
     }
     
+    private func configure() {
+        self.backgroundColor = .white
+        self.layer.cornerRadius = 4
+        self.layer.borderColor = UIColor.darkGray.cgColor
+        self.layer.borderWidth = 1
+        
+        switch self.colorViewMode {
+        case .edit:
+            guard let colorCode = self.palette?.colorCode else {return }
+            self.getColorCodeTextfield.text = String(colorCode, radix: 16).uppercased()
+            self.colorPreView.backgroundColor = self.uiColorFromHexCode(colorCode)
+            
+            self.addButton.setTitle("edit", for: .normal)
+            self.titleLabel.text = "색상 편집"
+            self.deleteColrButton.isHidden = false
+        case .add:
+            self.addButton.setTitle("add", for: .normal)
+            self.titleLabel.text = "색상 추가"
+        }
+    }
+    
+    //MARK: - Selector
     // textfield값이 변할때마다 불리는 액션 함수
     @objc func didEditingChanged(_ tf: UITextField) {
         //글자 수 제한
-        self.checkMaxLength(textField: self.getColorCodeTextfield, maxLength: 6)
+        self.checkMaxLength(textField: tf, maxLength: 6)
         
         //색 미리보기
         if let hexCode = Int(tf.text ?? "", radix: 16) {
-            self.addButton.tag = hexCode
-            let preViewColor = self.uiColorFromHexCode(hexCode)
-            self.colorPreView.backgroundColor = preViewColor
+            self.colorPreView.backgroundColor = self.uiColorFromHexCode(hexCode)
         }
+    }
+    
+    @objc func didClickAddColorButton(_ sender: UIButton) {
+        guard let hexCode = Int(self.getColorCodeTextfield.text ?? "", radix: 16) else { return }
+        try! realm.write{
+            let newColorCode = Palettes()
+            newColorCode.colorCode = hexCode
+            realm.add(newColorCode)
+        }
+        NotificationCenter.default.post(name: .closeColorEditView, object: nil)
+    }
+    
+    @objc func didClickDeleteColorButton(_ sender: UIButton){
+        try! realm.write{
+            realm.delete(self.palette!)
+        }
+        NotificationCenter.default.post(name: .closeColorEditView, object: nil)
+    }
+    
+    @objc func didClickEditColorButton(_ sender: UIButton) {
+        guard let hexCode = Int(self.getColorCodeTextfield.text ?? "", radix: 16) else { return }
+        try! realm.write{
+            guard let palette else { return }
+            palette.colorCode = hexCode
+        }
+        NotificationCenter.default.post(name: .closeColorEditView, object: nil)
+    }
+    
+    @objc func didClickCloseEditColorViewButton(_ sender: UIButton) {
+        NotificationCenter.default.post(name: .closeColorEditView, object: nil)
+    }
+    
+    //MARK: - AddSubView
+    private func addsubView(){
+        self.addSubview(self.titleLabel)
+        self.addSubview(self.guideLabel)
+        self.addSubview(self.getColorCodeTextfield)
+        self.addSubview(self.colorPreView)
+        self.addSubview(self.addButton)
+        self.addSubview(self.cancelButton)
+        self.addSubview(self.deleteColrButton)
+    }
+    
+    //MARK: - Layout
+    private func layout() {
+        self.titleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        self.guideLabel.snp.makeConstraints {
+            $0.top.equalTo(self.titleLabel.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
+        }
+        
+        self.getColorCodeTextfield.snp.makeConstraints {
+            $0.top.equalTo(self.guideLabel.snp.bottom).offset(20)
+            $0.leading.equalTo(self.guideLabel.snp.leading)
+            $0.width.equalTo(100)
+        }
+        
+        self.addButton.snp.makeConstraints {
+            $0.leading.equalTo(self.getColorCodeTextfield.snp.trailing).offset(10)
+            $0.top.bottom.equalTo(self.getColorCodeTextfield)
+            $0.width.equalTo(40)
+        }
+        
+        self.colorPreView.snp.makeConstraints {
+            $0.top.equalTo(self.getColorCodeTextfield.snp.bottom).offset(14)
+            $0.bottom.equalToSuperview().offset(-14)
+            $0.leading.equalTo(self.getColorCodeTextfield.snp.leading)
+            $0.trailing.equalTo(self.addButton.snp.trailing)
+        }
+        
+        self.cancelButton.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(8)
+            $0.width.height.equalTo(20)
+            $0.trailing.equalToSuperview().offset(-8)
+        }
+        
+        self.deleteColrButton.snp.makeConstraints {
+            $0.leading.equalTo(self.colorPreView.snp.trailing).offset(10)
+            $0.centerY.equalTo(self.colorPreView.snp.centerY).offset(-1)
+            $0.width.height.equalTo(24)
+        }
+    }
+    
+    //MARK: - AddTarget
+    private func addTarget(){
+        //글자 수를 제한하기 textfield에 액션 추가.
+        self.getColorCodeTextfield.addTarget(self, action: #selector(self.didEditingChanged(_:)), for: .editingChanged)
+        self.deleteColrButton.addTarget(self, action: #selector(self.didClickDeleteColorButton(_:)), for: .touchUpInside)
+        self.cancelButton.addTarget(self, action: #selector(self.didClickCloseEditColorViewButton(_:)), for: .touchUpInside)
+        
+        let addButtonSelector = self.colorViewMode == .add ? #selector(self.didClickAddColorButton(_:)) : #selector(self.didClickEditColorButton(_:))
+        self.addButton.addTarget(self, action: addButtonSelector, for: .touchUpInside)
     }
 }
  

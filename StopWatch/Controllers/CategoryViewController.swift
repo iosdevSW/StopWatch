@@ -45,7 +45,7 @@ final class CategoryViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
-        StopWatchDAO().create(date: self.saveDate)
+//        StopWatchDAO().create(date: self.saveDate)
         
         self.categoryTableView.reloadData()
         self.configureNavigationBar()

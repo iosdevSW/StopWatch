@@ -12,7 +12,8 @@ import SnapKit
 final class EditCategoryViewController: UIViewController {
     //MARK: - Properties
     private let realm = try! Realm()
-    let palette = Palette()
+    lazy var palette = realm.objects(Palettes.self)
+    
     var selectedColorCode: Int? 
     var selectedSegmentRow: Int?
     var saveDate:String = ""
@@ -70,20 +71,22 @@ final class EditCategoryViewController: UIViewController {
         self.paletteView.delegate = self
         self.paletteView.dataSource = self
         
-        
         self.hideKeyboardWhenTapped()
         self.setNavigationItem()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didRecieveCloseColorEditView(_:)), name: .closeColorEditView, object: nil)
         
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
     }
     
+    //MARK: - Method
     private func setNavigationItem() {
         self.navigationItem.hidesBackButton = true
         self.navigationItem.title = "Category"
     }
     
     private func addCategoryMtd(){
-        guard let row = self.selectedColorCode else { // 색을 정했는지 검사 안했으면 경고창 띄우기
+        guard let code = self.selectedColorCode else { // 색을 정했는지 검사 안했으면 경고창 띄우기
             self.notiAlert(title: "경 고", message: "색과 이름을 모두 입력해주세요.")
             return
         }
@@ -96,13 +99,13 @@ final class EditCategoryViewController: UIViewController {
         if name == ""{
             self.notiAlert(title: "경 고", message: "색과 이름을 모두 입력해주세요.")
         }else{
-            StopWatchDAO().addSegment(row: row, name: name, date: self.saveDate) // 과목을 DB에 추가하는 메소드
+            StopWatchDAO().addSegment(row: code, name: name, date: self.saveDate) // 과목을 DB에 추가하는 메소드
             
             self.navigationController?.popViewController(animated: true) // 전 뷰로 돌아가기
         }
     }
     
-    func editCategoryMtd(){
+    private func editCategoryMtd(){
         guard let code = self.selectedColorCode else {
             self.notiAlert(title: "경 고", message: "색과 이름을 모두 입력해주세요.")
             return
@@ -135,7 +138,7 @@ final class EditCategoryViewController: UIViewController {
         return idx
     }
     
-    //MARK: Selector
+    //MARK: - Selector
     @objc func buttonTapped(button: UIButton){
         switch button.tag{
         case 1:
@@ -144,7 +147,6 @@ final class EditCategoryViewController: UIViewController {
             }else{
                 self.addCategoryMtd() // 없으면 새로 추가.
             }
-           
         case 2:
             self.navigationController?.popViewController(animated: true)
         default:
@@ -152,79 +154,28 @@ final class EditCategoryViewController: UIViewController {
         }
     }
     
-    @objc func respondToGesture(_ sender: UILongPressGestureRecognizer){
-        self.openEditColorView()
-        //색상코드 불러오기
-        guard let row = sender.view?.tag else { return }
-        let object = realm.objects(Palettes.self)[row]
-        self.editColorView?.palettes = object
-        let colorCode = object.colorCode
-        self.editColorView?.addButton.tag = colorCode
-        let convertString = String(colorCode, radix: 16).uppercased()
-        self.editColorView!.getColorCodeTextfield.text? = convertString
-        self.editColorView!.colorPreView.backgroundColor = self.view.uiColorFromHexCode(colorCode)
-        
-        //버튼 타이틀을 edit으로 수정하고 edit method,delete method 추가
-        self.editColorView?.addButton.setTitle("edit", for: .normal)
-        self.editColorView?.titleLabel.text = "색상 편집"
-        self.editColorView?.addButton.addTarget(self, action: #selector(self.editColor(_:)), for: .touchUpInside)
-        self.editColorView?.deleteColrButton.addTarget(self, action: #selector(self.deleteColor(_:)), for: .touchUpInside)
-        //delete버튼 보이기
-        self.editColorView?.deleteColrButton.isHidden = false
+    @objc func didRecieveLongPressGesture(_ sender: UILongPressGestureRecognizer){
+        guard let row = self.paletteView.indexPathForItem(at: sender.location(in: self.paletteView))?.row else { return}
+        self.openEditColorView(.edit, palette: self.palette[row])
     }
     
-    //MARK: - EditColorViewMethod
-    //색 저장
-    @objc func addColor(_ sender: UIButton) {
-        let realm = try! Realm()
-        try! realm.write{
-            let newColorCode = Palettes()
-            newColorCode.colorCode = sender.tag
-            realm.add(newColorCode)
-        }
-        self.paletteView.reloadData()
-        self.editColorView?.removeFromSuperview()
-        self.editColorView = nil
-    }
-    
-    @objc func editColor(_ sender: UIButton) {
-        try! realm.write{
-            guard let object = self.editColorView?.palettes else { return }
-            object.colorCode = sender.tag
-        }
-        self.paletteView.reloadData()
-        self.editColorView?.removeFromSuperview()
-        self.editColorView = nil
-    }
-    
-    @objc func deleteColor(_ sender: UIButton){
-        guard let palette = self.editColorView?.palettes else { return }
-        let realm = try! Realm()
-        try! realm.write{
-            realm.delete(palette)
-        }
-        self.paletteView.reloadData()
-        self.editColorView?.removeFromSuperview()
-        self.editColorView = nil
-    }
-    
-    func openEditColorView() {
+    //MARK: - EditColorViewMethod    
+    func openEditColorView(_ mode: ColorViewMode, palette: Palettes?) {
         guard self.editColorView == nil else { return } // 중복 뷰 방지
-        self.editColorView = EditColorView()
-        self.view.addSubview(self.editColorView!)
-        self.editColorView!.cancelButton.addTarget(self, action: #selector(self.closeColorView(_:)), for: .touchUpInside)
-        
-        self.editColorView!.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.editColorView!.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 50),
-            self.editColorView!.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -50),
-            self.editColorView!.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-            self.editColorView!.heightAnchor.constraint(equalToConstant: 170)
-        ])
+        self.editColorView = EditColorView(mode, palette).then {
+            
+            self.view.addSubview($0)
+            $0.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(50)
+                make.trailing.equalToSuperview().offset(-50)
+                make.centerY.equalToSuperview()
+                make.height.equalTo(170)
+            }
+        }
     }
 
-    //닫기
-    @objc func closeColorView(_ sender: Any){
+    @objc private func didRecieveCloseColorEditView(_ sender: Any){
+        self.paletteView.reloadData()
         self.editColorView?.removeFromSuperview()
         self.editColorView = nil
     }
@@ -289,37 +240,32 @@ final class EditCategoryViewController: UIViewController {
 //MARK: - CollectionView Delegate , datasource
 extension EditCategoryViewController: UICollectionViewDelegate,UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.realm.objects(Palettes.self).count + 1
+        return self.palette.count + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! PaltteCell
         //초기화
-        cell.checkImageView.image = UIImage(systemName: "checkmark")
-        cell.checkImageView.isHidden = true
-        let palettes = self.realm.objects(Palettes.self)
+        cell.prepareForReuse()
         
         //색상을 추가하는 마지막 셀 구성
-        if indexPath.row == palettes.count {
+        if indexPath.row == palette.count {
             cell.checkImageView.image = UIImage(systemName: "plus")
             cell.checkImageView.isHidden = false
             cell.paintView.backgroundColor = .systemGray3
         }else { // 팔레트 구성
             //팔레트 색상 구성
-            let colorCode = palettes[indexPath.row].colorCode
+            let colorCode = palette[indexPath.row].colorCode
             cell.paintView.backgroundColor = self.view.uiColorFromHexCode(colorCode)
            
             //선택된 셀이면 체크마크!
             if let row = self.findColorIndex(self.selectedColorCode) {
-                if indexPath.row == row {
-                    cell.checkImageView.isHidden = false
-                }
+                cell.checkImageView.isHidden = indexPath.row == row ? false : true
             }
             
             //편집용 제스쳐 추가
-            let longPressGeture = UILongPressGestureRecognizer(target: self, action: #selector(self.respondToGesture(_:)))
+            let longPressGeture = UILongPressGestureRecognizer(target: self, action: #selector(self.didRecieveLongPressGesture(_:)))
             cell.addGestureRecognizer(longPressGeture)
-            longPressGeture.view?.tag = indexPath.row // 몇번째 셀인지 구분용
         }
         
         return cell
@@ -329,8 +275,7 @@ extension EditCategoryViewController: UICollectionViewDelegate,UICollectionViewD
         let object = self.realm.objects(Palettes.self)
         if indexPath.row == object.count {
             // 색상 추가뷰
-            self.openEditColorView()
-            self.editColorView!.addButton.addTarget(self, action: #selector(self.addColor(_:)), for: .touchUpInside)
+            self.openEditColorView(.add, palette: nil)
         }else { // 색상 골랐을 때
             self.selectedColorCode = object[indexPath.row].colorCode
             collectionView.reloadData()
