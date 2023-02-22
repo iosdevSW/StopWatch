@@ -32,7 +32,7 @@ final class EditColorView: UIView {
         $0.text = "색상코드를 입력해주세요."
     }
     
-    private let getColorCodeTextfield = UITextField().then {
+    let getColorCodeTextfield = UITextField().then {
         $0.borderStyle = .roundedRect
         $0.autocapitalizationType = .allCharacters // 대문자만 입력
         let attributes = [ NSAttributedString.Key.font : UIFont.systemFont(ofSize: 14) ]
@@ -45,12 +45,8 @@ final class EditColorView: UIView {
     }
     
     private let addButton = UIButton().then {
-        $0.setTitle("add", for: .normal)
-        $0.setTitleColor(.darkGray, for: .normal)
-        $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .light)
-        $0.layer.borderWidth = 1
-        $0.layer.cornerRadius = 6
-        $0.layer.borderColor = UIColor.darkGray.cgColor
+        $0.setImage(UIImage(systemName: "checkmark"), for: .normal)
+        $0.tintColor = UIColor(red: 60/255, green: 179/255, blue: 113/255, alpha: 1.0)
     }
     
     private let cancelButton = UIButton().then {
@@ -62,6 +58,11 @@ final class EditColorView: UIView {
         $0.setImage(UIImage(systemName: "trash.fill"), for: .normal)
         $0.tintColor = .darkGray
         $0.isHidden = true
+    }
+    
+    private let colorWell = UIButton(type: .system).then {
+        $0.setImage(UIImage(named: "ColorWell")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        $0.layer.cornerRadius = 15
     }
     
     init(_ mode: ColorViewMode, _ palette: Palettes?) {
@@ -112,22 +113,29 @@ final class EditColorView: UIView {
     
     private func configure() {
         self.backgroundColor = .white
-        self.layer.cornerRadius = 4
+        self.layer.cornerRadius = 16
         self.layer.borderColor = UIColor.darkGray.cgColor
         self.layer.borderWidth = 1
         
         switch self.colorViewMode {
         case .edit:
-            guard let colorCode = self.palette?.colorCode else {return }
+            guard let colorCode = self.palette?.colorCode else { return }
             self.getColorCodeTextfield.text = String(colorCode, radix: 16).uppercased()
             self.colorPreView.backgroundColor = self.uiColorFromHexCode(colorCode)
+            self.colorWell.backgroundColor = self.uiColorFromHexCode(colorCode)
             
-            self.addButton.setTitle("edit", for: .normal)
             self.titleLabel.text = "색상 편집"
             self.deleteColrButton.isHidden = false
         case .add:
-            self.addButton.setTitle("add", for: .normal)
             self.titleLabel.text = "색상 추가"
+        }
+    }
+    
+    func selectedColor(_ hex: String) {
+        self.getColorCodeTextfield.text = hex
+        if let hexCode = Int(hex, radix: 16) {
+            self.colorPreView.backgroundColor = self.uiColorFromHexCode(hexCode)
+            self.colorWell.backgroundColor = self.uiColorFromHexCode(hexCode)
         }
     }
     
@@ -140,6 +148,7 @@ final class EditColorView: UIView {
         //색 미리보기
         if let hexCode = Int(tf.text ?? "", radix: 16) {
             self.colorPreView.backgroundColor = self.uiColorFromHexCode(hexCode)
+            self.colorWell.backgroundColor = self.uiColorFromHexCode(hexCode)
         }
     }
     
@@ -173,6 +182,15 @@ final class EditColorView: UIView {
         NotificationCenter.default.post(name: .closeColorEditView, object: nil)
     }
     
+    @objc private func didClickColorWell() {
+        if let hexCode = Int(self.getColorCodeTextfield.text ?? "", radix: 16) {
+            let color = self.uiColorFromHexCode(hexCode)
+            NotificationCenter.default.post(name: .presentColorPicker, object: color)
+        } else {
+            NotificationCenter.default.post(name: .presentColorPicker, object: nil)
+        }
+    }
+    
     //MARK: - AddSubView
     private func addsubView(){
         self.addSubview(self.titleLabel)
@@ -182,6 +200,7 @@ final class EditColorView: UIView {
         self.addSubview(self.addButton)
         self.addSubview(self.cancelButton)
         self.addSubview(self.deleteColrButton)
+        self.addSubview(self.colorWell)
     }
     
     //MARK: - Layout
@@ -198,33 +217,39 @@ final class EditColorView: UIView {
         
         self.getColorCodeTextfield.snp.makeConstraints {
             $0.top.equalTo(self.guideLabel.snp.bottom).offset(20)
-            $0.leading.equalTo(self.guideLabel.snp.leading)
+            $0.centerX.equalToSuperview()
             $0.width.equalTo(100)
         }
         
         self.addButton.snp.makeConstraints {
-            $0.leading.equalTo(self.getColorCodeTextfield.snp.trailing).offset(10)
-            $0.top.bottom.equalTo(self.getColorCodeTextfield)
-            $0.width.equalTo(40)
+            $0.top.equalToSuperview().offset(8)
+            $0.trailing.equalToSuperview().offset(-8)
+            $0.height.width.equalTo(24)
         }
         
         self.colorPreView.snp.makeConstraints {
             $0.top.equalTo(self.getColorCodeTextfield.snp.bottom).offset(14)
             $0.bottom.equalToSuperview().offset(-14)
-            $0.leading.equalTo(self.getColorCodeTextfield.snp.leading)
-            $0.trailing.equalTo(self.addButton.snp.trailing)
+            $0.width.equalTo(self.getColorCodeTextfield).offset(20)
+            $0.centerX.equalToSuperview()
         }
         
         self.cancelButton.snp.makeConstraints {
             $0.top.equalToSuperview().offset(8)
-            $0.width.height.equalTo(20)
-            $0.trailing.equalToSuperview().offset(-8)
+            $0.width.height.equalTo(24)
+            $0.leading.equalToSuperview().offset(8)
         }
         
         self.deleteColrButton.snp.makeConstraints {
             $0.leading.equalTo(self.colorPreView.snp.trailing).offset(10)
             $0.centerY.equalTo(self.colorPreView.snp.centerY).offset(-1)
             $0.width.height.equalTo(24)
+        }
+        
+        self.colorWell.snp.makeConstraints {
+            $0.leading.equalTo(self.getColorCodeTextfield.snp.trailing).offset(10)
+            $0.centerY.equalTo(self.getColorCodeTextfield.snp.centerY)
+            $0.width.height.equalTo(30)
         }
     }
     
@@ -234,6 +259,7 @@ final class EditColorView: UIView {
         self.getColorCodeTextfield.addTarget(self, action: #selector(self.didEditingChanged(_:)), for: .editingChanged)
         self.deleteColrButton.addTarget(self, action: #selector(self.didClickDeleteColorButton(_:)), for: .touchUpInside)
         self.cancelButton.addTarget(self, action: #selector(self.didClickCloseEditColorViewButton(_:)), for: .touchUpInside)
+        self.colorWell.addTarget(self, action: #selector(self.didClickColorWell), for: .touchUpInside)
         
         let addButtonSelector = self.colorViewMode == .add ? #selector(self.didClickAddColorButton(_:)) : #selector(self.didClickEditColorButton(_:))
         self.addButton.addTarget(self, action: addButtonSelector, for: .touchUpInside)

@@ -80,6 +80,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
             $0.showsHorizontalScrollIndicator = false
             $0.isPagingEnabled = true // 페이징 스크롤 처리
             $0.tag = 1
+            $0.clipsToBounds = false
         }
         
         return view
@@ -264,7 +265,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
             } else { // 기본 캘린더일 경우
                 NotificationCenter.default.post(name: .changeSaveDate,
                                                 object: nil,
-                                                userInfo: ["selectedDate" : calendarMethod.componentToDateString(self.selectDateComponent)])
+                                                userInfo: ["selectedDate" : self.selectDateComponent.stringFormat])
             }
         }
     }

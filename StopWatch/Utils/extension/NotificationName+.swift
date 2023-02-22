@@ -12,4 +12,5 @@ extension Notification.Name {
     static let presentAlert = Notification.Name("presentAlert")
     static let changeSaveDate = Notification.Name("changeSaveDate")
     static let closeColorEditView = Notification.Name("closeColorEditView")
+    static let presentColorPicker = Notification.Name("presentColorPicker")
 }

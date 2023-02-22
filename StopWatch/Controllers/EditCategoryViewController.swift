@@ -8,6 +8,7 @@ import UIKit
 import RealmSwift
 import Then
 import SnapKit
+import SWColorPicker
 
 final class EditCategoryViewController: UIViewController {
     //MARK: - Properties
@@ -75,6 +76,7 @@ final class EditCategoryViewController: UIViewController {
         self.setNavigationItem()
         
         NotificationCenter.default.addObserver(self, selector: #selector(didRecieveCloseColorEditView(_:)), name: .closeColorEditView, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didClickColorWell), name: .presentColorPicker, object: nil)
         
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).saveDate
     }
@@ -157,6 +159,18 @@ final class EditCategoryViewController: UIViewController {
     @objc func didRecieveLongPressGesture(_ sender: UILongPressGestureRecognizer){
         guard let row = self.paletteView.indexPathForItem(at: sender.location(in: self.paletteView))?.row else { return}
         self.openEditColorView(.edit, palette: self.palette[row])
+    }
+    
+    @objc func didClickColorWell(_ notification: Notification) {
+        if let color = notification.object as? UIColor {
+            let vc = SWColorPickerViewController(color)
+            vc.delegate = self
+            self.present(vc, animated: true)
+        } else {
+            let vc = SWColorPickerViewController(.white)
+            vc.delegate = self
+            self.present(vc, animated: true)
+        }
     }
     
     //MARK: - EditColorViewMethod    
@@ -290,10 +304,22 @@ extension EditCategoryViewController: UICollectionViewDelegateFlowLayout {
 }
 
 //MARK:- UITextFieldDelegate
-extension CategoryViewController: UITextFieldDelegate {
-    
+extension EditCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension EditCategoryViewController: SWColorPickerViewDelegate {
+    func didSelectColor(_ color: UIColor) {
+        var (r,g,b): (CGFloat,CGFloat,CGFloat) = (0,0,0)
+        color.getRed(&r, green: &g, blue: &b, alpha: nil)
+        let red = String(Int(r * 255), radix: 16).padding(toLength: 2, withPad: "0", startingAt: 0).uppercased()
+        let green = String(Int(g * 255), radix: 16).padding(toLength: 2, withPad: "0", startingAt: 0).uppercased()
+        let blue = String(Int(b * 255), radix: 16).padding(toLength: 2, withPad: "0", startingAt: 0).uppercased()
+        let hexCode = red + green + blue
+        
+        editColorView?.selectedColor(hexCode)
     }
 }
