@@ -9,8 +9,8 @@ PODS:
   - Then (3.0.0)
 
 DEPENDENCIES:
-  - Realm (~> 10)
-  - RealmSwift (~> 10)
+  - Realm
+  - RealmSwift
   - SnapKit (~> 5.0.0)
   - SWColorPicker
   - Then

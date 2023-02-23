@@ -89,17 +89,19 @@ final class StopWatchViewController: UIViewController {
         
         // gesture
         self.hideKeyboardWhenTapped()
-        
-//                print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+
+
+//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // 프로퍼티 값 갱신
-    
         self.setDeviceMotion()   // coremotion 시작
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
+        self.toDoTableView.reloadData()
+        self.calendarView.calendarView.reloadData()
         self.setDday()
         self.setTimeLabel()
         self.guideLabelView.isHidden = false
@@ -781,11 +783,11 @@ extension StopWatchViewController {
         case 1:
             self.defaultAlert(title: nil, message: "정말 삭제 하시겠습니까?") {
                 StopWatchDAO().deleteTodoList(segData, row: editView.row)
+                StopWatchDAO().deleteDailyData(date: self.calendarView.selectDateComponent.stringFormat) // 데이터베이스에서 삭제
+                self.calendarView.calendarView.reloadData()
+                self.toDoTableView.reloadData()
             }
             
-            StopWatchDAO().deleteDailyData(date: self.calendarView.selectDateComponent.stringFormat) // 데이터베이스에서 삭제
-            self.toDoTableView.reloadData()
-            self.calendarView.calendarView.reloadData()
             self.closeListEditView()
         case 2:
             StopWatchDAO().changeListCheckImage(segData, row: editView.row)
