@@ -45,7 +45,6 @@ final class ChartView: UIView {
         self.backgroundColor = .white
         
         self.addSubview(self.guideLabel)
-        self.addSubview(self.closeLabel)
         self.addSubview(self.chevronImageView)
         self.layout()
     }
@@ -63,17 +62,8 @@ final class ChartView: UIView {
     
     //MARK: - Layout
     private func layout() {
-        self.closeLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(30)
-            make.centerX.equalToSuperview()
-        }
-        
-        self.chevronImageView.snp.makeConstraints { make in
-            make.width.equalTo(36)
-            make.height.equalTo(26)
-            make.centerX.equalToSuperview()
-            make.top.equalTo(self.closeLabel.snp.bottom)
-        }
+        let width = UIScreen.main.bounds.width
+        self.chevronImageView.frame = CGRect(x: width / 2 - 20, y: 8, width: 40, height: 12)
         
         self.guideLabel.snp.makeConstraints { make in
             make.leading.trailing.centerY.equalToSuperview()
@@ -83,6 +73,7 @@ final class ChartView: UIView {
     //MARK: Draw
     override func draw(_ rect: CGRect) {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        
         self.guideLabel.isHidden = true
         guard let segment = filter?.dailySegment else {
             self.guideLabel.isHidden = false

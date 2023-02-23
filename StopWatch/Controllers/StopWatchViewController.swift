@@ -91,7 +91,7 @@ final class StopWatchViewController: UIViewController {
         self.hideKeyboardWhenTapped()
 
 
-//        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
+        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -307,7 +307,7 @@ final class StopWatchViewController: UIViewController {
                 self.dDayLabel.alpha = 0
                 self.calendarView.changeCalendarMode.setTitle("월▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
-                self.chartView?.updateConstant(0)
+//                self.chartView?.updateConstant(0)
             case .month:
                 self.calendarView.calendarMode = .week
                 
@@ -328,10 +328,10 @@ final class StopWatchViewController: UIViewController {
                 self.calendarView.changeCalendarMode.setTitle("주▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
                 
-                self.chartView?.updateConstant(30)
+//                self.chartView?.updateConstant(30)
                 self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
             }
-            self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
+//            self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
         }
     }
     
@@ -570,7 +570,7 @@ extension StopWatchViewController {
         }
         
         self.toDoTableView.snp.makeConstraints { make in
-            make.top.equalTo(self.calendarView.snp.bottom).offset(10)
+            make.top.equalTo(self.calendarView.snp.bottom).offset(4)
             make.bottom.equalTo(self.goalTimeView.snp.top)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
