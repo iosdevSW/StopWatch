@@ -10,6 +10,7 @@ target 'StopWatch' do
 	pod 'Realm'
 	pod 'SnapKit', '~> 5.0.0'
 	pod 'Then'
+	pod 'SWColorPicker'
 
 
 end

@@ -27,8 +27,6 @@ final class StopWatchViewController: UIViewController {
     
     weak var delegate: StopWatchVCDelegate?
     
-    var saveDate: String = ""
-    
     private let guideLabelView = GuideLabelView()
     private let calendarView = CalendarView()
     private let goalTimeView = GoalTimeView()
@@ -91,14 +89,14 @@ final class StopWatchViewController: UIViewController {
         
         // gesture
         self.hideKeyboardWhenTapped()
+
+
 //        print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // 프로퍼티 값 갱신
-        self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate //오늘 날짜!
-        
         self.setDeviceMotion()   // coremotion 시작
         self.reloadProgressBar() // 진행바 재로딩
         self.setNavigationBar()  // 네비게이션바 설정
@@ -123,7 +121,7 @@ final class StopWatchViewController: UIViewController {
     
     //MARK: - Method
     private func autoScrollCurrentDate(){ // 현재 날짜로 달력 스크롤
-        let itemIndex = CalendarMethod().returnIndexOfDay(date: self.saveDate)
+        let itemIndex = CalendarMethod().returnIndexOfDay(date: self.calendarView.selectDateComponent.stringFormat)
         self.calendarView.calendarView.scrollToItem(at: IndexPath(item: itemIndex - 1, section: 0), at: .left, animated: true)
     }
     
@@ -172,9 +170,9 @@ final class StopWatchViewController: UIViewController {
         UIView.animate(withDuration: 0.3){
             self.editGoalTimeView!.transform = .identity
         }
-        StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
+        StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat) // 오늘 데이터가 없으면 데이터 생성
         
-        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
+        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)!
         let goal = dailyData.totalGoalTime
         let hourIndex = Int(goal / 3600) % 24 // 3600초 (1시간)으로 나눈 몫을 24로 나누면 시간 인덱스와 같다.
         let miniuteIndex = ((Int(goal) % 3600 ) / 60) / 5 // 남은 분을 5로 나누면 5분간격의 분 인덱스와 같다.
@@ -191,7 +189,7 @@ final class StopWatchViewController: UIViewController {
             UIView.animate(withDuration: 0.5,animations: {
                 _editGoalTimeView.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
             }){_ in
-                StopWatchDAO().deleteDailyData(date: self.saveDate)
+                StopWatchDAO().deleteDailyData(date: self.calendarView.selectDateComponent.stringFormat)
                 _editGoalTimeView.removeFromSuperview()
                 self.editGoalTimeView = nil
                 self.removeTapGesture()
@@ -226,7 +224,7 @@ final class StopWatchViewController: UIViewController {
         if self.chartView != nil { return }
         
         self.chartView = ChartView().then {
-            $0.saveDate = self.saveDate
+            $0.saveDate = self.calendarView.selectDateComponent.stringFormat
             
             self.frameView.addSubview($0)
             $0.snp.makeConstraints { make in
@@ -339,7 +337,7 @@ final class StopWatchViewController: UIViewController {
     
     @objc func didChangeSaveDate(_ notification: Notification) {
         if let saveDate = notification.userInfo?["selectedDate"] as? String {
-            self.saveDate = saveDate
+            self.chartView?.saveDate = saveDate
         }
         
         self.setGoalTime() // 목표시간 Label 재설정
@@ -347,7 +345,6 @@ final class StopWatchViewController: UIViewController {
         self.setTimeLabel() // 현재시간 Label 재설정
         self.toDoTableView.reloadData()
         self.calendarView.calendarView.reloadData()
-        self.chartView?.saveDate = self.saveDate
         self.chartView?.setNeedsDisplay() // 차트 다시 그리기
     }
     
@@ -362,7 +359,7 @@ final class StopWatchViewController: UIViewController {
     // 목표 시간 설정 뷰 닫기
     @objc func didFinishEditingGoalTime(_ sender: UIButton){
         if sender.tag == 1 { // 확인버튼
-            let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+            let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)
             try! self.realm.write{
                 dailyData!.totalGoalTime =
                 self.editGoalTimeView!.selectedHour + self.editGoalTimeView!.selectedMinute
@@ -392,9 +389,9 @@ final class StopWatchViewController: UIViewController {
     
     //세션(과목명)을 눌렀을때 호출되는 메소드
     @objc func didClickSection(_ sender: UIButton){
-        StopWatchDAO().create(date: self.saveDate) // 오늘 데이터가 없으면 데이터 생성
+        StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat) // 오늘 데이터가 없으면 데이터 생성
         
-        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)!
+        let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)!
         
         let segments = dailyData.dailySegment // 오늘 과목들
         let section = sender.tag
@@ -623,9 +620,9 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)
         let segment = filter?.dailySegment
-        StopWatchDAO().checkSegmentData(date: self.saveDate)
+        StopWatchDAO().checkSegmentData(date: self.calendarView.selectDateComponent.stringFormat)
         return segment?[section].toDoList.count ?? 0 // 오늘의 리스트가 없으면 0개
     }
     
@@ -707,7 +704,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
         // 마지막 섹션에 문구 출력
         if section == (categoryCount - 1) {
             // 오늘의 데이터가 nil일때
-            guard let category = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate) else { return guideText }
+            guard let category = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat) else { return guideText }
             
             var sum = 0 // todolist 합
             
@@ -727,7 +724,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
 extension StopWatchViewController: UITextFieldDelegate {
     //입력이 끝나면 호출되는 델리게이트메소드
     func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)
         let segment = filter!.dailySegment
         
         let row = segment[textField.tag].toDoList.count - 1
@@ -737,7 +734,7 @@ extension StopWatchViewController: UITextFieldDelegate {
                 segment[textField.tag].toDoList.remove(at: row)
                 segment[textField.tag].listCheckImageIndex.remove(at: row)
             }
-            StopWatchDAO().deleteDailyData(date: self.saveDate)
+            StopWatchDAO().deleteDailyData(date: self.calendarView.selectDateComponent.stringFormat)
             
         }else {
             try! self.realm.write{
@@ -755,7 +752,7 @@ extension StopWatchViewController: UITextFieldDelegate {
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)
+        let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)
         let segment = filter!.dailySegment
         
         let row = segment[textField.tag].toDoList.count - 1
@@ -822,3 +819,4 @@ extension StopWatchViewController {
         }
     }
 }
+
