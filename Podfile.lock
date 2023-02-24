@@ -5,7 +5,7 @@ PODS:
   - RealmSwift (10.36.0):
     - Realm (= 10.36.0)
   - SnapKit (5.0.1)
-  - SWColorPicker (0.2.1)
+  - SWColorPicker (0.2.2)
   - Then (3.0.0)
 
 DEPENDENCIES:
@@ -27,7 +27,7 @@ SPEC CHECKSUMS:
   Realm: 3fd136cb4c83a927482a7f1612496d37beed3cf5
   RealmSwift: 513d4dcbf5bfc4d573454088b592685fc48dd716
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
-  SWColorPicker: 1a4a4d1af47fe4f7b17920fe241eafb26e0a98e0
+  SWColorPicker: 11582e7c4153a073cb759cb2f152cc972b16ba86
   Then: 844265ae87834bbe1147d91d5d41a404da2ec27d
 
 PODFILE CHECKSUM: 2bc8538e3a7e41e8c11b59570633990f1d1432d3
