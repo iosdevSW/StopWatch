@@ -130,11 +130,15 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
         
         self.days = []
         for day in weekDayAdding...daysOfMonth {
+
             if day < 1 {
                 days.append("")
             } else {
                 self.days.append(String(day))
             }
+        }
+        while (days.count % 7) != 0 {
+            days.append("")
         }
     }
     
