@@ -104,7 +104,8 @@ final class StopWatchViewController: UIViewController {
         self.calendarView.calendarView.reloadData()
         self.setDday()
         self.setTimeLabel()
-        self.guideLabelView.isHidden = false
+        
+        if self.calendarView.calendarMode == .week { self.guideLabelView.isHidden = false }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -306,8 +307,8 @@ final class StopWatchViewController: UIViewController {
                 self.mainTimeLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
                 self.dDayLabel.alpha = 0
                 self.calendarView.changeCalendarMode.setTitle("월▾", for: .normal)
+                self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
                 self.mainTimeLabel.layoutIfNeeded()
-//                self.chartView?.updateConstant(0)
             case .month:
                 self.calendarView.calendarMode = .week
                 
@@ -327,11 +328,7 @@ final class StopWatchViewController: UIViewController {
                 self.dDayLabel.alpha = 1
                 self.calendarView.changeCalendarMode.setTitle("주▾", for: .normal)
                 self.mainTimeLabel.layoutIfNeeded()
-                
-//                self.chartView?.updateConstant(30)
-                self.guideLabelView.stopAnimate() // 가이드 레이블 멈춤
             }
-//            self.chartView?.setNeedsDisplay() // 차트 뷰 다시그리기
         }
     }
     
