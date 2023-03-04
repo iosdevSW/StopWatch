@@ -38,7 +38,7 @@ final class GuideLabelView: UIView {
     func startAnimate() {
         self.isHidden = false
         var count = 0
-        self.timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) {
+        self.timer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) {
             count += 1
             UIView.transition(with: self,
                               duration: 3.0,
