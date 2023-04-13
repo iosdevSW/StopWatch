@@ -15,6 +15,7 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
     private let realm = try! Realm()
     let calendarMethod = CalendarMethod()
     weak var modalCalendarDelegate: ChangeSelectDateDelegate?
+    private let cellSize: CGFloat
     
     private let calendar = Calendar.current
     var currentCalendarComponent = DateComponents() // 현재 달력의 보여지는 년/달
@@ -86,8 +87,10 @@ final class CalendarView: UIView,UICollectionViewDelegate, UICollectionViewDataS
         return view
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(cellSize: CGFloat? = (UIScreen.main.bounds.size.width - 20) / 7) {
+        self.cellSize = cellSize!
+        
+        super.init(frame: .zero)
         self.addSubView()
         self.layout()
         self.addTarget()
@@ -281,7 +284,7 @@ extension CalendarView: UICollectionViewDelegateFlowLayout {
     //뷰 크기 리턴
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(
-            width: (UIScreen.main.bounds.size.width - 20) / 7,
+            width: self.cellSize,
             height: 32
         )
     }

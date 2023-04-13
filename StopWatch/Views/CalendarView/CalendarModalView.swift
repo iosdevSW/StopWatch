@@ -18,7 +18,7 @@ final class CalendarModalView: UIView {
     //MARK: - Properties
     var indexPath: IndexPath!
     var changeDateComponent = DateComponents()
-    
+    let cellSize = (UIScreen.main.bounds.size.width - 60) / 7
     private var isTodayDate: Bool = true {
         didSet{
             let title = self.isTodayDate ? "내일 하기" : "오늘 하기"
@@ -49,7 +49,7 @@ final class CalendarModalView: UIView {
         $0.layer.shadowColor = UIColor.darkGray.cgColor
     }
 
-    lazy var calendarView = CalendarView().then {
+    lazy var calendarView = CalendarView(cellSize: cellSize).then {
         $0.calendarMode = .month
         $0.calendarView.layer.cornerRadius = 20
         $0.yearMonthLabel.font = UIFont(name: "GodoM", size: 16)
