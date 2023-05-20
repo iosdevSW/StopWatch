@@ -446,6 +446,9 @@ final class StopWatchViewController: UIViewController {
         case .dDay:
             let ddayVC = DdayViewController()
             self.navigationController?.pushViewController(ddayVC, animated: true)
+        case .contact:
+            let contact = ContactViewController()
+            self.navigationController?.pushViewController(contact, animated: true)
         case .statistics:
             print("미구현")
         }

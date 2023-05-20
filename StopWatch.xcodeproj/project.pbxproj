@@ -17,6 +17,7 @@
 		DB30E09A29487D1800F1151A /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB30E09929487D1800F1151A /* UIView+.swift */; };
 		DB340BC82940750100795FFC /* UITextField+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC72940750100795FFC /* UITextField+.swift */; };
 		DB340BCA2940753400795FFC /* UIColor+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC92940753400795FFC /* UIColor+.swift */; };
+		DB3BB9D72A1904D700E4432A /* ContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3BB9D62A1904D700E4432A /* ContactViewController.swift */; };
 		DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */; };
 		DB40D2002609B32C00A4E9FC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB40D1FE2609B32C00A4E9FC /* Main.storyboard */; };
 		DB40D2022609B32E00A4E9FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB40D2012609B32E00A4E9FC /* Assets.xcassets */; };
@@ -68,6 +69,7 @@
 		DB30E09929487D1800F1151A /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		DB340BC72940750100795FFC /* UITextField+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+.swift"; sourceTree = "<group>"; };
 		DB340BC92940753400795FFC /* UIColor+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+.swift"; sourceTree = "<group>"; };
+		DB3BB9D62A1904D700E4432A /* ContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactViewController.swift; sourceTree = "<group>"; };
 		DB40D1F52609B32C00A4E9FC /* StopWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StopWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DB40D1FF2609B32C00A4E9FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				DBBD52FF2636B109002F5157 /* CategoryViewController.swift */,
 				DBA7ED5427DDAC49004B0D0E /* MenuViewController.swift */,
 				DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */,
+				DB3BB9D62A1904D700E4432A /* ContactViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -464,6 +467,7 @@
 				DBBDF75826527986003F55FE /* drawBarView.swift in Sources */,
 				DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */,
 				DB340BCA2940753400795FFC /* UIColor+.swift in Sources */,
+				DB3BB9D72A1904D700E4432A /* ContactViewController.swift in Sources */,
 				DBA7ED5927DDAFF4004B0D0E /* MenuOption.swift in Sources */,
 				DB30E09A29487D1800F1151A /* UIView+.swift in Sources */,
 				DBEC226A276864380083ECDA /* ListEditItemView.swift in Sources */,

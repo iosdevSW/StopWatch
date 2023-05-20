@@ -11,6 +11,7 @@ enum MenuOption: Int,CustomStringConvertible {
     case category
     case goalTime
     case dDay
+    case contact
     case statistics
     
     var description: String {
@@ -19,6 +20,7 @@ enum MenuOption: Int,CustomStringConvertible {
         case .goalTime: return "SetGoalTime"
         case .dDay: return "D-Day"
         case .statistics: return "Statistics"
+        case .contact: return "Contact"
         }
     }
     
@@ -28,6 +30,7 @@ enum MenuOption: Int,CustomStringConvertible {
         case .goalTime: return UIImage(named: "goalTime") ?? UIImage()
         case .dDay: return UIImage(named: "dday") ?? UIImage()
         case .statistics: return UIImage(named: "statistics") ?? UIImage()
+        case .contact: return UIImage(named: "contact") ?? UIImage()
         }
     }
 }
