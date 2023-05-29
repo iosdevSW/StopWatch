@@ -32,7 +32,6 @@ class StopWatchDAO {
                     
                     day.dailySegment.append(object) // 오늘 데이터에 오늘 과목들 넣기
                 }
-                print(day)
                 realm.add(day)
             }
         }

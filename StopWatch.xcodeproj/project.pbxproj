@@ -13,6 +13,10 @@
 		DB10DB8C27E4A081000560A3 /* GodoM.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DB10DB8B27E4A081000560A3 /* GodoM.ttf */; };
 		DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */; };
 		DB2890752623074A00FCC4BC /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2890742623074900FCC4BC /* ChartView.swift */; };
+		DB2E263A2A246E82000D922E /* CheckImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2E26392A246E82000D922E /* CheckImage.swift */; };
+		DB2E263D2A246F0C000D922E /* Palette.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2E263C2A246F0C000D922E /* Palette.swift */; };
+		DB2E263F2A2470AC000D922E /* Segments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2E263E2A2470AC000D922E /* Segments.swift */; };
+		DB2E26412A24734C000D922E /* DailyData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2E26402A24734C000D922E /* DailyData.swift */; };
 		DB30E09829487CFA00F1151A /* UIViewController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB30E09729487CFA00F1151A /* UIViewController+.swift */; };
 		DB30E09A29487D1800F1151A /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB30E09929487D1800F1151A /* UIView+.swift */; };
 		DB340BC82940750100795FFC /* UITextField+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB340BC72940750100795FFC /* UITextField+.swift */; };
@@ -22,7 +26,7 @@
 		DB40D2002609B32C00A4E9FC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB40D1FE2609B32C00A4E9FC /* Main.storyboard */; };
 		DB40D2022609B32E00A4E9FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB40D2012609B32E00A4E9FC /* Assets.xcassets */; };
 		DB40D2052609B32E00A4E9FC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */; };
-		DB4FE82426BF80F100B1DF3E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FE82326BF80F100B1DF3E /* Model.swift */; };
+		DB4FE82426BF80F100B1DF3E /* SegmentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4FE82326BF80F100B1DF3E /* SegmentData.swift */; };
 		DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A7276CB61C00CF737C /* CalendarView.swift */; };
 		DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */; };
 		DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */; };
@@ -65,6 +69,10 @@
 		DB10DB8B27E4A081000560A3 /* GodoM.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GodoM.ttf; sourceTree = "<group>"; };
 		DB1BDAEC27F0603D0004AB4B /* GuideLabelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideLabelView.swift; sourceTree = "<group>"; };
 		DB2890742623074900FCC4BC /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		DB2E26392A246E82000D922E /* CheckImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckImage.swift; sourceTree = "<group>"; };
+		DB2E263C2A246F0C000D922E /* Palette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Palette.swift; sourceTree = "<group>"; };
+		DB2E263E2A2470AC000D922E /* Segments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segments.swift; sourceTree = "<group>"; };
+		DB2E26402A24734C000D922E /* DailyData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyData.swift; sourceTree = "<group>"; };
 		DB30E09729487CFA00F1151A /* UIViewController+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+.swift"; sourceTree = "<group>"; };
 		DB30E09929487D1800F1151A /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		DB340BC72940750100795FFC /* UITextField+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+.swift"; sourceTree = "<group>"; };
@@ -76,7 +84,7 @@
 		DB40D2012609B32E00A4E9FC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DB40D2042609B32E00A4E9FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DB40D2062609B32E00A4E9FC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB4FE82326BF80F100B1DF3E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Model.swift; path = StopWatch/Models/Model.swift; sourceTree = SOURCE_ROOT; };
+		DB4FE82326BF80F100B1DF3E /* SegmentData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SegmentData.swift; path = StopWatch/Models/SegmentData.swift; sourceTree = SOURCE_ROOT; };
 		DB5AE4A7276CB61C00CF737C /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTimeView.swift; sourceTree = "<group>"; };
@@ -198,6 +206,16 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		DB2E263B2A246EC1000D922E /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */,
+				DBC6782E293E991E0079CF1A /* MonthName.swift */,
+				DB2E26392A246E82000D922E /* CheckImage.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
 		DB340BCB2943602400795FFC /* TodoList */ = {
 			isa = PBXGroup;
 			children = (
@@ -285,9 +303,11 @@
 		DBA7ED5A27DDAFFF004B0D0E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				DBA7ED5827DDAFF4004B0D0E /* MenuOption.swift */,
-				DBC6782E293E991E0079CF1A /* MonthName.swift */,
-				DB4FE82326BF80F100B1DF3E /* Model.swift */,
+				DB2E263B2A246EC1000D922E /* Enums */,
+				DB4FE82326BF80F100B1DF3E /* SegmentData.swift */,
+				DB2E263C2A246F0C000D922E /* Palette.swift */,
+				DB2E263E2A2470AC000D922E /* Segments.swift */,
+				DB2E26402A24734C000D922E /* DailyData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -449,6 +469,8 @@
 				DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */,
 				DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */,
 				DB8DB18D2611E67900A5814A /* StopWatchViewController.swift in Sources */,
+				DB2E26412A24734C000D922E /* DailyData.swift in Sources */,
+				DB2E263A2A246E82000D922E /* CheckImage.swift in Sources */,
 				DBA7ED5527DDAC49004B0D0E /* MenuViewController.swift in Sources */,
 				DB8F532F26F085E60071F911 /* CustomTextField.swift in Sources */,
 				DBC6782F293E991E0079CF1A /* MonthName.swift in Sources */,
@@ -460,6 +482,8 @@
 				DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */,
 				DB8F532826F07A3A0071F911 /* PaletteCell.swift in Sources */,
 				DB0E89B9262842BE00533009 /* TimeSaveModalView.swift in Sources */,
+				DB2E263D2A246F0C000D922E /* Palette.swift in Sources */,
+				DB2E263F2A2470AC000D922E /* Segments.swift in Sources */,
 				DBBD53002636B109002F5157 /* CategoryViewController.swift in Sources */,
 				DB2890752623074A00FCC4BC /* ChartView.swift in Sources */,
 				DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */,
@@ -474,7 +498,7 @@
 				DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
 				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
-				DB4FE82426BF80F100B1DF3E /* Model.swift in Sources */,
+				DB4FE82426BF80F100B1DF3E /* SegmentData.swift in Sources */,
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,
 				DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */,
 				DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */,
