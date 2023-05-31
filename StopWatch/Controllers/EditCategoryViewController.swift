@@ -101,7 +101,7 @@ final class EditCategoryViewController: UIViewController {
         if name == ""{
             self.notiAlert(title: "경 고", message: "색과 이름을 모두 입력해주세요.")
         }else{
-            StopWatchDAO().addSegment(row: code, name: name, date: self.saveDate) // 과목을 DB에 추가하는 메소드
+            StopWatchDAO().addSegment(code, name: name, forDate: self.saveDate) // 과목을 DB에 추가하는 메소드
             
             self.navigationController?.popViewController(animated: true) // 전 뷰로 돌아가기
         }

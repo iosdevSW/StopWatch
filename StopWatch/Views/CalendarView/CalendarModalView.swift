@@ -145,7 +145,7 @@ final class CalendarModalView: UIView {
     }
     
     @objc func clickOkButton(_ sender: UIButton){
-        let _ = StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat)
+        StopWatchDAO().createDailyData(self.calendarView.selectDateComponent.stringFormat)
         
         self.changeDateTodoList()
     }
@@ -164,7 +164,7 @@ final class CalendarModalView: UIView {
             self.calendarView.selectDateComponent = todayComponents // 오늘로 설정
         }
         
-        let _ = StopWatchDAO().create(date: CalendarMethod().componentToDateString(self.calendarView.selectDateComponent))// 선택한 날짜 데이터 생성
+        StopWatchDAO().createDailyData(self.calendarView.selectDateComponent.stringFormat)// 선택한 날짜 데이터 생성
         
         self.changeDateTodoList()
     }

@@ -14,10 +14,16 @@ class DailyData: Object {
     @Persisted var totalGoalTime: TimeInterval
     @Persisted var dailySegment = List<SegmentData>()
     
-    init(_ date: String) {
-        super.init()
+    convenience init(_ date: String) {
+        self.init()
         self.date = date
         self.totalTime = 0
         self.totalGoalTime = 0
+        
+        let realm = try! Realm()
+        for seg in realm.objects(Segments.self) {
+            let segmentData = SegmentData(date: date, segment: seg)
+            self.dailySegment.append(segmentData)
+        }
     }
 }

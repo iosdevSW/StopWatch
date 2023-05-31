@@ -171,7 +171,7 @@ final class StopWatchViewController: UIViewController {
         UIView.animate(withDuration: 0.3){
             self.editGoalTimeView!.transform = .identity
         }
-        StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat) // 오늘 데이터가 없으면 데이터 생성
+        StopWatchDAO().createDailyData(self.calendarView.selectDateComponent.stringFormat)
         
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)!
         let goal = dailyData.totalGoalTime
@@ -386,7 +386,7 @@ final class StopWatchViewController: UIViewController {
     
     //세션(과목명)을 눌렀을때 호출되는 메소드
     @objc func didClickSection(_ sender: UIButton){
-        StopWatchDAO().create(date: self.calendarView.selectDateComponent.stringFormat) // 오늘 데이터가 없으면 데이터 생성
+        StopWatchDAO().createDailyData(self.calendarView.selectDateComponent.stringFormat)
         
         let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)!
         
@@ -622,7 +622,7 @@ extension StopWatchViewController: UITableViewDelegate,UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let filter = self.realm.object(ofType: DailyData.self, forPrimaryKey: self.calendarView.selectDateComponent.stringFormat)
         let segment = filter?.dailySegment
-        StopWatchDAO().checkSegmentData(date: self.calendarView.selectDateComponent.stringFormat)
+
         return segment?[section].toDoList.count ?? 0 // 오늘의 리스트가 없으면 0개
     }
     

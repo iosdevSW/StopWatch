@@ -9,59 +9,32 @@ import UIKit
 import RealmSwift
 
 class StopWatchDAO {
-    let realm = try! Realm()
+    private let realm = try! Realm()
     
-    /// 오늘의 데이터가 없을 때 오늘 데이터를 생성하는 함수
-    func create(date: String){
-        if let _ = self.realm.object(ofType: DailyData.self, forPrimaryKey: date) {
-        } else {
-            try! realm.write{
-                let day = DailyData() // 오늘 데이터 생성
-                day.date = date
-                day.totalGoalTime = 0
-                day.totalTime = 0
-                let totalSeg = realm.objects(Segments.self)
-                
-                for seg in totalSeg {
-                    let object = SegmentData() // 오늘 과목들 생성
-                    object.date = date
-                    object.goal = 0
-                    object.value = 0
-                    object.segment = seg
-                    realm.add(object)
-                    
-                    day.dailySegment.append(object) // 오늘 데이터에 오늘 과목들 넣기
-                }
-                realm.add(day)
-            }
-        }
+    /// 특정 Date의 Object가 존재하는지 여부를 반환하는 메소드
+    func doesObjectExist<T: Object>(type: T.Type, forDate: String) -> Bool {
+        return self.realm.object(ofType: T.self, forPrimaryKey: forDate) == nil ? false : true
     }
     
-    ///과목 추가 메소드
-    func addSegment(row: Int, name: String, date: String){
-        
-        try! realm.write{
-            let segment = Segments() // 과목리스트 추가
-            segment.colorCode = row
-            segment.name = name
-            
-            realm.add(segment)
-            
-            if let dailyData = realm.object(ofType: DailyData.self, forPrimaryKey: date)  {// 오늘 데이터 불러오기
-                let segmentData = SegmentData() // 오늘의 과목에 추가
-                segmentData.date = date
-                segmentData.goal = 0
-                segmentData.value = 0
-                segmentData.segment = segment
-                
-                realm.add(segmentData)
-                dailyData.dailySegment.append(segmentData) // 오늘 데이터에 추가한 과목 추가
+    func getObject<T: Object>(_ type: T.Type) -> Results<T> {
+        return self.realm.objects(T.self)
+    }
+    
+    /// 오늘의 데이터가 없을 때 오늘 데이터를 생성하는 함수
+    func createDailyData(_ forDate: String) {
+        guard !self.doesObjectExist(type: DailyData.self, forDate: forDate) else { return }
+
+        do {
+            try realm.write {
+                realm.add(DailyData(forDate))
             }
+        } catch {
+            print("Failed to create Object: \(error.localizedDescription)")
         }
     }
     
     /// date날짜 데이터 삭제
-    func deleteDailyData(date: String){
+    func deleteDailyData(date: String) {
         // 해당 날짜에 빈 segmentData 가 있는지 확인
         let blankSegmentData = self.realm.objects(SegmentData.self).where {
             ($0.value == 0) && ($0.goal == 0) && ($0.toDoList.count == 0) && ($0.date == date)
@@ -79,39 +52,53 @@ class StopWatchDAO {
         }
     }
     
-    func checkSegmentData(date: String) {
-        let segmentData = self.realm.objects(SegmentData.self).where {
-            $0.date == date
-        }
-        let segemnts = self.realm.objects(Segments.self)
-        guard let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: date) else { return }
-        
-        for segment in segemnts {
-            let isSeg = segmentData.contains{ seg in seg.segment == segment }
-            if isSeg == false {
-                try! self.realm.write{
-                    let object = SegmentData() // 오늘 과목들 생성
-                    object.date = date
-                    object.goal = 0
-                    object.value = 0
-                    object.segment = segment
-                    realm.add(object)
-                    
-                    dailyData.dailySegment.append(object)
+    /// 과목 추가 메소드
+    func addSegment(_ colorRow: Int, name: String, forDate: String) {
+        do {
+            try realm.write {
+                let segment = Segments(name: name, colorCode: colorRow)
+                realm.add(segment)
+                
+                let dailyData = getObject(DailyData.self)
+                
+                for data in dailyData {
+                    data.dailySegment.append(SegmentData(date: data.date, segment: segment))
                 }
             }
+        } catch {
+            print("Failed to add segment: \(error.localizedDescription)")
         }
     }
+    
+//    func checkSegmentData(date: String) {
+//        let segmentData = self.realm.objects(SegmentData.self).where {
+//            $0.date == date
+//        }
+//        let segemnts = self.realm.objects(Segments.self)
+//        guard let dailyData = self.realm.object(ofType: DailyData.self, forPrimaryKey: date) else { return }
+//
+//        for segment in segemnts {
+//            let isSeg = segmentData.contains{ seg in seg.segment == segment }
+//            if isSeg == false {
+//                try! self.realm.write{
+//                    let object = SegmentData() // 오늘 과목들 생성
+//                    object.date = date
+//                    object.goal = 0
+//                    object.value = 0
+//                    object.segment = segment
+//                    realm.add(object)
+//
+//                    dailyData.dailySegment.append(object)
+//                }
+//            }
+//        }
+//    }
+    
     //MARK: - DailyData 편집(읽기)
     /// DailyData 읽기
     func getDailyData(_ date: String) -> DailyData? {
         return self.realm.object(ofType: DailyData.self, forPrimaryKey: date)
     }
-    
-    func getDailyDatad(_ date: DateComponents) -> DailyData? {
-        return self.realm.object(ofType: DailyData.self, forPrimaryKey: date.stringFormat)
-    }
-    
     
     /// 총 시간 읽기!
     func getTotalTime(_ date: DateComponents) -> TimeInterval {
@@ -163,7 +150,7 @@ class StopWatchDAO {
                 from.toDoList.append(list)
                 from.listCheckImageIndex.append(0)
             }
-        } catch(let error) {
+        } catch {
             print(error.localizedDescription)
             return false
         }
@@ -177,7 +164,7 @@ class StopWatchDAO {
                 from.toDoList.append(to.toDoList[row])
                 from.listCheckImageIndex.append(0)
             }
-        } catch(let error) {
+        } catch {
             print(error.localizedDescription)
             return false
         }
@@ -187,7 +174,7 @@ class StopWatchDAO {
     /// TodoList 수정
     func editTodoList(_ segData: SegmentData, row: Int, text: String) {
         do {
-            try self.realm.write{
+            try self.realm.write {
                 segData.toDoList[row] = text
             }
         } catch let error {
@@ -237,7 +224,6 @@ class StopWatchDAO {
     }
     
     //MARK: - Segment
-    
     /// Segment 불러오기
     func getSegment(_ row: Int) -> Segments {
         return self.realm.objects(Segments.self)[row]

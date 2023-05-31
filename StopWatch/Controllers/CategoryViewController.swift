@@ -45,7 +45,6 @@ final class CategoryViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         self.saveDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
-//        StopWatchDAO().create(date: self.saveDate)
         
         self.categoryTableView.reloadData()
         self.configureNavigationBar()
@@ -54,8 +53,10 @@ final class CategoryViewController: UIViewController {
     //MARK: - Method 
     private func deleteCategory(point: CGPoint) {
         if let indexPath = self.categoryTableView.indexPathForRow(at: point) {
-            StopWatchDAO().deleteSegmentData(row: indexPath.row)
-            StopWatchDAO().create(date: self.saveDate)
+            let stopWatchDAO = StopWatchDAO()
+            stopWatchDAO.deleteSegmentData(row: indexPath.row)
+            stopWatchDAO.createDailyData(self.saveDate)
+            
             self.categoryTableView.reloadData()
         }
     }

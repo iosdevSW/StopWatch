@@ -12,4 +12,10 @@ class Segments: Object {
     @Persisted(primaryKey: true) var id : String = UUID().uuidString // 과목번호
     @Persisted var name: String // 과목명
     @Persisted var colorCode: Int //과목색상코드
+    
+    convenience init(name: String, colorCode: Int) {
+        self.init()
+        self.name = name
+        self.colorCode = colorCode
+    }
 }

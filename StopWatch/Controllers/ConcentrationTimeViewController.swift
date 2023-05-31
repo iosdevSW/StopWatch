@@ -99,7 +99,7 @@ final class ConcentrationTimeViewController: UIViewController{
         
         self.resetDate = (UIApplication.shared.delegate as! AppDelegate).resetDate
         
-        StopWatchDAO().create(date: self.resetDate) // 오늘 데이터 없으면 생성
+        StopWatchDAO().createDailyData(self.resetDate)
         
         self.changeUIColor(row: 0)
     }
