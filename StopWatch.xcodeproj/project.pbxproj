@@ -184,13 +184,12 @@
 		DB289046261C4F6600FCC4BC /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				DB62D66D2A273D83007D88F3 /* Category */,
 				DBF11E992A266A8100A69445 /* Authentication */,
 				DBA7ED5227DDAC39004B0D0E /* ContainerViewController.swift */,
 				DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */,
 				DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */,
 				DBAD2A4826D3E4370083478E /* BlackViewController.swift */,
-				DB8F532426F05C1A0071F911 /* EditCategoryViewController.swift */,
-				DBBD52FF2636B109002F5157 /* CategoryViewController.swift */,
 				DBA7ED5427DDAC49004B0D0E /* MenuViewController.swift */,
 				DBA7ED5F27E0614A004B0D0E /* DdayViewController.swift */,
 				DB3BB9D62A1904D700E4432A /* ContactViewController.swift */,
@@ -291,6 +290,15 @@
 				DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */,
 			);
 			path = CalendarView;
+			sourceTree = "<group>";
+		};
+		DB62D66D2A273D83007D88F3 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				DBBD52FF2636B109002F5157 /* CategoryViewController.swift */,
+				DB8F532426F05C1A0071F911 /* EditCategoryViewController.swift */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 		DB89756364217619A0677F8E /* Frameworks */ = {

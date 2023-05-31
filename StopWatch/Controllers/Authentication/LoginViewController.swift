@@ -83,6 +83,7 @@ final class LoginViewController: UIViewController {
         Auth.auth().signIn(withEmail: userInfo.email, password: userInfo.password) { (result,error) in
             guard let result else { self.errorHandler((error! as NSError)); return }
             if result.user.isEmailVerified {
+                NotificationCenter.default.post(name: .changeAuthState, object: nil)
                 self.dismiss(animated: true)
             } else {
                 let alert = UIAlertController(title: nil, message: "이메일 인증이 필요합니다.", preferredStyle: .alert)

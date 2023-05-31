@@ -35,9 +35,13 @@ final class MenuOptionCell: UITableViewCell{
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureCell(_ menu: MenuOption?) {
+    func configureCell(_ menu: MenuOption?, isLogoutCell: Bool = false) {
         self.menuImageView.image = menu?.image
         self.menuTitleLabel.text = menu?.description
+        if isLogoutCell {
+            self.menuImageView.tintColor = UIColor(red: 180/255, green: 88/255, blue: 90/255, alpha: 1)
+            self.menuTitleLabel.textColor = UIColor(red: 180/255, green: 88/255, blue: 90/255, alpha: 1)
+        }
     }
     
     private func layout() {

@@ -108,11 +108,7 @@ final class StopWatchViewController: UIViewController {
         if self.calendarView.calendarMode == .week { self.guideLabelView.isHidden = false }
         
         // 로그인 상태가 아니면 LoginVC띄우기
-        if Auth.auth().currentUser == nil || !Auth.auth().currentUser!.isEmailVerified {
-            let loginVC = UINavigationController(rootViewController: LoginViewController())
-            loginVC.modalPresentationStyle = .fullScreen
-            self.present(loginVC, animated: true)
-        }
+        self.checkUserAuthentication()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -128,6 +124,16 @@ final class StopWatchViewController: UIViewController {
     }
     
     //MARK: - Method
+    private func checkUserAuthentication() {
+        if Auth.auth().currentUser == nil || !Auth.auth().currentUser!.isEmailVerified {
+            let loginVC = UINavigationController(rootViewController: LoginViewController())
+            loginVC.modalPresentationStyle = .fullScreen
+            self.present(loginVC, animated: true)
+        } else {
+            NotificationCenter.default.post(name: .changeAuthState, object: nil)
+        }
+    }
+    
     private func autoScrollCurrentDate(){ // 현재 날짜로 달력 스크롤
         let itemIndex = CalendarMethod().returnIndexOfDay(date: self.calendarView.selectDateComponent.stringFormat)
         self.calendarView.calendarView.scrollToItem(at: IndexPath(item: itemIndex - 1, section: 0), at: .left, animated: true)
@@ -456,6 +462,14 @@ final class StopWatchViewController: UIViewController {
         case .contact:
             let contact = ContactViewController()
             self.navigationController?.pushViewController(contact, animated: true)
+        case .logout:
+            do {
+                try Auth.auth().signOut()
+                self.checkUserAuthentication()
+            } catch {
+                print(error.localizedDescription)
+            }
+            
         case .statistics:
             print("미구현")
         }
