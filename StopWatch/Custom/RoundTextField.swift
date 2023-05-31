@@ -8,7 +8,9 @@
 import UIKit
 
 final class RoundTextField: UIView {
-    private let textfield = UITextField()
+    private let textfield = UITextField().then {
+        $0.autocapitalizationType = .none
+    }
     
     var placeHolder: String = "" {
         didSet {

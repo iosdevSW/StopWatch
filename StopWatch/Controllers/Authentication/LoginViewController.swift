@@ -55,6 +55,18 @@ final class LoginViewController: UIViewController {
         $0.setAttributedTitle(attributedTitle, for: .normal)
     }
     
+    private let resetPasswordButton = UIButton(type: .system).then {
+        $0.backgroundColor = .white
+        let title = "P/W 찾기"
+        let attributedTitle = NSMutableAttributedString(string: title,
+                                                        attributes: [.font: UIFont.systemFont(ofSize: 12, weight: .regular),
+                                                                     .foregroundColor: #colorLiteral(red: 0.7810429931, green: 0.7810428739, blue: 0.7810428739, alpha: 1),
+                                                                     NSAttributedString.Key.underlineStyle : NSUnderlineStyle.single.rawValue,
+                                                                     .underlineColor: #colorLiteral(red: 0.7810429931, green: 0.7810428739, blue: 0.7810428739, alpha: 1)])
+        attributedTitle.addAttribute(.foregroundColor, value: UIColor(red: 201/255, green: 189/255, blue: 255/255, alpha: 1), range: (title as NSString).range(of: "P/W 찾기"))
+        $0.setAttributedTitle(attributedTitle, for: .normal)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -107,7 +119,34 @@ final class LoginViewController: UIViewController {
         self.navigationController?.pushViewController(RegisterViewController(), animated: true)
     }
     
-    func errorHandler(_ error: NSError) {
+    @objc private func didClickResetPWButton() {
+        let tempEmail = self.emailTextField.text ?? ""
+        
+        let alert = UIAlertController(title: "비밀번호 재설정", message: "비밀번호를 재설정하실 이메일을 입력해주세요.", preferredStyle: .alert)
+        alert.addTextField { tf in
+            tf.placeholder = "abc@naver.com"
+            tf.text = tempEmail
+        }
+        let cancel = UIAlertAction(title: "취소", style: .cancel)
+        let send = UIAlertAction(title: "재설정 메일 전송", style: .default) { _ in
+            let email = alert.textFields?[0].text ?? ""
+            let user = User(email: email, password: "")
+            Auth.auth().sendPasswordReset(withEmail: user.email) { error in
+                if let error {
+                    self.errorHandler(error as NSError)
+                } else {
+                    self.notiAlert(title: "이메일 전송 성공", message: "전송된 이메일을 확인하고 비밀번호 재설정 후 로그인을 시도해주세요.")
+                }
+            }
+        }
+        
+        alert.addAction(cancel)
+        alert.addAction(send)
+        
+        self.present(alert, animated: true)
+    }
+    
+    private func errorHandler(_ error: NSError) {
         switch error.code {
         case 17011:
             let alert = UIAlertController(title: nil, message: "회원정보가 없습니다.\n회원가입 하시겠습니까?", preferredStyle: .alert)
@@ -119,6 +158,8 @@ final class LoginViewController: UIViewController {
             alert.addAction(okAction)
             
             self.present(alert, animated: true)
+        case 17008:
+            self.notiAlert(title: "알 림", message: "올바르지 않은 이메일 형식입니다.")
         default: self.notiAlert(title: "잘못된 계정정보입니다.", message: nil)
         }
     }
@@ -155,6 +196,7 @@ final class LoginViewController: UIViewController {
         self.view.addSubview(loginButton)
         self.view.addSubview(warningLabel)
         self.view.addSubview(registerationButton)
+        self.view.addSubview(resetPasswordButton)
     }
 }
 
@@ -201,12 +243,18 @@ extension LoginViewController{
             $0.top.equalTo(self.loginButton.snp.bottom).offset(4)
             $0.leading.equalTo(self.loginButton.snp.leading)
         }
+        
+        self.resetPasswordButton.snp.makeConstraints {
+            $0.top.equalTo(self.registerationButton)
+            $0.leading.equalTo(self.registerationButton.snp.trailing).offset(20)
+        }
     }
     
     //MARK: - AddTarget
     private func addTarget() {
         self.loginButton.addTarget(self, action: #selector(self.didClickLoginButton), for:.touchUpInside)
         self.registerationButton.addTarget(self, action: #selector(self.didClickRegistButton), for: .touchUpInside)
+        self.resetPasswordButton.addTarget(self, action: #selector(self.didClickResetPWButton), for: .touchUpInside)
     }
 }
 

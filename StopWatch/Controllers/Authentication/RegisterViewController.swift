@@ -73,7 +73,7 @@ final class RegisterViewController: UIViewController {
     private func errorHandler(_ error: NSError) {
         switch error.code {
         case 17007: self.notiAlert(title: "이미 존재하는 계정입니다.", message: nil)
-        default: self.notiAlert(title: "잘못된 형식입니다..", message: nil)
+        default: self.notiAlert(title: "잘못된 형식입니다.", message: nil)
         }
     }
     
