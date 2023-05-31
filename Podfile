@@ -11,6 +11,7 @@ target 'StopWatch' do
 	pod 'SnapKit', '~> 5.0.0'
 	pod 'Then'
 	pod 'SWColorPicker'
-
-
+	pod 'FirebaseAnalytics'
+	pod 'FirebaseAuth'
+	pod 'FirebaseFirestore'
 end

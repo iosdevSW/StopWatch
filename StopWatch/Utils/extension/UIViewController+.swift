@@ -32,9 +32,11 @@ extension UIViewController {
     }
     
     ///단순 안내용 안내창 (확인 버튼만 존재)
-    func notiAlert(title: String?, message: String?) {
+    func notiAlert(title: String?, message: String?, completion: (()->())? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let ok = UIAlertAction(title: "확인", style: .default)
+        let ok = UIAlertAction(title: "확인", style: .default) { _ in
+            completion?()
+        }
         alert.addAction(ok)
         
         present(alert, animated: true)

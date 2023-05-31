@@ -57,6 +57,11 @@
 		DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC67830293F07D40079CF1A /* DateComponents+.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
 		DBEC226A276864380083ECDA /* ListEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2269276864380083ECDA /* ListEditItemView.swift */; };
+		DBF11E922A262AE700A69445 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DBF11E912A262AE700A69445 /* GoogleService-Info.plist */; };
+		DBF11E942A262DA800A69445 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E932A262DA800A69445 /* LoginViewController.swift */; };
+		DBF11E962A26321500A69445 /* RoundTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E952A26321500A69445 /* RoundTextField.swift */; };
+		DBF11E982A2636F800A69445 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E972A2636F800A69445 /* User.swift */; };
+		DBF11E9B2A266AB000A69445 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E9A2A266AB000A69445 /* RegisterViewController.swift */; };
 		DBF7E79226AFF438009902BE /* EditGoalTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF7E79126AFF438009902BE /* EditGoalTimeView.swift */; };
 /* End PBXBuildFile section */
 
@@ -115,6 +120,11 @@
 		DBC67830293F07D40079CF1A /* DateComponents+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+.swift"; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
 		DBEC2269276864380083ECDA /* ListEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListEditItemView.swift; sourceTree = "<group>"; };
+		DBF11E912A262AE700A69445 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		DBF11E932A262DA800A69445 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		DBF11E952A26321500A69445 /* RoundTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundTextField.swift; sourceTree = "<group>"; };
+		DBF11E972A2636F800A69445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		DBF11E9A2A266AB000A69445 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		DBF7E79126AFF438009902BE /* EditGoalTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGoalTimeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -174,6 +184,7 @@
 		DB289046261C4F6600FCC4BC /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				DBF11E992A266A8100A69445 /* Authentication */,
 				DBA7ED5227DDAC39004B0D0E /* ContainerViewController.swift */,
 				DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */,
 				DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */,
@@ -258,6 +269,7 @@
 				DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */,
 				DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */,
 				DB40D2062609B32E00A4E9FC /* Info.plist */,
+				DBF11E912A262AE700A69445 /* GoogleService-Info.plist */,
 			);
 			path = StopWatch;
 			sourceTree = "<group>";
@@ -296,6 +308,7 @@
 				DB8F532E26F085E60071F911 /* CustomTextField.swift */,
 				DB08F0C22765DB88001EBBEE /* StopWatchDAO.swift */,
 				DBA7ED6327E301C5004B0D0E /* CalendarMethod.swift */,
+				DBF11E952A26321500A69445 /* RoundTextField.swift */,
 			);
 			path = Custom;
 			sourceTree = "<group>";
@@ -308,6 +321,7 @@
 				DB2E263C2A246F0C000D922E /* Palette.swift */,
 				DB2E263E2A2470AC000D922E /* Segments.swift */,
 				DB2E26402A24734C000D922E /* DailyData.swift */,
+				DBF11E972A2636F800A69445 /* User.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -332,6 +346,15 @@
 				DB30E09929487D1800F1151A /* UIView+.swift */,
 			);
 			path = extension;
+			sourceTree = "<group>";
+		};
+		DBF11E992A266A8100A69445 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				DBF11E932A262DA800A69445 /* LoginViewController.swift */,
+				DBF11E9A2A266AB000A69445 /* RegisterViewController.swift */,
+			);
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 		F95DBA0BF70FC8275FA2BE45 /* Pods */ = {
@@ -404,6 +427,7 @@
 			files = (
 				DB40D2052609B32E00A4E9FC /* LaunchScreen.storyboard in Resources */,
 				DB40D2022609B32E00A4E9FC /* Assets.xcassets in Resources */,
+				DBF11E922A262AE700A69445 /* GoogleService-Info.plist in Resources */,
 				DB40D2002609B32C00A4E9FC /* Main.storyboard in Resources */,
 				DB10DB8C27E4A081000560A3 /* GodoM.ttf in Resources */,
 			);
@@ -461,6 +485,7 @@
 				DB08F0C32765DB88001EBBEE /* StopWatchDAO.swift in Sources */,
 				DB8F532526F05C1A0071F911 /* EditCategoryViewController.swift in Sources */,
 				DBA7ED5327DDAC39004B0D0E /* ContainerViewController.swift in Sources */,
+				DBF11E942A262DA800A69445 /* LoginViewController.swift in Sources */,
 				DBAD2A4926D3E4370083478E /* BlackViewController.swift in Sources */,
 				DBBD53052636BB78002F5157 /* CategoryCell.swift in Sources */,
 				DB1BDAED27F0603D0004AB4B /* GuideLabelView.swift in Sources */,
@@ -473,6 +498,7 @@
 				DB2E263A2A246E82000D922E /* CheckImage.swift in Sources */,
 				DBA7ED5527DDAC49004B0D0E /* MenuViewController.swift in Sources */,
 				DB8F532F26F085E60071F911 /* CustomTextField.swift in Sources */,
+				DBF11E962A26321500A69445 /* RoundTextField.swift in Sources */,
 				DBC6782F293E991E0079CF1A /* MonthName.swift in Sources */,
 				DBA7ED6027E0614A004B0D0E /* DdayViewController.swift in Sources */,
 				DBC6782B293C9E270079CF1A /* NotificationName+.swift in Sources */,
@@ -497,6 +523,8 @@
 				DBEC226A276864380083ECDA /* ListEditItemView.swift in Sources */,
 				DBA7ED6427E301C5004B0D0E /* CalendarMethod.swift in Sources */,
 				DB40D1F92609B32C00A4E9FC /* AppDelegate.swift in Sources */,
+				DBF11E9B2A266AB000A69445 /* RegisterViewController.swift in Sources */,
+				DBF11E982A2636F800A69445 /* User.swift in Sources */,
 				DBBFFBEF29334A3500CA3FBC /* TimeLabel.swift in Sources */,
 				DB4FE82426BF80F100B1DF3E /* SegmentData.swift in Sources */,
 				DBA7ED5C27DDB790004B0D0E /* MenuOptionCell.swift in Sources */,

@@ -7,10 +7,10 @@
 
 import UIKit
 import RealmSwift
+import FirebaseCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     var window: UIWindow?
     let realm = try! Realm()
     
@@ -20,16 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var resetDate: String {
         return self.returnResetDate()
-    }
-    
-    var totalTime: TimeInterval {
-            //DB에서 전체시간 리턴
-        return self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalTime ?? 0
-    }
-    
-    var totalGoalTime: TimeInterval {
-            //DB에서 전체시간 리턴
-        return self.realm.object(ofType: DailyData.self, forPrimaryKey: self.saveDate)?.totalGoalTime ?? 0
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -42,6 +32,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let ud = UserDefaults.standard
         if ud.bool(forKey: "FirstPalette") == false { self.setFirstPalette() }
+        
+        FirebaseApp.configure()
         
         return true
     }

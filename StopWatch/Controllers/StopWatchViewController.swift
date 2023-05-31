@@ -10,6 +10,7 @@ import CoreMotion
 import RealmSwift
 import Then
 import SnapKit
+import FirebaseAuth
 
 final class StopWatchViewController: UIViewController {
     //MARK: - Properties
@@ -89,8 +90,7 @@ final class StopWatchViewController: UIViewController {
         
         // gesture
         self.hideKeyboardWhenTapped()
-
-
+        
         print("path =  \(Realm.Configuration.defaultConfiguration.fileURL!)")
     }
     
@@ -106,6 +106,13 @@ final class StopWatchViewController: UIViewController {
         self.setTimeLabel()
         
         if self.calendarView.calendarMode == .week { self.guideLabelView.isHidden = false }
+        
+        // 로그인 상태가 아니면 LoginVC띄우기
+        if Auth.auth().currentUser == nil || !Auth.auth().currentUser!.isEmailVerified {
+            let loginVC = UINavigationController(rootViewController: LoginViewController())
+            loginVC.modalPresentationStyle = .fullScreen
+            self.present(loginVC, animated: true)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
