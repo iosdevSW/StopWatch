@@ -29,7 +29,7 @@ final class RoundTextField: UIView {
         
     }
     
-    var delegate: UITextFieldDelegate? {
+    weak var delegate: UITextFieldDelegate? {
         didSet {
             self.textfield.delegate = delegate
         }
