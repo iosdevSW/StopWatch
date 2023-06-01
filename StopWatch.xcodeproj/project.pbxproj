@@ -30,6 +30,7 @@
 		DB5AE4A8276CB61C00CF737C /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A7276CB61C00CF737C /* CalendarView.swift */; };
 		DB5AE4AA276CB6D800CF737C /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */; };
 		DB5AE4AE276EFBF700CF737C /* GoalTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */; };
+		DB5F1A962A28B53F00C40A69 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DB5F1A952A28B53E00C40A69 /* GoogleService-Info.plist */; };
 		DB74504727F6B8730088C26C /* CalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB74504627F6B8730088C26C /* CalendarModalView.swift */; };
 		DB8DB1882611E1C600A5814A /* ConcentrationTimeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */; };
 		DB8DB18D2611E67900A5814A /* StopWatchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */; };
@@ -57,7 +58,6 @@
 		DBC67831293F07D40079CF1A /* DateComponents+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC67830293F07D40079CF1A /* DateComponents+.swift */; };
 		DBEC2268276864380083ECDA /* EditTodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2267276864380083ECDA /* EditTodoListView.swift */; };
 		DBEC226A276864380083ECDA /* ListEditItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEC2269276864380083ECDA /* ListEditItemView.swift */; };
-		DBF11E922A262AE700A69445 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DBF11E912A262AE700A69445 /* GoogleService-Info.plist */; };
 		DBF11E942A262DA800A69445 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E932A262DA800A69445 /* LoginViewController.swift */; };
 		DBF11E962A26321500A69445 /* RoundTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E952A26321500A69445 /* RoundTextField.swift */; };
 		DBF11E982A2636F800A69445 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF11E972A2636F800A69445 /* User.swift */; };
@@ -93,6 +93,7 @@
 		DB5AE4A7276CB61C00CF737C /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		DB5AE4A9276CB6D800CF737C /* CalendarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		DB5AE4AD276EFBF700CF737C /* GoalTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTimeView.swift; sourceTree = "<group>"; };
+		DB5F1A952A28B53E00C40A69 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DB74504627F6B8730088C26C /* CalendarModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarModalView.swift; sourceTree = "<group>"; };
 		DB8DB1872611E1C600A5814A /* ConcentrationTimeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcentrationTimeViewController.swift; sourceTree = "<group>"; };
 		DB8DB18C2611E67900A5814A /* StopWatchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatchViewController.swift; sourceTree = "<group>"; };
@@ -120,7 +121,6 @@
 		DBC67830293F07D40079CF1A /* DateComponents+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+.swift"; sourceTree = "<group>"; };
 		DBEC2267276864380083ECDA /* EditTodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoListView.swift; sourceTree = "<group>"; };
 		DBEC2269276864380083ECDA /* ListEditItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListEditItemView.swift; sourceTree = "<group>"; };
-		DBF11E912A262AE700A69445 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DBF11E932A262DA800A69445 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		DBF11E952A26321500A69445 /* RoundTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundTextField.swift; sourceTree = "<group>"; };
 		DBF11E972A2636F800A69445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -268,7 +268,7 @@
 				DB40D2032609B32E00A4E9FC /* LaunchScreen.storyboard */,
 				DB40D1F82609B32C00A4E9FC /* AppDelegate.swift */,
 				DB40D2062609B32E00A4E9FC /* Info.plist */,
-				DBF11E912A262AE700A69445 /* GoogleService-Info.plist */,
+				DB5F1A952A28B53E00C40A69 /* GoogleService-Info.plist */,
 			);
 			path = StopWatch;
 			sourceTree = "<group>";
@@ -435,9 +435,9 @@
 			files = (
 				DB40D2052609B32E00A4E9FC /* LaunchScreen.storyboard in Resources */,
 				DB40D2022609B32E00A4E9FC /* Assets.xcassets in Resources */,
-				DBF11E922A262AE700A69445 /* GoogleService-Info.plist in Resources */,
 				DB40D2002609B32C00A4E9FC /* Main.storyboard in Resources */,
 				DB10DB8C27E4A081000560A3 /* GodoM.ttf in Resources */,
+				DB5F1A962A28B53F00C40A69 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
